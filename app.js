@@ -1,5 +1,5 @@
 /**
- * PillScope TW — UI 接線。
+ * 藥丸偵探 Pill Detective TW — UI 接線。
  *
  * **這個檔案不含任何搜尋邏輯**：三值語意、分區、排序、UI 狀態全部在 `search.js`，
  * 那份同時被建置管線 import（規格 D15「正規化只有一份」）。
@@ -8,6 +8,7 @@
 import {
   COLORS, SHAPES, SCORE_MARKS, SCORE_ANY,
   indexItems, search, resultStates, relaxSuggestions, ResultState,
+  isOfficialImgUrl,
 } from './search.js';
 
 const DATA_URL = 'data/appearance.json';
@@ -65,6 +66,7 @@ function contractErrors(payload) {
 function fatal(why) {
   $('fatalWhy').textContent = why;
   $('fatal').hidden = false;
+  $('bar').hidden = true;
   $('panel').hidden = true;
   $('results').replaceChildren();
 }
@@ -82,6 +84,7 @@ async function load() {
   if (bad) return fatal(`資料格式不符：${bad}`);
 
   items = indexItems(payload.items);
+  $('bar').hidden = false;
   $('panel').hidden = false;
   buildChips();
   render();
@@ -129,6 +132,14 @@ const onInput = (key) => (e) => {
  * 已快取的瀏覽器會繼續顯示舊圖——那正是威脅模型的「新資料配舊圖片」。
  */
 const imgUrl = (g) => `data/${g.file}${g.sha256 ? `?v=${g.sha256.slice(0, 8)}` : ''}`;
+
+/**
+ * 官方原圖連結的 href。
+ *
+ * href 來自**資料**（`imgs[].src`），不是原始碼裡的常數——E5b 那道原始碼掃描
+ * 看不到它。白名單用 `search.js` 的 `isOfficialImgUrl`，與管線發布前的守門同一條規則。
+ */
+const officialUrl = (src) => (isOfficialImgUrl(src) ? src : null);
 
 function thumb(item, size) {
   const box = el('div', 'thumb');
@@ -267,19 +278,33 @@ function openDetail(item) {
   const shots = el('div', 'shots');
   if (item.imgs.length) {
     for (const g of item.imgs) {
+      const shot = el('div', 'shot');
       const box = el('div', 'thumb');
-      if (!g.sha256) { box.appendChild(el('span', 'ph', '官方暫無可用圖片')); shots.appendChild(box); continue; }
-      const img = el('img');
-      img.loading = 'lazy'; img.decoding = 'async'; img.alt = '';
-      img.addEventListener('error', () => box.replaceChildren(el('span', 'ph', '官方暫無可用圖片')));
-      img.src = imgUrl(g);
-      box.appendChild(img);
-      shots.appendChild(box);
+      if (!g.sha256) {
+        // 鏡像缺這一張時仍留下官方原圖連結——那是使用者唯一還看得到外觀的路
+        box.appendChild(el('span', 'ph', '官方暫無可用圖片'));
+      } else {
+        const img = el('img');
+        img.loading = 'lazy'; img.decoding = 'async'; img.alt = '';
+        img.addEventListener('error', () => box.replaceChildren(el('span', 'ph', '官方暫無可用圖片')));
+        img.src = imgUrl(g);
+        box.appendChild(img);
+      }
+      shot.appendChild(box);
+      const href = officialUrl(g.src);
+      if (href) {
+        const a = el('a', null, '查看 TFDA 官方原圖');
+        a.href = href; a.target = '_blank'; a.rel = 'noopener noreferrer';
+        shot.appendChild(a);
+      }
+      shots.appendChild(shot);
     }
   } else {
+    const shot = el('div', 'shot');
     const box = el('div', 'thumb');
     box.appendChild(el('span', 'ph', '官方暫無可用圖片'));
-    shots.appendChild(box);
+    shot.appendChild(box);
+    shots.appendChild(shot);
   }
   body.appendChild(shots);
 

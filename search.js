@@ -1,5 +1,5 @@
 /**
- * PillScope TW — 搜尋核心（純函式）
+ * 藥丸偵探 Pill Detective TW — 搜尋核心（純函式）
  *
  * 規格：`.ai-review/plan.md` v1.2。**動這個檔前先讀 D1.1、D3、D4。**
  *
@@ -97,6 +97,28 @@ export function tokenizeQuery(q) {
 /** 名稱比較一律先大寫（D1.1）。中文與許可證字號無大小寫，不受影響。 */
 export function normalizeName(s) {
   return String(s ?? '').toUpperCase();
+}
+
+/**
+ * 官方圖檔 origin 白名單。
+ *
+ * v0.1 起 `imgs[].src` 會成為詳細頁上一個**使用者可點的外部連結**
+ * （「查看 TFDA 官方原圖」），不再只是管線內部用來下載的字串。
+ * 來源列若出現別的 origin，那個 origin 就會被我們發布出去。
+ *
+ * 放在這裡是因為**管線與前端必須用同一條規則**：verify-data 在發布前擋，
+ * app.js 在算 href 前再擋一次。兩邊各抄一份必然漂移，而漂移的那一天
+ * 會是「驗證放行、前端卻不給連結」或更糟的反過來。
+ */
+export const IMG_ORIGIN = 'https://mcp.fda.gov.tw';
+
+/** URL 解析失敗或 origin 不符一律回 false（不得回傳原字串當作「大概沒問題」） */
+export function isOfficialImgUrl(src) {
+  try {
+    return new URL(src).origin === IMG_ORIGIN;
+  } catch {
+    return false;
+  }
 }
 
 /**

@@ -1,4 +1,4 @@
-# CLAUDE.md — PillScope TW
+# CLAUDE.md — 藥丸偵探 Pill Detective TW
 
 規格在 `.ai-review/plan.md`（**v1.4，動任何東西前先讀 §5 的 D1.1／D3／D12／D14／D17／D18**）。
 兩輪 Codex 覆審報告與判定在同目錄，數字爭議先查 `plan-verdict.md` 的事實查核段。
@@ -78,6 +78,37 @@
 **不是** `--verify-all`（22 GB，保留給人工全量稽核，不排程）。
 `--freshness` 不寫入任何檔案，且**問不出 Content-Length 一律列為需人工確認**——
 把問不出來當成沒變，等於讓壞掉的端點自動過關。
+
+## 吸頂的東西永遠不得高於視窗
+
+`#panel` 曾經整個 `position:sticky; top:0`，而它在 386px 下高 802px。
+sticky 的包含塊是 `.wrap`（涵蓋整頁），於是面板一吸頂就整段捲動都不放開，
+`z-index:20` 蓋在結果上 —— **手機上一張卡片都看不到**，捲到底也一樣。
+
+規格 §8.1 寫的是「**搜尋列** sticky」；實作把它擴大成整個面板。
+現在只有 `#bar` sticky，且帶 `max-height:45vh` 當結構性防呆。
+
+**這個 bug 逃過了 87 個測試與一次人工留檔。** 原因是留檔用 DOM 幾何量
+（卡片在文件 y=904，數字看起來正常），沒有看畫面。
+**量得到座標不等於看得見** —— 版面結論要有截圖。
+
+## 官方原圖連結：href 來自資料，原始碼掃描看不到它
+
+詳細頁的「查看 TFDA 官方原圖」href 是 `imgs[].src`，**不是程式碼裡的常數**，
+所以 E5b 那道「掃原始碼裡的 URL」擋不住它。白名單 `IMG_ORIGIN`／
+`isOfficialImgUrl()` 放在 `search.js`，**管線與前端共用一份**：
+`verify-data` 發布前擋、`app.js` 算 href 前再擋一次。
+兩邊各抄一份必然漂移。驗收 B13（函式本身，含 `mcp.fda.gov.tw.evil.example`
+這類騙得過 `startsWith` 的反例）＋ E5e（UI 真的有經過它）。
+
+## 圖片鏡像複用姊妹專案（D20）
+
+`TFDA-drug-id-quiz` 的資產鍵 `sha1(id)[:16]` 與本專案同一套推導，
+且 `content_hash` 是同一份來源快照，實算 **3,744 張（55.1%）可直接複用**。
+
+**兩個不可混用的欄位**：quiz 的 `src_sha256` 是**原圖**雜湊；
+本專案 `imgs[].sha256` 是**轉檔後 WebP** 的雜湊。複用時必須**在本地實算**，
+不得沿用對方的值。另外 quiz 沒有 `src_bytes`，複用的那批要補跑 HEAD-only 掃描。
 
 ## 圖片 URL 必須帶內容版本
 

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "PillScope TW — 台灣藥品外觀搜尋（TFDA 藥品外觀資料集）",
+  "description": "藥丸偵探 Pill Detective TW — 台灣藥品外觀搜尋（TFDA 藥品外觀資料集）",
   "engines": {
     "node": ">=22"
   },

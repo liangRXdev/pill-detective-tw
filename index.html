@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#3D7A8A">
-<meta name="description" content="PillScope TW — 依藥品外觀特徵（刻字、顏色、形狀、刻痕）從 TFDA 公開資料縮小候選藥品清單，供藥師與醫療人員人工比對確認。">
-<title>台灣藥品外觀搜尋</title>
+<meta name="description" content="藥丸偵探 Pill Detective TW — 依藥品外觀特徵（刻字、顏色、形狀、刻痕）從 TFDA 公開資料縮小候選藥品清單，供藥師與醫療人員人工比對確認。">
+<title>藥丸偵探 Pill Detective TW — 台灣藥品外觀搜尋</title>
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <style>
 /* ── house style token（pharmacy-portal 共用）─────────────────────
@@ -24,17 +24,23 @@
 body{margin:0;background:var(--bg-primary);color:var(--text-primary);line-height:1.6;
   font-family:'Noto Sans TC','PingFang TC','Microsoft JhengHei','Hiragino Sans',sans-serif;}
 .wrap{max-width:880px;margin:0 auto;padding:1rem 1rem 4rem}
-h1{font-size:1.25rem;margin:.5rem 0 .15rem}
-.sub{font-size:.78rem;color:var(--text-muted);margin:0 0 .75rem}
+h1{font-size:1.1rem;margin:.25rem 0 .1rem}
+.sub{font-size:.74rem;color:var(--text-muted);margin:0 0 .5rem}
 .card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);
   padding:1rem 1rem 1.15rem;margin-top:1rem;box-shadow:0 2px 8px rgba(0,0,0,.05)}
 .card h2{font-size:1rem;margin:0 0 .2rem;display:flex;align-items:center;gap:.5rem}
 .card .hint{font-size:.75rem;color:var(--text-muted);margin:0 0 .85rem}
 
-/* ── 搜尋面板：手機優先，sticky ─────────────────────────────── */
-#panel{position:sticky;top:0;z-index:20;background:var(--bg-primary);
-  padding-top:.5rem;margin-top:0}
-#panel .card{margin-top:0}
+/* ── 搜尋列（sticky）與條件面板（隨頁捲動）──────────────────────
+   規格 §8.1 要求的是「**搜尋列** sticky」，不是整個條件面板。
+   曾經把整個 #panel 設成 sticky，而它在 386px 下高 802px > 視窗高度；
+   sticky 的包含塊是 .wrap（涵蓋整頁），於是面板一吸頂就整段捲動都不放開，
+   z-index:20 蓋在結果之上 —— **手機上一張結果卡片都看不到**。
+   吸頂的東西必須永遠矮於視窗，故此處加 max-height 當結構性防呆。 */
+#bar{position:sticky;top:0;z-index:20;background:var(--bg-primary);
+  padding-top:.5rem;margin-top:0;max-height:45vh;overflow-y:auto}
+#bar .card{margin-top:0}
+#panel .card{margin-top:.6rem}
 label.fld{display:block;font-size:.78rem;color:var(--text-muted);margin:.7rem 0 .3rem}
 input[type=text]{width:100%;min-height:44px;padding:.55rem .7rem;font-size:1rem;
   font-family:var(--mono);border:1px solid var(--border);border-radius:6px;background:#fff;color:inherit}
@@ -46,7 +52,12 @@ input[type=text]:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 
   display:inline-flex;align-items:center;justify-content:center}
 .chip[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:500}
 .chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.count{margin-top:.9rem;font-size:.95rem;font-weight:500}
+/* 收合的進階條件。summary 本身也是 touch target，故給 44px 高 */
+.adv{margin-top:.7rem}
+.adv > summary{min-height:44px;display:flex;align-items:center;cursor:pointer;
+  font-size:.78rem;color:var(--accent)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.count{margin-top:.7rem;font-size:.95rem;font-weight:500}
 .count b{font-family:var(--mono);font-size:1.15rem;color:var(--accent)}
 .count .aux{font-size:.78rem;color:var(--text-muted);font-weight:400}
 .notice{margin-top:.5rem;font-size:.78rem;color:var(--warning)}
@@ -87,7 +98,9 @@ dialog::backdrop{background:rgba(44,44,44,.45)}
 .dlg{padding:1rem}
 .dlg h3{margin:0 0 .1rem;font-size:1rem}
 .dlg .en{font-size:.76rem;color:var(--text-muted);margin:0 0 .6rem}
-.shots{display:flex;gap:.4rem;overflow-x:auto;padding-bottom:.3rem}
+.shots{display:flex;gap:.5rem;overflow-x:auto;padding-bottom:.3rem}
+.shot{flex:none;display:flex;flex-direction:column;align-items:center;gap:.25rem}
+.shot a{font-size:.68rem;color:var(--accent);text-align:center}
 .shots .thumb{width:160px;height:160px;flex:none}
 .kv{width:100%;border-collapse:collapse;margin-top:.7rem}
 .kv th,.kv td{border:1px solid var(--border);padding:.35rem .5rem;font-size:.8rem;text-align:left}
@@ -108,13 +121,23 @@ dialog::backdrop{background:rgba(44,44,44,.45)}
 @media (max-width:480px){
   .wrap{padding:.5rem .7rem 3rem}
   .grid{grid-template-columns:1fr}
+  /* chips 在 386px 下換行：顏色 3 行、形狀 4 行，合計約 300px，
+     是把第一筆結果推出首屏的主因。改成單行橫捲：所有 chip 仍然可達，
+     頁面本身不橫向溢出，且邊緣被切一半的 chip 本身就是「可往右捲」的提示。
+     chip 的 44×44 touch target 不動（§8.1）——省高度不得從那裡省。
+     顏色的常數順序即 TFDA 詞彙順序，前 6 個（白黃橘紅粉綠）已涵蓋絕大多數，
+     不必橫捲就看得到。 */
+  #colorChips,#shapeChips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:.15rem;scrollbar-width:none}
+  #colorChips::-webkit-scrollbar,#shapeChips::-webkit-scrollbar{display:none}
+  #colorChips .chip,#shapeChips .chip{flex:none}
+  label.fld{margin:.45rem 0 .25rem}
 }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>台灣藥品外觀搜尋</h1>
-  <p class="sub">依外觀特徵縮小候選藥品清單，供人工比對確認</p>
+  <h1>藥丸偵探 Pill Detective TW</h1>
+  <p class="sub">台灣藥品外觀搜尋 — 依外觀特徵縮小候選藥品清單，供人工比對確認</p>
 
   <!-- 資料載入失敗的 fail-closed 狀態（D16）。
        絕不可表述為「找不到符合的藥品」——部署或網路錯誤會被讀成「這顆藥不在資料庫裡」。 -->
@@ -124,13 +147,20 @@ dialog::backdrop{background:rgba(44,44,44,.45)}
     <p style="font-size:.85rem;margin:0">請稍後再試。<b>這不代表查無此藥</b>，搜尋功能已停用。</p>
   </section>
 
-  <section id="panel" hidden>
+  <!-- 吸頂的只有搜尋列（§8.1）。刻字輸入與即時計數留在畫面上，
+       條件面板則隨頁捲走，否則它會蓋住結果。 -->
+  <section id="bar" hidden>
     <div class="card">
       <label class="fld" for="imprint">藥品上看到什麼文字或數字？</label>
       <input type="text" id="imprint" inputmode="latin" autocapitalize="characters"
              autocomplete="off" spellcheck="false" placeholder="例如 10、APO、M 40">
       <p class="notice" id="noToken" hidden>輸入內容不含可搜尋的英數字元，已忽略此條件</p>
+      <p class="count" id="count"></p>
+    </div>
+  </section>
 
+  <section id="panel" hidden>
+    <div class="card">
       <label class="fld">顏色（可複選）</label>
       <div class="chips" id="colorChips"></div>
 
@@ -140,10 +170,14 @@ dialog::backdrop{background:rgba(44,44,44,.45)}
       <label class="fld">刻痕</label>
       <div class="chips" id="scoreChips"></div>
 
-      <label class="fld" for="name">已知藥名？（中文／英文／許可證字號）</label>
-      <input type="text" id="name" autocomplete="off" placeholder="例如 蘇打、SODIUM、衛署藥製字第…">
+      <!-- 名稱不是縮小外觀候選的手段（§8.4 明載它不納入「條件皆已填」判定），
+           收合它換回約 50px 的首屏高度。summary 用與原欄位相同的文字，維持可發現性。 -->
+      <details class="adv">
+        <summary>已知藥名？（中文／英文／許可證字號）</summary>
+        <label class="fld sr" for="name">藥名或許可證字號</label>
+        <input type="text" id="name" autocomplete="off" placeholder="例如 蘇打、SODIUM、衛署藥製字第…">
+      </details>
 
-      <p class="count" id="count"></p>
       <div class="actions" id="actions"></div>
     </div>
   </section>

@@ -103,13 +103,18 @@ test('E5 不得出現任何 storage 或 cookie 存取', () => {
   }
 });
 
-test('E5b 外部 origin 允許清單：只有 TFDA 資料集頁的超連結', () => {
-  const ALLOW = 'https://data.fda.gov.tw/opendata/exportDataList.do';
+test('E5b 外部 origin 允許清單：只有 TFDA 資料集頁與官方原圖 origin', () => {
+  // 兩者都**只以超連結形式存在**，沒有任何一個會在載入時被請求（§9）。
+  // `mcp.fda.gov.tw` 是 v0.1 新增的：詳細頁的「查看 TFDA 官方原圖」。
+  const ALLOW = [
+    'https://data.fda.gov.tw/opendata/exportDataList.do',
+    'https://mcp.fda.gov.tw',
+  ];
   for (const f of PUBLISHABLE) {
     const src = read(f);
     const urls = [...src.matchAll(/https?:\/\/[^\s"'`)<>]+/g)].map((m) => m[0]);
     for (const u of urls) {
-      assert.ok(u.startsWith(ALLOW),
+      assert.ok(ALLOW.some((a) => u.startsWith(a)),
         `E5b: ${f} 含允許清單外的外部 URL：${u}`);
     }
   }
@@ -149,6 +154,18 @@ test('E6-static UI chips 的可選值集合 === search.js 常數 === vocab.lock�
   assert.match(src, /multi\(\$\('colorChips'\), COLORS, 'color'\)/);
   assert.match(src, /multi\(\$\('shapeChips'\), SHAPES, 'shape'\)/);
   assert.ok(!/['"]白['"]/.test(src), 'E6: app.js 內出現硬編的顏色值');
+});
+
+test('E5e 官方原圖連結必須走 origin 白名單，且不得自己抄一份', () => {
+  const src = stripComments(read('app.js'));
+  // 弱化版本：`a.href = g.src` 直接指派。B13 驗的是白名單函式本身正確，
+  // 這條驗的是 UI **真的有經過它**——只驗函式的話，繞過它一樣全綠。
+  assert.ok(!/\.href = g\.src/.test(src), 'E5e: 未經白名單就把來源 URL 當成 href');
+  assert.match(src, /officialUrl\(g\.src\)/);
+  assert.match(src, /isOfficialImgUrl\(src\)/);
+  assert.match(src, /a\.rel = 'noopener noreferrer'/);
+  // 白名單常數只能有一份（search.js）。app.js 自己寫死 origin 就是漂移的起點。
+  assert.ok(!/mcp\.fda\.gov\.tw/.test(src), 'E5e: app.js 內出現硬編的圖檔 origin');
 });
 
 test('E-arch app.js 不得自己實作搜尋語意（正規化只有一份）', () => {

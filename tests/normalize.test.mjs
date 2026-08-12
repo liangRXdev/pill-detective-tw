@@ -10,6 +10,7 @@ import assert from 'node:assert/strict';
 
 import {
   normalizeImprintField, tokenizeQuery, recordTokens, splitMulti,
+  isOfficialImgUrl, IMG_ORIGIN,
   normalizeName, imprintQueryState, QueryState, toItem,
 } from '../search.js';
 
@@ -178,4 +179,22 @@ test('B12 toItem：缺值為 null 或空陣列，不填佔位字串；字面「�
   assert.equal(empty.zh, null);
   assert.deepEqual(empty.color, []);
   assert.deepEqual(empty.imgs, []);
+});
+
+test('B13 官方圖檔 origin 白名單：解析失敗與他站一律 false', () => {
+  // 這條守的不是搜尋語意，是「發布頁面上會出現哪些可點的外部 origin」。
+  // v0.1 把 imgs[].src 做成詳細頁的「查看 TFDA 官方原圖」連結之後才需要。
+  assert.equal(IMG_ORIGIN, 'https://mcp.fda.gov.tw');
+  assert.equal(isOfficialImgUrl('https://mcp.fda.gov.tw/insert/shapeImg/abc?c=o'), true);
+
+  // 弱化版本一：用 includes/startsWith 比字串。以下每一條都能騙過那種寫法。
+  assert.equal(isOfficialImgUrl('https://mcp.fda.gov.tw.evil.example/x'), false, 'B13: 子網域後綴');
+  assert.equal(isOfficialImgUrl('https://evil.example/?u=https://mcp.fda.gov.tw'), false, 'B13: 出現在查詢字串');
+  assert.equal(isOfficialImgUrl('http://mcp.fda.gov.tw/x'), false, 'B13: 明文 http 不是同一個 origin');
+  assert.equal(isOfficialImgUrl('https://mcp.fda.gov.tw:8443/x'), false, 'B13: 不同 port');
+
+  // 弱化版本二：解析失敗時回傳原字串／true
+  for (const bad of ['', null, undefined, 'javascript:alert(1)', 'data:text/html,x', '//mcp.fda.gov.tw/x', 42]) {
+    assert.equal(isOfficialImgUrl(bad), false, `B13: ${JSON.stringify(bad)} 應為 false`);
+  }
 });
