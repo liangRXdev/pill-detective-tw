@@ -7,7 +7,7 @@
  */
 import {
   COLORS, SHAPES, SCORE_MARKS, SCORE_ANY,
-  indexItems, search, resultStates, relaxSuggestions, ResultState,
+  indexItems, search, resultStates, relaxSuggestions, ResultState, hasActiveCriteria,
   isOfficialImgUrl, officialLeafletUrl,
 } from './search.js';
 
@@ -238,21 +238,34 @@ const TIER_WHY = [
 
 function render() {
   if (!items) return;
+
+  const c = $('count');
+  const acts = $('actions');
+  const out = $('results');
+  c.replaceChildren();
+  acts.replaceChildren();
+  out.replaceChildren();
+
+  if (!hasActiveCriteria(criteria)) {
+    $('noToken').hidden = true;
+    c.append('目前收錄 ', Object.assign(el('b'), {
+      textContent: items.length.toLocaleString('zh-TW'),
+    }), ' 項 TFDA 藥品外觀資料');
+    const start = el('section', 'start-state');
+    start.appendChild(el('p', 'start-state__eyebrow', '外觀辨識搜尋'));
+    start.appendChild(el('p', 'start-state__prompt', '輸入刻字或選擇外觀特徵開始搜尋'));
+    out.appendChild(start);
+    return;
+  }
+
   const res = search(items, criteria);
   const states = resultStates(res, criteria);
 
   $('noToken').hidden = !states.includes(ResultState.NO_TOKEN_NOTICE);
 
   const uncertain = res.partial.length + res.unknown.length;
-  const c = $('count');
-  c.replaceChildren();
   c.append('符合條件 ', Object.assign(el('b'), { textContent: String(res.mainCount) }), ' 項');
   if (uncertain) c.appendChild(el('span', 'aux', `（另有 ${uncertain} 項無法排除）`));
-
-  const acts = $('actions');
-  acts.replaceChildren();
-  const out = $('results');
-  out.replaceChildren();
 
   if (states.includes(ResultState.EMPTY)) {
     const box = el('section', 'card empty');
@@ -292,8 +305,15 @@ function render() {
 function openDetail(item) {
   const body = $('dlgBody');
   body.replaceChildren();
-  body.appendChild(el('h3', null, item.zh ?? NA));
-  body.appendChild(el('p', 'en', item.en ?? NA));
+
+  const identity = el('header', 'identity-card__header');
+  identity.appendChild(el('p', 'identity-card__eyebrow', '藥品外觀辨識卡'));
+  identity.appendChild(el('h3', null, item.zh ?? NA));
+  identity.appendChild(el('p', 'en', item.en ?? NA));
+  const license = el('p', 'identity-card__license');
+  license.append(el('span', null, '許可證字號'), el('strong', null, item.id));
+  identity.appendChild(license);
+  body.appendChild(identity);
 
   const shots = el('div', 'shots');
   if (item.imgs.length) {
@@ -328,25 +348,42 @@ function openDetail(item) {
   }
   body.appendChild(shots);
 
-  // 標註一／標註二**不得**標成正面／背面：TFDA 未定義兩欄的面向語意（D7）
+  const profile = el('section', 'identity-card');
+  profile.appendChild(el('h4', 'identity-card__title', '外觀特徵'));
+  const features = el('dl', 'identity-card__features');
   const rows = [
-    ['許可證字號', item.id],
     ['形狀', fmt(item.shape)],
     ['顏色', fmt(item.color)],
     ['刻痕', fmt(item.score_mark)],
     ['外觀尺寸', fmt(item.size)],
-    ['標註一', fmt(item.mark1)],
-    ['標註二', fmt(item.mark2)],
   ];
-  const tbl = el('table', 'kv');
   for (const [k, v] of rows) {
-    const tr = el('tr');
-    tr.appendChild(el('th', null, k));
-    const td = el('td', v == null ? 'na' : null, v ?? NA);
-    tr.appendChild(td);
-    tbl.appendChild(tr);
+    const field = el('div', 'identity-card__feature');
+    field.appendChild(el('dt', null, k));
+    field.appendChild(el('dd', v == null ? 'is-missing' : null, v ?? NA));
+    features.appendChild(field);
   }
-  body.appendChild(tbl);
+  profile.appendChild(features);
+
+  // 標註一／標註二**不得**標成正面／背面：TFDA 未定義兩欄的面向語意（D7）
+  const marks = el('section', 'identity-card__marks');
+  marks.appendChild(el('h4', 'identity-card__title', '刻字紀錄'));
+  const mark1 = fmt(item.mark1);
+  const mark2 = fmt(item.mark2);
+  if (mark1 == null && mark2 == null) {
+    marks.appendChild(el('p', 'identity-card__marks-empty', '刻字資料未提供'));
+  } else {
+    const markList = el('dl', 'identity-card__mark-list');
+    for (const [label, value] of [['標註一', mark1], ['標註二', mark2]]) {
+      const field = el('div', 'identity-card__mark');
+      field.appendChild(el('dt', null, label));
+      field.appendChild(el('dd', value == null ? 'is-missing' : null, value ?? NA));
+      markList.appendChild(field);
+    }
+    marks.appendChild(markList);
+  }
+  profile.appendChild(marks);
+  body.appendChild(profile);
 
   const leafletHref = officialLeafletUrl(item.id);
   if (leafletHref) {

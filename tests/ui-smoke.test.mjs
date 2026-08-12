@@ -176,6 +176,28 @@ test('E5f TFDA 仿單連結必須使用共用 URL builder', () => {
     'E5f: app.js 不得自行拼接 TFDA 仿單 URL 或 origin');
 });
 
+test('E-ux 零條件顯示資料庫入口，不建立全資料集結果卡', () => {
+  const src = stripComments(read('app.js'));
+  assert.match(src, /hasActiveCriteria\(criteria\)/);
+  assert.ok(src.includes('目前收錄 '));
+  assert.ok(src.includes('項 TFDA 藥品外觀資料'));
+  assert.ok(src.includes('輸入刻字或選擇外觀特徵開始搜尋'));
+  const start = src.indexOf('if (!hasActiveCriteria(criteria))');
+  const run = src.indexOf('search(items, criteria)');
+  assert.ok(start > 0 && run > start, '空搜尋判定必須發生在執行搜尋之前');
+  assert.ok(src.slice(start, run).includes('return;'), '入口狀態必須提前返回');
+});
+
+test('E-detail 詳細視窗使用辨識卡，兩個刻字欄皆缺時只顯示一次提示', () => {
+  const src = stripComments(read('app.js'));
+  assert.ok(!src.includes("el('table', 'kv')"), '詳細視窗不應保留 table 版型');
+  assert.match(src, /el\('dl', 'identity-card__features'\)/);
+  assert.match(src, /mark1 == null && mark2 == null/);
+  assert.equal((src.match(/刻字資料未提供/g) ?? []).length, 1);
+  assert.ok(src.includes("[['標註一', mark1], ['標註二', mark2]]"),
+    '只有單欄缺值時仍須保留 TFDA 原始欄位名稱');
+});
+
 test('E-arch app.js 不得自己實作搜尋語意（正規化只有一份）', () => {
   const src = stripComments(read('app.js'));
   // 只列**比對動作**。`unknown`／`partial` 是 search.js 回傳的分區名稱，

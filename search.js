@@ -34,6 +34,21 @@ export const SCORE_ANY = '不限';
 /** 刻痕條件是否啟用。`null`／`''`／`'不限'` 三種寫法都視為未啟用。 */
 const scoreEnabled = (v) => v !== null && v !== undefined && v !== '' && v !== SCORE_ANY;
 
+/**
+ * 是否已有任何有效搜尋條件。
+ *
+ * 零條件是資料庫入口狀態，不是「全部藥品都完全符合」。這個判定放在搜尋層，
+ * 避免 UI 與搜尋引擎對空白、刻痕「不限」的語意各自解讀。
+ */
+export function hasActiveCriteria(criteria = {}) {
+  const { color = [], shape = [], score = null, imprint = '', name = '' } = criteria;
+  return color.length > 0
+    || shape.length > 0
+    || scoreEnabled(score)
+    || String(imprint ?? '').trim() !== ''
+    || String(name ?? '').trim() !== '';
+}
+
 // ── 欄位層正規化 ────────────────────────────────────────────────────
 
 /** TFDA 的多值分隔符。實測顏色/形狀/刻痕/尺寸/標註/圖檔連結都可能出現。 */

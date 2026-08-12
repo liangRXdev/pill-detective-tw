@@ -12,6 +12,7 @@ import {
   normalizeImprintField, tokenizeQuery, recordTokens, splitMulti,
   isOfficialImgUrl, officialLeafletUrl, IMG_ORIGIN,
   normalizeName, imprintQueryState, QueryState, toItem,
+  hasActiveCriteria, SCORE_ANY,
 } from '../search.js';
 
 /** B1 的非空對照組——沒有它，「一律回空陣列」也會通過整組 B1 */
@@ -215,4 +216,19 @@ test('B14 TFDA 仿單 URL：許可證字號須安全編碼為單一路徑片段'
     '斜線必須留在編碼後的單一路徑片段內');
   assert.match(officialLeafletUrl('A?x=#y'), /\/im_detail_1\/A%3Fx%3D%23y$/,
     'query／fragment 字元不得改變 URL 結構');
+});
+
+test('B15 零條件是資料庫入口狀態，不是全資料集完全符合', () => {
+  assert.equal(hasActiveCriteria({
+    color: [], shape: [], score: SCORE_ANY, imprint: '', name: '',
+  }), false);
+  assert.equal(hasActiveCriteria({ imprint: '   ', name: '\t', score: SCORE_ANY }), false);
+
+  for (const criteria of [
+    { color: ['白'] },
+    { shape: ['圓形'] },
+    { score: '直線' },
+    { imprint: '10' },
+    { name: '蘇打' },
+  ]) assert.equal(hasActiveCriteria(criteria), true, JSON.stringify(criteria));
 });
