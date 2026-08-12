@@ -120,6 +120,12 @@ dialog::backdrop{background:rgba(44,44,44,.45)}
 .kv th{background:var(--accent-light);color:var(--accent);font-weight:500;width:6.5rem;white-space:nowrap}
 .kv td{font-family:var(--mono)}
 .kv td.na{font-family:inherit;color:var(--text-muted)}
+.official-doc{margin-top:.7rem}
+.official-doc a{min-height:44px;padding:.45rem .75rem;display:inline-flex;align-items:center;gap:.4rem;
+  border:1px solid var(--accent);border-radius:6px;color:var(--accent);font-size:.78rem;text-decoration:none}
+.official-doc a::after{content:'↗';font-family:var(--mono);font-size:.8rem}
+.official-doc a:hover{background:var(--accent-light)}
+.official-doc a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .dlg .src{font-size:.7rem;color:var(--text-muted);margin-top:.7rem}
 .dlg .src a{color:var(--accent)}
 .dlg .close{margin-top:.8rem;min-height:44px;width:100%;background:var(--accent);color:#fff;

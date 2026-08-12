@@ -1,6 +1,6 @@
-# 藥丸偵探 Pill Detective TW — 台灣藥品外觀搜尋　規劃文件 v1.7
+# 藥丸偵探 Pill Detective TW — 台灣藥品外觀搜尋　規劃文件 v1.8
 
-- 修訂時間：2026-08-12（最新 v1.7；v1.2 依 `plan-verdict-2.md`，v1.3–v1.7 為實作階段裁決。修訂紀錄見 §14）
+- 修訂時間：2026-08-12（最新 v1.8；v1.2 依 `plan-verdict-2.md`，v1.3–v1.8 為實作階段裁決。修訂紀錄見 §14）
 - repo：https://github.com/liangRXdev/pill-detective-tw （GitHub Pages 靜態站）
 - 資料源：衛生福利部食品藥物管理署 Open Data「藥品外觀資料集」（opendata infoId=42）
 - 姊妹專案：`TFDA-drug-id-quiz`（藥品辨識王，同一資料源，已上線）
@@ -830,6 +830,12 @@ CLAUDE.md / README.md / LICENSE / .gitignore / package.json
 
 ## 14. 修訂紀錄
 
+### v1.7 → v1.8（TFDA 官方仿單連結，2026-08-12）
+
+詳細視窗新增 **D25「查看 TFDA 仿單」**：以許可證字號建立
+`https://mcp.fda.gov.tw/im_detail_1/<許可證字號>`，並將字號安全編碼為單一 path segment。
+仿單是整筆藥品層級的文件，因此操作列置於屬性表下方，不與逐張圖片的官方原圖連結混放。
+
 ### v1.6 → v1.7（低確定性結果收合，2026-08-12）
 
 搜尋 `M 40` 時「部分符合」與「資料未提供」合計 2,379 筆，若沿用自動續繪，頁面會隨
@@ -974,6 +980,13 @@ fail-closed 資料更新與回歸測試**均未變動**。
 - 使用原生 `<details>/<summary>`，保留鍵盤操作與 disclosure 語意
 - 卡片在首次展開時才建立；展開後仍沿用 D11 的每批 24 筆續繪
 - 臨床安全提示維持固定顯示，不得移入任何收合容器
+
+### D25 TFDA 官方仿單連結（v1.8）
+
+- URL 由共用 `officialLeafletUrl(id)` 產生；`app.js` 不得自行硬編 origin 或路徑
+- 許可證字號以 `encodeURIComponent` 編成單一 path segment，空值與無效 Unicode fail-closed
+- 新分頁開啟並使用 `rel="noopener noreferrer"`
+- 連結位於詳細資料表下方，與每張圖片的「查看 TFDA 官方原圖」維持不同資訊層級
 
 ### v1.3 → v1.4（實測 HEAD 支援後修訂 D14）
 

@@ -122,6 +122,22 @@ export function isOfficialImgUrl(src) {
 }
 
 /**
+ * 許可證字號 → TFDA 官方仿單資料頁。
+ *
+ * 字號是 URL path segment，不可直接串接：`encodeURIComponent` 避免 `/`、`?`、`#`
+ * 等字元改變路徑語意；無效 Unicode 則 fail-closed 回 null。
+ */
+export function officialLeafletUrl(id) {
+  const value = String(id ?? '').trim();
+  if (!value) return null;
+  try {
+    return new URL(`/im_detail_1/${encodeURIComponent(value)}`, IMG_ORIGIN).href;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * TFDA 原始列 → canonical item（§7）。
  *
  * 缺值一律 `null` 或空陣列，**不填佔位字串**。

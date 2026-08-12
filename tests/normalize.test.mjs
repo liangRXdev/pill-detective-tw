@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 
 import {
   normalizeImprintField, tokenizeQuery, recordTokens, splitMulti,
-  isOfficialImgUrl, IMG_ORIGIN,
+  isOfficialImgUrl, officialLeafletUrl, IMG_ORIGIN,
   normalizeName, imprintQueryState, QueryState, toItem,
 } from '../search.js';
 
@@ -197,4 +197,22 @@ test('B13 官方圖檔 origin 白名單：解析失敗與他站一律 false', ()
   for (const bad of ['', null, undefined, 'javascript:alert(1)', 'data:text/html,x', '//mcp.fda.gov.tw/x', 42]) {
     assert.equal(isOfficialImgUrl(bad), false, `B13: ${JSON.stringify(bad)} 應為 false`);
   }
+});
+
+test('B14 TFDA 仿單 URL：許可證字號須安全編碼為單一路徑片段', () => {
+  const id = '衛署藥輸字第021571號';
+  const href = officialLeafletUrl(id);
+  const parsed = new URL(href);
+  assert.equal(parsed.origin, IMG_ORIGIN);
+  assert.equal(parsed.pathname.split('/').slice(0, -1).join('/'), '/im_detail_1');
+  assert.equal(decodeURIComponent(parsed.pathname.split('/').at(-1)), id);
+
+  assert.equal(officialLeafletUrl(''), null);
+  assert.equal(officialLeafletUrl('   '), null);
+  assert.equal(officialLeafletUrl(null), null);
+  assert.equal(officialLeafletUrl('\ud800'), null, '無效 Unicode 必須 fail-closed');
+  assert.match(officialLeafletUrl('../evil'), /\/im_detail_1\/\.\.%2Fevil$/,
+    '斜線必須留在編碼後的單一路徑片段內');
+  assert.match(officialLeafletUrl('A?x=#y'), /\/im_detail_1\/A%3Fx%3D%23y$/,
+    'query／fragment 字元不得改變 URL 結構');
 });

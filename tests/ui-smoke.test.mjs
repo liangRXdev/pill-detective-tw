@@ -168,6 +168,14 @@ test('E5e 官方原圖連結必須走 origin 白名單，且不得自己抄一�
   assert.ok(!/mcp\.fda\.gov\.tw/.test(src), 'E5e: app.js 內出現硬編的圖檔 origin');
 });
 
+test('E5f TFDA 仿單連結必須使用共用 URL builder', () => {
+  const src = stripComments(read('app.js'));
+  assert.match(src, /officialLeafletUrl\(item\.id\)/);
+  assert.match(src, /leaflet\.rel = 'noopener noreferrer'/);
+  assert.ok(!/im_detail_1|mcp\.fda\.gov\.tw/.test(src),
+    'E5f: app.js 不得自行拼接 TFDA 仿單 URL 或 origin');
+});
+
 test('E-arch app.js 不得自己實作搜尋語意（正規化只有一份）', () => {
   const src = stripComments(read('app.js'));
   // 只列**比對動作**。`unknown`／`partial` 是 search.js 回傳的分區名稱，

@@ -8,7 +8,7 @@
 import {
   COLORS, SHAPES, SCORE_MARKS, SCORE_ANY,
   indexItems, search, resultStates, relaxSuggestions, ResultState,
-  isOfficialImgUrl,
+  isOfficialImgUrl, officialLeafletUrl,
 } from './search.js';
 
 const DATA_URL = 'data/appearance.json';
@@ -347,6 +347,17 @@ function openDetail(item) {
     tbl.appendChild(tr);
   }
   body.appendChild(tbl);
+
+  const leafletHref = officialLeafletUrl(item.id);
+  if (leafletHref) {
+    const official = el('div', 'official-doc');
+    const leaflet = el('a', null, '查看 TFDA 仿單');
+    leaflet.href = leafletHref;
+    leaflet.target = '_blank';
+    leaflet.rel = 'noopener noreferrer';
+    official.appendChild(leaflet);
+    body.appendChild(official);
+  }
 
   const src = el('p', 'src');
   src.append('資料來源：衛生福利部食品藥物管理署 Open Data。');
