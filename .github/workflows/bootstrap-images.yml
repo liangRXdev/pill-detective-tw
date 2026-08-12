@@ -1,0 +1,95 @@
+name: 首建圖片鏡像（一次性）
+
+# 規格 D10／AS6。**只跑一次**，之後由週更的增量判定維護。
+#
+# 全量 6,798 張、官方原圖平均 3.66 MB → 約 25 GB 下載。
+# 這件事不該放進週更 workflow（一次性成本不進常態流程），
+# 也不必在本機做——Actions 的頻寬比家用連線適合得多。
+#
+# **續傳靠 data/bootstrap-progress.json**：Actions runner 是短暫的（L10），
+# 每批結束就把進度 manifest 與已下載的圖一起 commit。
+# 沒有它的話，下一批因為讀不到前版而把 sha256 全留 null，於是重抓全部 —— 永遠跑不完。
+on:
+  workflow_dispatch:
+    inputs:
+      batches:
+        description: '總批數'
+        default: '6'
+      from:
+        description: '從第幾批開始（續跑用）'
+        default: '1'
+      workers:
+        description: '並行下載數'
+        default: '8'
+
+concurrency:
+  group: bootstrap-images-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330          # L7 是 360，留 30 分鐘給收尾
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1   # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020  # v7
+        with:
+          node-version: '22'
+      - uses: astral-sh/setup-uv@94527f2e458b27549849d47d273a16bec83a01e9  # v7
+
+      - name: 設定 git
+        run: |
+          git config user.name  'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+
+      # 讀 bootstrap-progress.json 當前版 → 已完成的圖不會被重抓
+      - name: 建置 canonical（續傳自 bootstrap-progress.json）
+        run: node tools/fetch-appearance.mjs --resume data/bootstrap-progress.json
+
+      - name: 分批鏡像圖片
+        env:
+          N: ${{ github.event.inputs.batches || '6' }}
+          FROM: ${{ github.event.inputs.from || '1' }}
+          W: ${{ github.event.inputs.workers || '8' }}
+        run: |
+          set -euo pipefail
+          for k in $(seq "$FROM" "$N"); do
+            echo "::group::批次 $k/$N"
+            uv run tools/fetch-images.py \
+              --in data/appearance.json.staging --batch "$k/$N" --workers "$W"
+            # 進度落地：manifest 與圖片一起 commit，下次才續得下去
+            cp data/appearance.json.staging data/bootstrap-progress.json
+            git add data/img data/bootstrap-progress.json
+            if ! git diff --cached --quiet; then
+              DONE=$(node -p "const j=require('./data/bootstrap-progress.json');const g=j.items.flatMap(i=>i.imgs);g.filter(x=>x.sha256).length+' / '+g.length")
+              git commit -q -m "chore(images): 首建鏡像批次 $k/$N（$DONE）"
+              git push
+            fi
+            echo "::endgroup::"
+          done
+
+      # 全部完成才驗；任一張缺 sha256 都不會通過
+      - name: 驗證產物
+        run: node tools/verify-data.mjs --source data/source.zip --in data/appearance.json.staging
+
+      - name: 跑測試
+        run: npm test
+
+      - name: 切換到新版本並發布
+        run: |
+          node tools/fetch-appearance.mjs --publish
+          rm -f data/bootstrap-progress.json
+          git add -A data/
+          N=$(node -p "require('./data/appearance.json').meta.count")
+          MB=$(node -p "(require('./data/appearance.json').meta.images_bytes/1048576).toFixed(1)")
+          git commit -q -m "feat(data): 首建完成，${N} 筆／圖片 ${MB} MB"
+          git push
+
+      - name: 未完成時提示續跑
+        if: failure()
+        run: |
+          echo "::warning::首建未完成。已下載的圖與進度已 commit，"
+          echo "::warning::重跑本 workflow 並把 from 設為未完成的那一批即可續傳。"

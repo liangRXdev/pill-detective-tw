@@ -399,6 +399,36 @@ test('C11 carryHashes 四個子案例：全未變 0、URL 變更、檔案缺、�
   assert.equal(carryHashes(mk(['u0']), []), 0);
 });
 
+test('C11c --resume：首建跨批次時從進度 manifest 讀前版，而不是從未發布的 appearance.json', () => {
+  const ws = workspace();
+  const rows = srcRows(5100);
+  const zip = writeZip(ws.dir, rows);
+
+  // 第一批：無進度檔 → 全部待抓
+  const r1 = run(['--source', zip, '--out', ws.out, '--vocab-lock', ws.lock,
+    '--resume', path.join(ws.dir, 'progress.json')]);
+  assert.equal(r1.code, 0);
+  assert.match(r1.stdout, /沿用雜湊 0 \/ 5,100/);
+
+  // 模擬第一批抓完 3 張後把進度落地
+  const staged = JSON.parse(fs.readFileSync(`${ws.out}.staging`, 'utf8'));
+  for (const it of staged.items.slice(0, 3)) {
+    for (const g of it.imgs) { g.sha256 = 'a'.repeat(64); g.src_bytes = 1000; }
+  }
+  fs.writeFileSync(path.join(ws.dir, 'progress.json'), JSON.stringify(staged), 'utf8');
+
+  // 第二批：必須沿用那 3 張，而不是重抓全部
+  const r2 = run(['--source', zip, '--out', ws.out, '--vocab-lock', ws.lock,
+    '--resume', path.join(ws.dir, 'progress.json')]);
+  assert.equal(r2.code, 0);
+  assert.match(r2.stdout, /沿用雜湊 3 \/ 5,100/, 'C11c: 進度沒被沿用——首建會永遠跑不完');
+  assert.match(r2.stdout, /首建續傳/);
+
+  // 對照組：不給 --resume 就回到讀已發布版本（此處不存在）→ 全部待抓
+  const r3 = run(['--source', zip, '--out', ws.out, '--vocab-lock', ws.lock]);
+  assert.match(r3.stdout, /沿用雜湊 0 \/ 5,100/, 'C11c: --resume 影響到了預設行為');
+});
+
 test('C11b 首建時沒有前版，全部落入待抓（不得寫死 null 以外的值）', () => {
   const ws = workspace();
   const r = run(['--source', writeZip(ws.dir, srcRows(5100)), '--out', ws.out, '--vocab-lock', ws.lock]);

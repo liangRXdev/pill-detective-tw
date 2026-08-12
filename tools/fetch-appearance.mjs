@@ -370,9 +370,19 @@ async function main() {
   for (const w of warnings) console.log(`      ⚠ D8 警告：${w}`);
 
   console.log('[8/9] 比對變動幅度，沿用未變動項目的雜湊');
+  /**
+   * 前版來源預設是**已發布**的 `appearance.json`（D12）。
+   *
+   * `--resume <path>` 只給首建用：Actions runner 是短暫的（L10），
+   * 首建 6,798 張圖跨多個 batch，中途沒有已發布版本可讀。
+   * 沒有這個開關的話，每個 batch 都會因為讀不到前版而把 sha256 全留 null，
+   * 於是每一批都重抓全部 —— 首建永遠跑不完。
+   */
+  const prevPath = path.resolve(ROOT, arg('--resume') || outPath);
   let prev = null;
-  if (fs.existsSync(outPath)) {
-    try { prev = JSON.parse(fs.readFileSync(outPath, 'utf8')); } catch { /* 損毀視同無前版 */ }
+  if (fs.existsSync(prevPath)) {
+    try { prev = JSON.parse(fs.readFileSync(prevPath, 'utf8')); } catch { /* 損毀視同無前版 */ }
+    if (prevPath !== outPath) console.log(`      前版取自 ${path.relative(ROOT, prevPath)}（首建續傳）`);
   }
   const carried = carryHashes(items, prev?.items);
   console.log(`      沿用雜湊 ${carried.toLocaleString()} / ${imgCount.toLocaleString()}`
