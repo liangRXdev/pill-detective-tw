@@ -1,7 +1,7 @@
-# PillScope TW — 台灣藥品外觀搜尋　規劃文件 v1.2
+# PillScope TW — 台灣藥品外觀搜尋　規劃文件 v1.4
 
-- 修訂時間：2026-08-12（v1.1 → v1.2，依 `plan-verdict-2.md` 修訂，修訂紀錄見 §14）
-- repo：`pill-detective-tw`（GitHub Pages 靜態站，尚未建立）
+- 修訂時間：2026-08-12（最新 v1.4；v1.2 依 `plan-verdict-2.md`，v1.3／v1.4 為實作階段裁決。修訂紀錄見 §14）
+- repo：https://github.com/liangRXdev/pill-detective-tw （GitHub Pages 靜態站）
 - 資料源：衛生福利部食品藥物管理署 Open Data「藥品外觀資料集」（opendata infoId=42）
 - 姊妹專案：`TFDA-drug-id-quiz`（藥品辨識王，同一資料源，已上線）
 - **資料 baseline：`2026-08-12` 快照**（§10 的所有精確數字均綁定此快照，見 D13）
