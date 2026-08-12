@@ -191,4 +191,8 @@ test('E-img 圖片一律 lazy＋帶內容版本，且失敗時換 placeholder �
   assert.ok(src.includes('官方暫無可用圖片'));
   assert.ok(src.includes('鏡像圖片建置中'));
   assert.ok(src.includes("payload.meta.images_complete !== false"));
+  assert.ok(src.includes("collapsed ? 'details' : 'section'"), '低確定性結果須使用原生 details');
+  assert.match(src, /res\.partial, true, true/, '部分符合區須預設收合');
+  assert.match(src, /res\.unknown, true, true/, '資料未提供區須預設收合');
+  assert.ok(src.includes("s.addEventListener('toggle'"), '收合區應在首次展開時才建立卡片');
 });

@@ -1,6 +1,6 @@
-# 藥丸偵探 Pill Detective TW — 台灣藥品外觀搜尋　規劃文件 v1.6
+# 藥丸偵探 Pill Detective TW — 台灣藥品外觀搜尋　規劃文件 v1.7
 
-- 修訂時間：2026-08-12（最新 v1.6；v1.2 依 `plan-verdict-2.md`，v1.3–v1.6 為實作階段裁決。修訂紀錄見 §14）
+- 修訂時間：2026-08-12（最新 v1.7；v1.2 依 `plan-verdict-2.md`，v1.3–v1.7 為實作階段裁決。修訂紀錄見 §14）
 - repo：https://github.com/liangRXdev/pill-detective-tw （GitHub Pages 靜態站）
 - 資料源：衛生福利部食品藥物管理署 Open Data「藥品外觀資料集」（opendata infoId=42）
 - 姊妹專案：`TFDA-drug-id-quiz`（藥品辨識王，同一資料源，已上線）
@@ -830,6 +830,12 @@ CLAUDE.md / README.md / LICENSE / .gitignore / package.json
 
 ## 14. 修訂紀錄
 
+### v1.6 → v1.7（低確定性結果收合，2026-08-12）
+
+搜尋 `M 40` 時「部分符合」與「資料未提供」合計 2,379 筆，若沿用自動續繪，頁面會隨
+捲動不斷增長。新增 **D24 證據抽屜**：確定符合維持展開；部分符合與資料未提供改為
+預設收合的原生 `<details>`，摘要保留分區名稱與筆數，首次展開時才建立卡片。
+
 ### v1.5 → v1.6（metadata-first hotfix，2026-08-12）
 
 首次 Pages 部署時，正式 `data/appearance.json` 尚未發布，導致整個搜尋介面因 HTTP 404
@@ -960,6 +966,14 @@ fail-closed 資料更新與回歸測試**均未變動**。
 - 原 `--publish` 仍拒絕任何缺少合法 sha256 的圖片；全量完成後標示 `images_complete=true`
 
 因此就緒狀態由一個含糊的「有／無 manifest」拆成兩個可觀察狀態：搜尋資料就緒與圖片鏡像就緒。
+
+### D24 低確定性結果使用證據抽屜（v1.7）
+
+- 完全／字首／包含三級維持展開，不增加確定候選的操作成本
+- 「部分符合」與「資料未提供」預設收合，摘要永遠顯示各自筆數
+- 使用原生 `<details>/<summary>`，保留鍵盤操作與 disclosure 語意
+- 卡片在首次展開時才建立；展開後仍沿用 D11 的每批 24 筆續繪
+- 臨床安全提示維持固定顯示，不得移入任何收合容器
 
 ### v1.3 → v1.4（實測 HEAD 支援後修訂 D14）
 

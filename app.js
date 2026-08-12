@@ -184,16 +184,24 @@ function card(item) {
   return b;
 }
 
-/** 分區：標題 + 說明 + 卡片格 + 捲動載入 */
-function section(title, why, list, soft) {
+/** 分區：標題 + 說明 + 卡片格 + 捲動載入；低確定性分區可延遲展開 */
+function section(title, why, list, soft, collapsed = false) {
   if (!list.length) return null;
-  const s = el('section', `sect${soft ? ' soft' : ''}`);
-  s.appendChild(el('h3', null, `${title}（${list.length}）`));
+  const s = el(collapsed ? 'details' : 'section',
+    `sect${soft ? ' soft' : ''}${collapsed ? ' result-drawer' : ''}`);
+  if (collapsed) {
+    const summary = el('summary');
+    summary.append(el('span', 'drawer-title', title), el('span', 'drawer-count', `${list.length} 項`));
+    s.appendChild(summary);
+  } else {
+    s.appendChild(el('h3', null, `${title}（${list.length}）`));
+  }
   if (why) s.appendChild(el('p', 'why', why));
   const grid = el('div', 'grid');
   s.appendChild(grid);
 
   let shown = 0;
+  let initialized = false;
   const more = el('div', 'more');
   const draw = () => {
     const next = list.slice(shown, shown + PAGE);
@@ -202,15 +210,20 @@ function section(title, why, list, soft) {
     if (shown >= list.length) { more.replaceChildren(); return; }
     more.replaceChildren(el('span', null, `已顯示 ${shown} / ${list.length}`));
   };
-  draw();
-  if (shown < list.length) {
+  const initialize = () => {
+    if (initialized) return;
+    initialized = true;
+    draw();
+    if (shown >= list.length) return;
     s.appendChild(more);
     // 捲到底才續繪，避免一次 render 上千張卡片（D11）
     const io = new IntersectionObserver((es) => {
       if (es.some((x) => x.isIntersecting)) { draw(); if (shown >= list.length) io.disconnect(); }
     }, { rootMargin: '400px' });
     io.observe(more);
-  }
+  };
+  if (collapsed) s.addEventListener('toggle', () => { if (s.open) initialize(); });
+  else initialize();
   return s;
 }
 
@@ -268,9 +281,9 @@ function render() {
     const s = section(TIER_TITLE[t], TIER_WHY[t], res.tiers[t]);
     if (s) out.appendChild(s);
   }
-  const p = section('部分符合', 'TFDA 只記錄了部分刻字，無法排除', res.partial, true);
+  const p = section('部分符合', 'TFDA 只記錄了部分刻字，無法排除', res.partial, true, true);
   if (p) out.appendChild(p);
-  const u = section('資料未提供', 'TFDA 未填該欄位，不代表不符合，無法排除', res.unknown, true);
+  const u = section('資料未提供', 'TFDA 未填該欄位，不代表不符合，無法排除', res.unknown, true, true);
   if (u) out.appendChild(u);
 }
 
