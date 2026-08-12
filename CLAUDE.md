@@ -48,7 +48,8 @@
 |---|---|
 | `export/42/json` 回傳 **ZIP** 不是 JSON | 內含 `42_5.json`，**檔名帶版本號會變** → 必須依 schema 辨識，不可 glob 取第一個 |
 | 帶 `Origin` header 即 **403** | 前端絕對不能直接 fetch 來源 |
-| 圖檔主機**無 CORS**、**無 ETag／Last-Modified**、`Cache-Control: private` | 圖片不可進 canvas；且**無法輕量判斷遠端是否換圖** → 季度 `--verify-all` |
+| 圖檔主機**無 CORS**、**無 ETag／Last-Modified**、`Cache-Control: private` | 圖片不可進 canvas |
+| **HEAD 可用且 `Content-Length` 準確**；Range 不支援（回 200 全檔） | 換圖偵測靠 HEAD 掃描比對 `src_bytes`，不必全量重抓（D14）|
 | 圖檔**不存在時回 HTTP 200 + 0 bytes** | 不是 404。管線不能只看 status |
 | 官方原圖中位 **1.5 MB**、最大 18 MB、`?c=` 無縮圖參數 | 單頁 20 張約 68 MB → 必須鏡像（D10） |
 | `info.fda.gov.tw` TLS 握手失敗 | 逐藥深連結無法驗證 → 不做 |
@@ -65,6 +66,18 @@
 不變量同時成立**：命名空間（key === sha1(id)）＋ 來源歸屬（src 出自同一 id 的來源列）
 ＋ 內容一致（實算 sha === manifest sha）。
 **只驗第一條等於沒驗**——key 只證明命名空間，不證明內容來自哪一筆。
+
+## 兩個雜湊欄位不是同一件事
+
+`imgs[].sha256` 是**轉檔後 WebP** 的雜湊（給 D12.1 第三條與前端 `?v=` cache key）；
+`imgs[].src_bytes` 是**原圖**的 Content-Length（給 D14 的 HEAD 掃描當基準）。
+兩者是同一次下載的產物，`carryHashes()` **必須一起沿用**——
+只沿用其中一個會讓 HEAD 掃描拿 `null` 去比對而全部誤判為「已變更」。
+
+季度檢查是 `--freshness`（HEAD 掃全量 ＋ 抽樣 100 張深驗，約 366 MB），
+**不是** `--verify-all`（22 GB，保留給人工全量稽核，不排程）。
+`--freshness` 不寫入任何檔案，且**問不出 Content-Length 一律列為需人工確認**——
+把問不出來當成沒變，等於讓壞掉的端點自動過關。
 
 ## 圖片 URL 必須帶內容版本
 
@@ -85,6 +98,7 @@ npm run expected              # 重產 expected ID sets（只在規則或 baseli
 npm run build -- --source <本機zip>            # 開發時避免重複打 TFDA
 npm run verify -- --source <zip> --in data/appearance.json.staging
 npm run publish:data          # 資料就緒切換點（圖片未全部完成時會拒絕）
+uv run tools/fetch-images.py --in data/appearance.json --freshness   # 季度新鮮度檢查
 ```
 
 `verify` 的 `--source` **是必要的**，沒有 `--source` 直接 exit 2。

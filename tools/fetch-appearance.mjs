@@ -233,6 +233,9 @@ export function carryHashes(items, prevItems) {
       if (old && old.src === it.imgs[n].src && isSha256(old.sha256)) {
         it.imgs[n].sha256 = old.sha256;
         it.imgs[n].file = old.file;
+        // src_bytes 與 sha256 是同一次下載的產物，必須一起沿用；
+        // 只沿用其中一個會讓 D14 的 HEAD 掃描拿 null 去比對而全部誤判為「已變更」
+        it.imgs[n].src_bytes = old.src_bytes ?? null;
         carried++;
       }
     }
@@ -269,7 +272,12 @@ export function buildItems(rows, exceptions = []) {
       if (hit) dropped++;
       return !hit;
     });
-    it.imgs = kept.map((g, n) => ({ file: `img/${assetKey(it.id)}-${n}.webp`, src: g.src, sha256: null }));
+    it.imgs = kept.map((g, n) => ({
+      file: `img/${assetKey(it.id)}-${n}.webp`,
+      src: g.src,
+      sha256: null,       // **轉檔後 WebP** 的雜湊：D12.1 第三條與前端 ?v= cache key 用
+      src_bytes: null,    // **原圖** 的 Content-Length：D14 的 HEAD 新鮮度掃描用
+    }));
   }
   return { items, dropped };
 }

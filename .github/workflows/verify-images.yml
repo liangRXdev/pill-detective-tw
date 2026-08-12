@@ -1,48 +1,68 @@
-name: 季度圖片內容重驗
+name: 季度圖片新鮮度檢查
 
 # 規格 D14：來源無 ETag／Last-Modified，URL 未變不代表內容未變。
-# 一般排程的增量判定偵測不到「原地換圖」——那是威脅模型第 3 項
-#（新資料配舊圖片）。這條每季全量重抓並比對雜湊。
+# 一般排程的增量判定偵測不到「原地換圖」——那是威脅模型第 3 項（新資料配舊圖片）。
 #
-# **分四批**：全量約 22 GB，單批會撞 L7 的六小時上限。
+# **不下載全量。** 兩層：
+#   ① HEAD 掃全量 6,798 張，比對 Content-Length 與 manifest 的 src_bytes（幾 MB）
+#   ② 隨機抽 100 張真的 GET 下來重新轉檔比對 sha256（約 366 MB）
+#
+# 原本是季度 --verify-all 全量重抓（22 GB × 4 = 88 GB/年）。
+# 實測 30 張重抓位元組 30/30 相同，且圖檔 URL 是 UUID-keyed
+#（換圖較可能換 UUID，那由一般模式的增量判定就抓得到）。
+# `--verify-all` 保留給人工全量稽核，不再排程。
 on:
   schedule:
     - cron: '23 21 1 1,4,7,10 *'   # 每季首月 1 日 05:23 (UTC+8)
   workflow_dispatch:
+    inputs:
+      sample:
+        description: '抽樣深驗張數'
+        default: '100'
 
 concurrency:
-  group: image-verify-${{ github.ref }}
+  group: image-freshness-${{ github.ref }}
   cancel-in-progress: false
 
 permissions:
   contents: read
+  issues: write
 
 jobs:
-  verify:
+  freshness:
     runs-on: ubuntu-latest
-    timeout-minutes: 330
-    strategy:
-      fail-fast: false        # 一批失敗不該讓其餘三批的結果消失
-      max-parallel: 1         # 對來源保持禮貌，且避免四批同時打爆對方
-      matrix:
-        batch: [1, 2, 3, 4]
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1   # v7
       - uses: astral-sh/setup-uv@94527f2e458b27549849d47d273a16bec83a01e9  # v7
 
-      # 對**已發布**的版本重驗。這裡刻意不重建 canonical：
-      # 要驗的是「線上這一版的圖片內容是否仍與官方相同」，不是產一個新版本。
-      - name: 重驗第 ${{ matrix.batch }} 批（共 4 批）
-        run: uv run tools/fetch-images.py --in data/appearance.json --verify-all --batch ${{ matrix.batch }}/4
+      # 對**已發布**的版本檢查。這裡刻意不重建 canonical：
+      # 要驗的是「線上這一版的圖片是否仍與官方相同」，不是產一個新版本。
+      # freshness 模式**不寫入任何檔案**（由 fetch_images_probe.py 的斷言守著）。
+      - name: 新鮮度檢查
+        run: >
+          uv run tools/fetch-images.py --in data/appearance.json
+          --freshness --sample ${{ github.event.inputs.sample || '100' }}
 
-      # 內容有變 → 檔案被改寫、git 出現 diff。**不自動提交**：
-      # 換圖可能代表 TFDA 換了藥品外觀，需要人看過。
-      - name: 回報差異
-        run: |
-          if git diff --quiet -- data/img; then
-            echo "第 ${{ matrix.batch }} 批：內容無變化"
-          else
-            echo "::warning::第 ${{ matrix.batch }} 批偵測到官方原地換圖，需人工確認："
-            git diff --stat -- data/img
-            exit 1
-          fi
+      # 有發現 → 開 issue。**不自動更新圖片**：
+      # 官方換圖可能代表藥品外觀真的變了，需要人看過。
+      - name: 有發現時開 issue
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const url = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            await github.rest.issues.create({
+              owner: context.repo.owner, repo: context.repo.repo,
+              title: `圖片新鮮度檢查有發現（${new Date().toISOString().slice(0,10)}）`,
+              body: [
+                '季度新鮮度檢查偵測到官方端有變化，**圖片未自動更新**。',
+                '',
+                `執行紀錄（含逐張明細）：${url}`,
+                '',
+                '處置：',
+                '- 「官方換圖」→ 人工確認新圖是否為同一顆藥，確認後跑 `uv run tools/fetch-images.py --verify-all`',
+                '- 「HEAD 問不出 Content-Length」→ 端點可能壞了；若為永久性，走 `data/image-exceptions.json` 的人工審核',
+                '- 「長度相同但內容已改寫」→ 抽樣抓到的，代表可能有一批同型變更，建議跑一次全量稽核',
+              ].join('\n'),
+            });

@@ -370,14 +370,20 @@ test('C11 carryHashes 四個子案例：全未變 0、URL 變更、檔案缺、�
   const sha = 'a'.repeat(64);
   const prev = [{
     id: 'A',
-    imgs: [{ file: 'img/k-0.webp', src: 'u0', sha256: sha }, { file: 'img/k-1.webp', src: 'u1', sha256: sha }],
+    imgs: [
+      { file: 'img/k-0.webp', src: 'u0', sha256: sha, src_bytes: 111 },
+      { file: 'img/k-1.webp', src: 'u1', sha256: sha, src_bytes: 222 },
+    ],
   }];
-  const mk = (srcs) => [{ id: 'A', imgs: srcs.map((s, n) => ({ file: `img/k-${n}.webp`, src: s, sha256: null })) }];
+  const mk = (srcs) => [{ id: 'A', imgs: srcs.map((s, n) => ({ file: `img/k-${n}.webp`, src: s, sha256: null, src_bytes: null })) }];
 
   // 全未變 → 兩張都沿用，待抓 0
   const same = mk(['u0', 'u1']);
   assert.equal(carryHashes(same, prev), 2);
   assert.equal(same[0].imgs.filter((g) => !isSha256(g.sha256)).length, 0, '待抓數量應為 0');
+  // src_bytes 與 sha256 是同一次下載的產物，必須一起沿用——
+  // 只沿用其中一個會讓 D14 的 HEAD 掃描拿 null 去比對而全部誤判為「已變更」
+  assert.deepEqual(same[0].imgs.map((g) => g.src_bytes), [111, 222], 'src_bytes 未一起沿用');
 
   // 一張 URL 變更 → 只有那張要重抓
   const changed = mk(['u0', 'u1-new']);
@@ -385,7 +391,7 @@ test('C11 carryHashes 四個子案例：全未變 0、URL 變更、檔案缺、�
   assert.equal(changed[0].imgs[1].sha256, null, 'URL 變了卻沿用舊雜湊——新圖永遠抓不進來');
 
   // 前版雜湊格式不合法 → 不沿用
-  const badPrev = [{ id: 'A', imgs: [{ file: 'img/k-0.webp', src: 'u0', sha256: 'undefined' }] }];
+  const badPrev = [{ id: 'A', imgs: [{ file: 'img/k-0.webp', src: 'u0', sha256: 'undefined', src_bytes: 111 }] }];
   const fresh = mk(['u0']);
   assert.equal(carryHashes(fresh, badPrev), 0);
 
@@ -408,7 +414,7 @@ test('C12 provenance：key 正確但 src 來自相鄰記錄時必須被抓到', 
     meta: { schema: 1, count: 3, source_rows: 3, vocab: { color: ['白'], shape: ['圓形'], score_mark: ['無'] } },
     items: rows.map((r) => ({
       id: r['許可證字號'],
-      imgs: [{ file: `img/${assetKey(r['許可證字號'])}-0.webp`, src: r['外觀圖檔連結'], sha256: 'a'.repeat(64) }],
+      imgs: [{ file: `img/${assetKey(r['許可證字號'])}-0.webp`, src: r['外觀圖檔連結'], sha256: 'a'.repeat(64), src_bytes: 1024 }],
     })),
   };
   // 對照組：完全正確時只該有 search.js 常數與精簡 fixture 詞彙不符的錯（用完整常數比對會噪音）
@@ -438,7 +444,7 @@ test('C12b provenance：檔案實算 sha256 與 manifest 不符時必須被抓�
 
   const mk = (sha) => ({
     meta: { schema: 1, count: 1, source_rows: 1, vocab: { color: ['白'], shape: ['圓形'], score_mark: ['無'] } },
-    items: [{ id: rows[0]['許可證字號'], imgs: [{ file, src: rows[0]['外觀圖檔連結'], sha256: sha }] }],
+    items: [{ id: rows[0]['許可證字號'], imgs: [{ file, src: rows[0]['外觀圖檔連結'], sha256: sha, src_bytes: content.length }] }],
   });
   const clean = (p) => verify(p, rows, { imgDir }).filter((e) => !e.startsWith('search.js 的'));
   assert.deepEqual(clean(mk(real)), [], '實算相符時不該報錯');
@@ -470,7 +476,7 @@ test('C13 例外清單以 id+src 為鍵：精確命中才排除，同筆其餘�
     meta: { schema: 1, count: 1, source_rows: 1, vocab: { color: ['白'], shape: ['圓形'], score_mark: ['無'] } },
     items: [{ id, imgs }],
   });
-  const g = (n, src) => ({ file: `img/${assetKey(id)}-${n}.webp`, src, sha256: 'a'.repeat(64) });
+  const g = (n, src) => ({ file: `img/${assetKey(id)}-${n}.webp`, src, sha256: 'a'.repeat(64), src_bytes: 1024 });
   const clean = (p, ex) => verify(p, rows, { imgDir: null, skipContent: true, exceptions: ex })
     .filter((e) => !e.startsWith('search.js 的'));
 
@@ -488,7 +494,7 @@ test('C13b 例外的 id 或 src 對不上來源 → 報陳舊例外；缺欄位 
   const id = rows[0]['許可證字號'];
   const payload = {
     meta: { schema: 1, count: 1, source_rows: 1, vocab: { color: ['白'], shape: ['圓形'], score_mark: ['無'] } },
-    items: [{ id, imgs: [{ file: `img/${assetKey(id)}-0.webp`, src: rows[0]['外觀圖檔連結'], sha256: 'a'.repeat(64) }] }],
+    items: [{ id, imgs: [{ file: `img/${assetKey(id)}-0.webp`, src: rows[0]['外觀圖檔連結'], sha256: 'a'.repeat(64), src_bytes: 1024 }] }],
   };
   const clean = (ex) => verify(payload, rows, { imgDir: null, skipContent: true, exceptions: ex })
     .filter((e) => !e.startsWith('search.js 的'));
@@ -507,7 +513,7 @@ test('C-extra verify 抓得到 count 不符、id 重複、缺 id、來源與產�
     meta: { schema: 1, count: 2, source_rows: 2, vocab: { color: ['白'], shape: ['圓形'], score_mark: ['無'] } },
     items: rows.map((r) => ({
       id: r['許可證字號'],
-      imgs: [{ file: `img/${assetKey(r['許可證字號'])}-0.webp`, src: r['外觀圖檔連結'], sha256: 'a'.repeat(64) }],
+      imgs: [{ file: `img/${assetKey(r['許可證字號'])}-0.webp`, src: r['外觀圖檔連結'], sha256: 'a'.repeat(64), src_bytes: 1024 }],
     })),
   });
   const clean = (p) => verify(p, rows, { imgDir: null, skipContent: true }).filter((e) => !e.startsWith('search.js 的'));

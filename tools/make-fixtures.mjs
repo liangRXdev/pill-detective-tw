@@ -54,7 +54,9 @@ function expectedItem(row) {
     size: split(row['外觀尺寸']),
     mark1: text(row['標註一']),
     mark2: text(row['標註二']),
-    imgs: split(row['外觀圖檔連結']).map((src, n) => ({ file: `img/${key(id)}-${n}.webp`, src, sha256: null })),
+    imgs: split(row['外觀圖檔連結']).map((src, n) => ({
+      file: `img/${key(id)}-${n}.webp`, src, sha256: null, src_bytes: null,
+    })),
   };
 }
 

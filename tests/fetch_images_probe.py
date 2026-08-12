@@ -16,6 +16,7 @@ C7／C15 驗收 — 圖片管線（規格 `.ai-review/plan.md` §10）
 """
 from __future__ import annotations
 
+import hashlib
 import http.server
 import importlib.util
 import io
@@ -56,6 +57,30 @@ HITS: dict[str, int] = {}
 class Handler(http.server.BaseHTTPRequestHandler):
     def log_message(self, *a):  # 靜音
         pass
+
+    def _body(self):
+        if self.path.startswith("/zero"):
+            return b""
+        if self.path.startswith("/corrupt"):
+            return png_bytes()[:40]
+        if self.path.startswith("/big"):
+            return png_bytes(size=(200, 200), color=(10, 90, 200))
+        return png_bytes()
+
+    def do_HEAD(self):  # noqa: N802
+        HITS[self.path] = HITS.get(self.path, 0) + 1
+        if self.path.startswith("/nohead"):
+            self.send_response(405)
+            self.end_headers()
+            return
+        if self.path.startswith("/nolen"):
+            self.send_response(200)
+            self.end_headers()      # 刻意不給 Content-Length
+            return
+        body = self._body()
+        self.send_response(200)
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
 
     def do_GET(self):  # noqa: N802
         HITS[self.path] = HITS.get(self.path, 0) + 1
@@ -159,15 +184,19 @@ def main() -> int:
         backup = p.read_bytes() if existed else None
         p.write_bytes(FI.to_webp(png_bytes()))
         try:
-            check(FI.needs_fetch({"file": rel, "sha256": sha_ok}, False) is False,
-                  "needs_fetch: 檔案在且雜湊合法時不該重抓")
-            check(FI.needs_fetch({"file": rel, "sha256": None}, False) is True,
+            check(FI.needs_fetch({"file": rel, "sha256": sha_ok, "src_bytes": 123}, False) is False,
+                  "needs_fetch: 檔案在、雜湊合法且有 src_bytes 時不該重抓")
+            check(FI.needs_fetch({"file": rel, "sha256": sha_ok, "src_bytes": None}, False) is True,
+                  "needs_fetch: 缺 src_bytes 必須重抓補上（否則永久落在 D14 掃描死角）")
+            check(FI.needs_fetch({"file": rel, "sha256": sha_ok, "src_bytes": 0}, False) is True,
+                  "needs_fetch: src_bytes 為 0 視同缺漏")
+            check(FI.needs_fetch({"file": rel, "sha256": None, "src_bytes": 1}, False) is True,
                   "needs_fetch: 雜湊缺漏時必須重抓")
-            check(FI.needs_fetch({"file": rel, "sha256": "undefined"}, False) is True,
+            check(FI.needs_fetch({"file": rel, "sha256": "undefined", "src_bytes": 1}, False) is True,
                   "needs_fetch: 雜湊格式不合法時必須重抓")
-            check(FI.needs_fetch({"file": "img/does-not-exist-0.webp", "sha256": sha_ok}, False) is True,
+            check(FI.needs_fetch({"file": "img/does-not-exist-0.webp", "sha256": sha_ok, "src_bytes": 1}, False) is True,
                   "needs_fetch: 檔案不存在時必須重抓")
-            check(FI.needs_fetch({"file": rel, "sha256": sha_ok}, True) is True,
+            check(FI.needs_fetch({"file": rel, "sha256": sha_ok, "src_bytes": 1}, True) is True,
                   "needs_fetch: --verify-all 必須一律重抓")
         finally:
             if backup is not None:
@@ -179,6 +208,42 @@ def main() -> int:
     check(FI.is_sha256("a" * 64) and not FI.is_sha256("A" * 64)
           and not FI.is_sha256("a" * 63) and not FI.is_sha256("undefined")
           and not FI.is_sha256(None), "is_sha256 格式判定錯誤")
+
+    # ── D14①：HEAD 取長度 ─────────────────────────────────────────
+    ok_len = len(png_bytes())
+    check(FI.head_length(f"{base}/ok-h") == ok_len, "D14: HEAD 未取得正確 Content-Length")
+    check(FI.head_length(f"{base}/nohead-h") is None, "D14: HEAD 非 200 應回 None")
+    check(FI.head_length(f"{base}/nolen-h") is None, "D14: 缺 Content-Length 應回 None")
+
+    # ── D14②：freshness_sweep 的三種歸類 ──────────────────────────
+    good = FI.to_webp(png_bytes())
+    good_sha = hashlib.sha256(good).hexdigest()
+    imgs = [
+        # 長度相符且內容相符 → 不該有任何發現
+        {"file": "a.webp", "src": f"{base}/ok-1", "src_bytes": ok_len, "sha256": good_sha},
+        # 長度與基準不同 → 官方換圖
+        {"file": "b.webp", "src": f"{base}/big-1", "src_bytes": ok_len, "sha256": good_sha},
+        # HEAD 問不出長度 → **不得**當成沒變
+        {"file": "c.webp", "src": f"{base}/nolen-1", "src_bytes": ok_len, "sha256": good_sha},
+        # 沒有基準 → 跳過掃描（由 needs_fetch 負責補上）
+        {"file": "d.webp", "src": f"{base}/ok-2", "src_bytes": None, "sha256": good_sha},
+    ]
+    findings, errors = FI.freshness_sweep(imgs, sample=0, workers=2)
+    check(any("b.webp" in f for f in findings), "D14: 長度變化未被列為換圖")
+    check(any("c.webp" in e for e in errors), "D14: 問不出長度被當成沒變（壞端點會自動過關）")
+    check(not any("a.webp" in x for x in findings + errors), "D14: 未變者被誤報")
+    check(not any("d.webp" in x for x in findings + errors), "D14: 無基準者應跳過而非誤報")
+
+    # 抽樣深驗：長度相同但 sha256 不符 → 必須抓到
+    imgs2 = [{"file": "e.webp", "src": f"{base}/ok-3", "src_bytes": ok_len, "sha256": "f" * 64}]
+    f2, e2 = FI.freshness_sweep(imgs2, sample=1, workers=1)
+    check(any("內容已改寫" in x for x in f2), f"D14: 抽樣深驗未抓到同長度改寫（{f2} {e2}）")
+
+    # freshness 不得寫入任何檔案
+    before = sorted(p.name for p in (FI.ROOT / "data").glob("*"))
+    FI.freshness_sweep(imgs, sample=0, workers=2)
+    check(sorted(p.name for p in (FI.ROOT / "data").glob("*")) == before,
+          "D14: freshness 模式改動了 data/")
 
     # ── C15：分批切片必須穩定且互斥、涵蓋全集 ──────────────────────
     imgs = [{"file": f"img/{i:04d}-0.webp"} for i in range(97)]
