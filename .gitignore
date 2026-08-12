@@ -1,0 +1,12 @@
+node_modules/
+
+# 尚未通過就緒切換點的候選版本（D12）——只有 rename 之後的 appearance.json 才進版控
+*.staging
+*.staging.tmp
+*.tmp
+
+__pycache__/
+.DS_Store
+
+# fetch-appearance 留下的來源 ZIP，供 verify 對帳用的中間產物
+data/source.zip

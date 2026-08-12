@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#3D7A8A">
+<meta name="description" content="PillScope TW — 依藥品外觀特徵（刻字、顏色、形狀、刻痕）從 TFDA 公開資料縮小候選藥品清單，供藥師與醫療人員人工比對確認。">
+<title>台灣藥品外觀搜尋</title>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<style>
+/* ── house style token（pharmacy-portal 共用）─────────────────────
+   刻意**不**載入 Google Fonts CDN：本站宣稱搜尋輸入不離開瀏覽器、
+   無第三方 origin（規格 §9、F11）。外連字型會把使用者 IP 送給第三方，
+   與那個宣稱互相矛盾。改用系統字體堆疊。 */
+:root{
+  --bg-primary:#F5F0E8; --bg-card:#FFFFFF;
+  --accent:#3D7A8A; --accent-hover:#2E6B7A; --accent-light:rgba(61,122,138,0.08);
+  --text-primary:#2C2C2C; --text-muted:#6B7280; --border:#E0D9CE;
+  --danger:#C0392B; --success:#27AE60; --warning:#E67E22;
+  --radius:8px;
+  --mono:ui-monospace,'JetBrains Mono','Cascadia Mono',Consolas,'Courier New',monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg-primary);color:var(--text-primary);line-height:1.6;
+  font-family:'Noto Sans TC','PingFang TC','Microsoft JhengHei','Hiragino Sans',sans-serif;}
+.wrap{max-width:880px;margin:0 auto;padding:1rem 1rem 4rem}
+h1{font-size:1.25rem;margin:.5rem 0 .15rem}
+.sub{font-size:.78rem;color:var(--text-muted);margin:0 0 .75rem}
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:1rem 1rem 1.15rem;margin-top:1rem;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.card h2{font-size:1rem;margin:0 0 .2rem;display:flex;align-items:center;gap:.5rem}
+.card .hint{font-size:.75rem;color:var(--text-muted);margin:0 0 .85rem}
+
+/* ── 搜尋面板：手機優先，sticky ─────────────────────────────── */
+#panel{position:sticky;top:0;z-index:20;background:var(--bg-primary);
+  padding-top:.5rem;margin-top:0}
+#panel .card{margin-top:0}
+label.fld{display:block;font-size:.78rem;color:var(--text-muted);margin:.7rem 0 .3rem}
+input[type=text]{width:100%;min-height:44px;padding:.55rem .7rem;font-size:1rem;
+  font-family:var(--mono);border:1px solid var(--border);border-radius:6px;background:#fff;color:inherit}
+input[type=text]#name{font-family:inherit}
+input[type=text]:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-light)}
+.chips{display:flex;flex-wrap:wrap;gap:.35rem}
+.chip{min-height:44px;min-width:44px;padding:.4rem .7rem;font-size:.85rem;cursor:pointer;
+  border:1px solid var(--border);border-radius:999px;background:#fff;color:inherit;
+  display:inline-flex;align-items:center;justify-content:center}
+.chip[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:500}
+.chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.count{margin-top:.9rem;font-size:.95rem;font-weight:500}
+.count b{font-family:var(--mono);font-size:1.15rem;color:var(--accent)}
+.count .aux{font-size:.78rem;color:var(--text-muted);font-weight:400}
+.notice{margin-top:.5rem;font-size:.78rem;color:var(--warning)}
+.actions{margin-top:.6rem;display:flex;gap:.5rem;flex-wrap:wrap}
+button.link{min-height:44px;padding:.4rem .8rem;font-size:.8rem;cursor:pointer;
+  background:#fff;border:1px solid var(--border);border-radius:6px;color:var(--accent)}
+
+/* ── 結果 ──────────────────────────────────────────────────── */
+.sect{margin-top:1.25rem}
+.sect > h3{font-size:.85rem;margin:0 0 .1rem;color:var(--accent);
+  border-left:3px solid var(--accent);padding-left:.5rem}
+.sect > .why{font-size:.72rem;color:var(--text-muted);margin:0 0 .6rem;padding-left:.55rem}
+.sect.soft > h3{color:var(--text-muted);border-left-color:var(--border)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.7rem}
+.pill{border:1px solid var(--border);border-radius:6px;background:#fff;padding:.6rem;
+  display:grid;grid-template-columns:96px 1fr;gap:.6rem;align-items:start;text-align:left;
+  width:100%;cursor:pointer;color:inherit;font:inherit}
+.pill:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.thumb{width:96px;height:96px;border:1px solid var(--border);border-radius:4px;
+  background:#faf7f2;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.thumb img{width:100%;height:100%;object-fit:contain}
+.thumb .ph{font-size:.62rem;color:var(--text-muted);text-align:center;padding:.3rem;line-height:1.3}
+.pill .zh{font-size:.86rem;font-weight:500;line-height:1.35}
+.pill .en{font-size:.7rem;color:var(--text-muted);line-height:1.3;margin-top:.1rem}
+.pill .mk{font-family:var(--mono);font-size:.78rem;margin-top:.25rem}
+.pill .ap{font-size:.72rem;color:var(--text-muted);margin-top:.1rem}
+.pill .lic{font-family:var(--mono);font-size:.64rem;color:var(--text-muted);margin-top:.2rem}
+.more{margin-top:.7rem;text-align:center}
+.empty{font-size:.9rem}
+.empty .lead{font-weight:500}
+.fatal{border-color:var(--danger)}
+.fatal h2{color:var(--danger)}
+
+/* ── 詳細 ──────────────────────────────────────────────────── */
+dialog{border:1px solid var(--border);border-radius:var(--radius);padding:0;max-width:min(560px,94vw);
+  background:var(--bg-card);color:inherit}
+dialog::backdrop{background:rgba(44,44,44,.45)}
+.dlg{padding:1rem}
+.dlg h3{margin:0 0 .1rem;font-size:1rem}
+.dlg .en{font-size:.76rem;color:var(--text-muted);margin:0 0 .6rem}
+.shots{display:flex;gap:.4rem;overflow-x:auto;padding-bottom:.3rem}
+.shots .thumb{width:160px;height:160px;flex:none}
+.kv{width:100%;border-collapse:collapse;margin-top:.7rem}
+.kv th,.kv td{border:1px solid var(--border);padding:.35rem .5rem;font-size:.8rem;text-align:left}
+.kv th{background:var(--accent-light);color:var(--accent);font-weight:500;width:6.5rem;white-space:nowrap}
+.kv td{font-family:var(--mono)}
+.kv td.na{font-family:inherit;color:var(--text-muted)}
+.dlg .src{font-size:.7rem;color:var(--text-muted);margin-top:.7rem}
+.dlg .src a{color:var(--accent)}
+.dlg .close{margin-top:.8rem;min-height:44px;width:100%;background:var(--accent);color:#fff;
+  border:none;border-radius:6px;font-size:.9rem;cursor:pointer}
+
+/* ── 臨床安全提示：固定顯示、不可摺疊 ───────────────────────── */
+.safety{margin-top:1.25rem;border:1px solid var(--accent);background:var(--accent-light);
+  border-radius:var(--radius);padding:.7rem .85rem;font-size:.76rem;line-height:1.55}
+.disclaimer{margin-top:1.25rem;font-size:.72rem;color:var(--text-muted);text-align:center;line-height:1.6}
+.disclaimer a{color:var(--accent)}
+
+@media (max-width:480px){
+  .wrap{padding:.5rem .7rem 3rem}
+  .grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>台灣藥品外觀搜尋</h1>
+  <p class="sub">依外觀特徵縮小候選藥品清單，供人工比對確認</p>
+
+  <!-- 資料載入失敗的 fail-closed 狀態（D16）。
+       絕不可表述為「找不到符合的藥品」——部署或網路錯誤會被讀成「這顆藥不在資料庫裡」。 -->
+  <section id="fatal" class="card fatal" hidden>
+    <h2>資料暫時無法載入</h2>
+    <p class="hint" id="fatalWhy"></p>
+    <p style="font-size:.85rem;margin:0">請稍後再試。<b>這不代表查無此藥</b>，搜尋功能已停用。</p>
+  </section>
+
+  <section id="panel" hidden>
+    <div class="card">
+      <label class="fld" for="imprint">藥品上看到什麼文字或數字？</label>
+      <input type="text" id="imprint" inputmode="latin" autocapitalize="characters"
+             autocomplete="off" spellcheck="false" placeholder="例如 10、APO、M 40">
+      <p class="notice" id="noToken" hidden>輸入內容不含可搜尋的英數字元，已忽略此條件</p>
+
+      <label class="fld">顏色（可複選）</label>
+      <div class="chips" id="colorChips"></div>
+
+      <label class="fld">形狀（可複選）</label>
+      <div class="chips" id="shapeChips"></div>
+
+      <label class="fld">刻痕</label>
+      <div class="chips" id="scoreChips"></div>
+
+      <label class="fld" for="name">已知藥名？（中文／英文／許可證字號）</label>
+      <input type="text" id="name" autocomplete="off" placeholder="例如 蘇打、SODIUM、衛署藥製字第…">
+
+      <p class="count" id="count"></p>
+      <div class="actions" id="actions"></div>
+    </div>
+  </section>
+
+  <div id="results"></div>
+
+  <p class="safety">
+    本工具依 TFDA 公開藥品外觀資料提供候選結果，外觀相似不代表為同一藥品。
+    實際藥品仍應依原包裝、藥袋、許可證資訊或由醫療專業人員確認。
+  </p>
+
+  <p class="disclaimer">
+    資料來源：衛生福利部食品藥物管理署 Open Data「藥品外觀資料集」（infoId=42）。
+    比對規則為 deterministic 規則式：刻字以 token 比對並分為完全／字首／包含三級，
+    單字元查詢不啟用包含級；TFDA 未填之欄位一律列為「資料未提供」而非排除。
+    本站不使用任何 AI 推測藥品身份，亦不提供相似度分數。
+    <br><a id="dsLink" href="https://data.fda.gov.tw/opendata/exportDataList.do?method=openData&infoId=42"
+      target="_blank" rel="noopener">查看官方資料集</a>
+  </p>
+</div>
+
+<dialog id="detail"><div class="dlg" id="dlgBody"></div></dialog>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

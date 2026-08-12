@@ -1,0 +1,48 @@
+name: 季度圖片內容重驗
+
+# 規格 D14：來源無 ETag／Last-Modified，URL 未變不代表內容未變。
+# 一般排程的增量判定偵測不到「原地換圖」——那是威脅模型第 3 項
+#（新資料配舊圖片）。這條每季全量重抓並比對雜湊。
+#
+# **分四批**：全量約 22 GB，單批會撞 L7 的六小時上限。
+on:
+  schedule:
+    - cron: '23 21 1 1,4,7,10 *'   # 每季首月 1 日 05:23 (UTC+8)
+  workflow_dispatch:
+
+concurrency:
+  group: image-verify-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    strategy:
+      fail-fast: false        # 一批失敗不該讓其餘三批的結果消失
+      max-parallel: 1         # 對來源保持禮貌，且避免四批同時打爆對方
+      matrix:
+        batch: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1   # v7
+      - uses: astral-sh/setup-uv@94527f2e458b27549849d47d273a16bec83a01e9  # v7
+
+      # 對**已發布**的版本重驗。這裡刻意不重建 canonical：
+      # 要驗的是「線上這一版的圖片內容是否仍與官方相同」，不是產一個新版本。
+      - name: 重驗第 ${{ matrix.batch }} 批（共 4 批）
+        run: uv run tools/fetch-images.py --in data/appearance.json --verify-all --batch ${{ matrix.batch }}/4
+
+      # 內容有變 → 檔案被改寫、git 出現 diff。**不自動提交**：
+      # 換圖可能代表 TFDA 換了藥品外觀，需要人看過。
+      - name: 回報差異
+        run: |
+          if git diff --quiet -- data/img; then
+            echo "第 ${{ matrix.batch }} 批：內容無變化"
+          else
+            echo "::warning::第 ${{ matrix.batch }} 批偵測到官方原地換圖，需人工確認："
+            git diff --stat -- data/img
+            exit 1
+          fi

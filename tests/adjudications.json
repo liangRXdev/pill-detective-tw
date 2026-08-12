@@ -1,0 +1,101 @@
+{
+ "_about": "A12 髒值 golden decisions ＋ 雙向反例追問（規格 .ai-review/plan.md §10 A12、E6）。人工裁決紀錄，非自動產生。每筆的 expected_tokens／expected_hit 由 tests/search.test.mjs 對實際規則輸出比對。",
+ "adjudicator": "liang（臨床藥師）",
+ "adjudicated_at": "2026-08-12",
+ "data_version": "6f62c4ad",
+ "decisions": [
+  {
+   "id": "衛部藥製字第059056號",
+   "class": "chinese-mixed",
+   "data_version": "6f62c4ad",
+   "input": ["六邊形裡面有K", "KJ 195"],
+   "expected_tokens": ["K", "KJ", "195"],
+   "query": "K",
+   "expected_hit": true,
+   "verdict": "規則正確",
+   "rationale": "TFDA 用中文描述外觀（六邊形內有 K），規則抽出 K。藥師手上看到的正是六邊形裡的 K，會輸入 K，因此命中是對的。中文描述本身不應成為可搜尋 token——沒有人會在藥錠上讀到「六邊形裡面有」這幾個字。"
+  },
+  {
+   "id": "衛署藥製字第024374號",
+   "class": "head-tail",
+   "data_version": "6f62c4ad",
+   "input": ["頭CL;;;CL", "尾016;;;016"],
+   "expected_tokens": ["CL", "016"],
+   "query": "CL 016",
+   "expected_hit": true,
+   "verdict": "規則正確",
+   "rationale": "全資料集唯一使用頭／尾字樣的記錄。頭／尾是面向描述而非刻字內容，剝除後得到 CL 與 016，與藥錠實際刻字一致。這一筆同時佐證 D7：標註一／二並非固定對應正面／背面，若把兩欄標成正反面，這筆會是唯一有面向資訊的例外，其餘 6294 筆都是推論。"
+  },
+  {
+   "id": "衛署藥製字第036749號",
+   "class": "both-fields-same",
+   "data_version": "6f62c4ad",
+   "input": ["STD 511", "STD 511"],
+   "expected_tokens": ["STD", "511"],
+   "query": "STD 511",
+   "expected_hit": true,
+   "verdict": "規則正確",
+   "rationale": "兩欄填相同值（全資料集 41 筆）。取聯集後去重得到 2 個 token，不會因重複而產生重複卡片或影響等級判定。若改採「同欄全中」語意，這 41 筆的行為不變，因此本類無法區分兩種語意——區分靠的是 A2b 的跨欄案例。"
+  },
+  {
+   "id": "衛部罕藥輸字第000039號",
+   "class": "mark2-only",
+   "data_version": "6f62c4ad",
+   "input": [null, "BG 12 120 mg"],
+   "expected_tokens": ["BG", "12", "120", "MG"],
+   "query": "BG 12",
+   "expected_hit": true,
+   "verdict": "規則正確，但附帶保留",
+   "rationale": "標註一為空、標註二有值（全資料集 68 筆）。若實作誤以為標註一是必要欄位而跳過整筆，這 68 筆會完全搜不到。保留意見：TFDA 把單位 mg 一併寫進標註欄，規則因此產生 token MG——藥錠上通常確實印有 mg，故不視為錯誤，但這使得查詢 MG 會命中一批不相干的藥（歸在包含區）。"
+  },
+  {
+   "id": "衛署藥製字第007529號",
+   "class": "single-char-noise",
+   "data_version": "6f62c4ad",
+   "input": ["OUYeh", "OUYeh"],
+   "expected_tokens": ["OUYEH"],
+   "query": "S",
+   "expected_hit": false,
+   "verdict": "規則正確（此筆不含 S，正確不命中）",
+   "rationale": "作為單字元噪音類的對照筆。單字元查詢 S 的實測分佈為 完全 174／字首 657／包含 423，合計 1254 筆。本筆 token 為 OUYEH，不含 S，正確被排除。分級本身有效，但包含區的規模見下方 false_positive 的裁決。"
+  }
+ ],
+ "bidirectional": {
+  "false_positive": {
+   "question": "是否存在「規則命中但人工認為不該命中」的案例？",
+   "found": true,
+   "search_scope": "全 baseline 6,295 筆；針對三類可能誤命中的來源逐一檢視：(1) 含中文描述的標註 8 筆全查、(2) 單字元查詢在 36 種單字元 token 上的三級分佈、(3) 標註欄含單位或品牌全稱者（如 mg、OLYMPIC HORMONE）。",
+   "method": "以 tools/make-expected.mjs 的獨立 oracle 逐筆算出三級歸屬，再人工檢視「包含」級的樣本是否為使用者在藥錠上可能讀到的字樣。",
+   "cases": [
+    {
+     "query": "S",
+     "tier": "包含",
+     "count": 423,
+     "samples": ["YSP", "ASTAR/AS/428", "EVEREST", "YUNG/NIHS"],
+     "verdict": "屬 false positive",
+     "rationale": "使用者在藥錠上只看到一個字母 S，卻拿到印著 EVEREST、YSP 的藥。即使標示為「包含」區，423 筆的第三區在藥車前實質不可用——臨床上不會有人逐張比對 423 張圖。分級有揭露、沒有欺騙，但沒有解決可用性。",
+     "rule_change_proposed": true,
+     "proposal": "單字元查詢（len(token) === 1）不啟用「包含」級，只保留完全與字首兩級（S 為 174 + 657 = 831，仍多但去掉最不可用的一層）。此為規格層變更，須由使用者裁決，未自行實作。"
+    }
+   ]
+  },
+  "false_negative": {
+   "question": "是否存在「規則不命中但人工認為該命中」的案例？",
+   "found": true,
+   "search_scope": "全 baseline 6,295 筆中有有效 token 的 4,210 筆；重點檢視 TFDA 只記錄部分刻字的情形（token 數 = 1 者共 1,293 筆，佔有 token 記錄的 30.7%）。",
+   "method": "以查詢 token 數大於記錄 token 數的情境，追蹤該記錄在三值語意下的歸屬。",
+   "cases": [
+    {
+     "example_id": "內衛藥製字第000278號",
+     "record_tokens": ["I", "15", "JCP"],
+     "query": "I 15 JCP XYZ",
+     "actual": "mismatch → 完全排除（連未提供區都進不去）",
+     "verdict": "屬 false negative，且是系統性的",
+     "rationale": "查詢 token 對記錄 token 取 AND，只要有一個查詢 token 找不到就判 mismatch，該筆被完全排除。而 TFDA 的標註欄經常只記錄部分刻字（1,293 筆只有單一 token）。使用者照著藥錠把看到的字全部讀出來，反而會把記錄不完整的那批藥全部濾掉——**輸入越完整、漏檢越嚴重**，與 D1 確立的漏檢優先直接衝突。這與缺值不同：缺值有未提供區接住，部分記錄沒有。",
+     "rule_change_proposed": true,
+     "proposal": "候選作法（須使用者裁決，未自行實作）：新增第四個分區「部分符合」，收容『至少一個查詢 token 命中、但非全部命中』的記錄，排在包含區之後並明確標示；或在查詢 token ≥2 時把未全中者降級而非排除。兩者都不改動既有三級的定義與數字。"
+    }
+   ]
+  }
+ }
+}

@@ -1,0 +1,87 @@
+name: 更新 TFDA 藥品外觀資料
+
+# 規格 `.ai-review/plan.md` §6。任一步失敗即紅燈，**已 commit 的版本維持上一版**。
+on:
+  schedule:
+    - cron: '17 20 * * 0'      # 每週一 04:17 (UTC+8)
+  workflow_dispatch:
+
+# D9：同一 branch 只允許一個資料更新在跑。
+# 兩個並行的更新會讓較舊的來源覆蓋較新的，或兩邊都失敗。
+# 後到者取消而非排隊——資料更新沒有「補跑舊版本」的價值。
+concurrency:
+  group: data-update-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300          # L7 是 360 分鐘，留 60 分鐘餘裕給收尾
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1   # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020  # v7
+        with:
+          node-version: '22'
+      - uses: astral-sh/setup-uv@94527f2e458b27549849d47d273a16bec83a01e9  # v7
+
+      # ① 抓來源並守門 → 寫出 staging（尚未發布）
+      - name: 建置 canonical（守門：筆數／欄位／詞彙鎖／id／資產鍵／變動幅度）
+        run: node tools/fetch-appearance.mjs
+
+      # ② 增量鏡像圖片。失敗即整批中止，staging 不回寫。
+      #    **不得**用「把該張剔除」吸收暫時性失敗。
+      - name: 鏡像圖片
+        run: uv run tools/fetch-images.py
+
+      # ③ 完整性與 provenance（D12.1 三條）
+      - name: 驗證產物
+        run: node tools/verify-data.mjs --source data/source.zip --in data/appearance.json.staging
+        # fetch-appearance 會把下載的來源留在 data/source.zip 供此步對帳
+        # （沒有來源就只能驗檔名格式，那等於沒驗 provenance）
+
+      - name: 跑測試
+        run: npm test
+
+      # ⑤ 資料就緒切換點（rename）。圖片未全部完成時會拒絕。
+      - name: 切換到新版本
+        run: node tools/fetch-appearance.mjs --publish
+
+      # ⑥ 唯一對外發布快照：一次帶入 JSON 與圖片
+      - name: 提交
+        run: |
+          git config user.name  'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add data/appearance.json data/img
+          if git diff --cached --quiet; then
+            echo '來源未變，無需提交（meta 不含執行時間，冪等）'
+            exit 0
+          fi
+          VER=$(node -p "JSON.parse(require('fs').readFileSync('data/appearance.json','utf8')).meta.source_version ?? 'unknown'")
+          N=$(node -p "JSON.parse(require('fs').readFileSync('data/appearance.json','utf8')).meta.count")
+          git commit -m "chore(data): 更新 TFDA 藥品外觀資料至 ${VER}（${N} 筆）"
+          git push
+
+      # 失敗時開 issue，讓「幅度超門檻需人工裁決」不會靜靜地紅在 Actions 頁裡
+      - name: 失敗時開 issue
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const url = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            await github.rest.issues.create({
+              owner: context.repo.owner, repo: context.repo.repo,
+              title: `資料更新失敗（${new Date().toISOString().slice(0,10)}）`,
+              body: [
+                '週更失敗，**已發布的資料維持上一版**（全有全無）。',
+                '',
+                `執行紀錄：${url}`,
+                '',
+                '常見原因與處置：',
+                '- 變動幅度 > ±3% 或移除 > 50 筆 → 確認差異無誤後以 `--allow-any-delta` 重跑',
+                '- 詞彙快照出現新值 → 人工更新 `data/vocab.lock.json` **與** `search.js` 的常數',
+                '- 圖片永久回 0 bytes → 人工審核後加入 `data/image-exceptions.json`（管線不得自動加）',
+              ].join('\n'),
+            });
