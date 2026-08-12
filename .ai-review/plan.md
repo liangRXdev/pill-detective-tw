@@ -1,6 +1,6 @@
-# 藥丸偵探 Pill Detective TW — 台灣藥品外觀搜尋　規劃文件 v1.5
+# 藥丸偵探 Pill Detective TW — 台灣藥品外觀搜尋　規劃文件 v1.6
 
-- 修訂時間：2026-08-12（最新 v1.5；v1.2 依 `plan-verdict-2.md`，v1.3／v1.4／v1.5 為實作階段裁決。修訂紀錄見 §14）
+- 修訂時間：2026-08-12（最新 v1.6；v1.2 依 `plan-verdict-2.md`，v1.3–v1.6 為實作階段裁決。修訂紀錄見 §14）
 - repo：https://github.com/liangRXdev/pill-detective-tw （GitHub Pages 靜態站）
 - 資料源：衛生福利部食品藥物管理署 Open Data「藥品外觀資料集」（opendata infoId=42）
 - 姊妹專案：`TFDA-drug-id-quiz`（藥品辨識王，同一資料源，已上線）
@@ -830,6 +830,17 @@ CLAUDE.md / README.md / LICENSE / .gitignore / package.json
 
 ## 14. 修訂紀錄
 
+### v1.5 → v1.6（metadata-first hotfix，2026-08-12）
+
+首次 Pages 部署時，正式 `data/appearance.json` 尚未發布，導致整個搜尋介面因 HTTP 404
+而 fail-closed。圖片首建需下載 6,798 張來源圖，且 workflow 只在全量完成後才切換正式
+manifest；用圖片首建阻塞搜尋資料上線，會讓網站在整段首建期間持續不可用。
+
+新增 **D23 metadata-only 發布狀態**：搜尋資料可先發布，所有 `imgs[].sha256` 強制清為
+`null`，並以 `meta.images_complete=false` 明確標示。前端顯示「鏡像圖片建置中」，但
+候選搜尋、缺值分區與 TFDA 官方原圖連結皆可使用。完整 `--publish` 的圖片完整性守門
+維持不變；圖片首建完成後改為 `images_complete=true`。
+
 ### v1.4 → v1.5（v0.1 架構精簡，2026-08-12 下午）
 
 依使用者指示做 v0.1 精簡覆審（不新增功能）。搜尋語意、三值／PARTIAL、
@@ -937,6 +948,18 @@ fail-closed 資料更新與回歸測試**均未變動**。
 它們**不影響搜尋語意、不影響三值分區、不影響 fail-closed 發布**，
 最壞後果是一顆藥顯示了舊照片 —— 而 §8.5 的安全文案已要求以原包裝人工確認。
 若哪一條的失效會讓使用者**看不出來地**拿到錯的候選清單，那條就不在這個清單裡。
+
+### D23 metadata-only 發布狀態（v1.6）
+
+`npm run publish:metadata` 是獨立且明示的暫時發布路徑，不等同完整圖片就緒：
+
+- 輸入仍必須是 canonical staging，且通過 schema、筆數、id 唯一性與圖片連結結構檢查
+- 輸出保留完整搜尋欄位與官方 `src`，但強制把每個 `sha256` 清為 `null`，不引用尚未發布的鏡像
+- `meta.images_complete=false`、`meta.images_bytes=0`
+- staging 不被消耗，後續圖片首建仍可沿用原流程
+- 原 `--publish` 仍拒絕任何缺少合法 sha256 的圖片；全量完成後標示 `images_complete=true`
+
+因此就緒狀態由一個含糊的「有／無 manifest」拆成兩個可觀察狀態：搜尋資料就緒與圖片鏡像就緒。
 
 ### v1.3 → v1.4（實測 HEAD 支援後修訂 D14）
 

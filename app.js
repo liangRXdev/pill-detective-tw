@@ -33,6 +33,9 @@ const fmt = (v) => {
 
 const criteria = { color: [], shape: [], score: SCORE_ANY, imprint: '', name: '' };
 let items = null;
+let imagesComplete = true;
+
+const imagePlaceholder = () => imagesComplete ? '官方暫無可用圖片' : '鏡像圖片建置中';
 
 // ── 資料載入：任何契約違反都 fail-closed（D16）────────────────────
 
@@ -45,6 +48,9 @@ let items = null;
 function contractErrors(payload) {
   if (!payload || typeof payload !== 'object') return '回應不是物件';
   if (payload.meta?.schema !== 1) return `meta.schema 不是 1（${JSON.stringify(payload.meta?.schema)}）`;
+  if ('images_complete' in payload.meta && typeof payload.meta.images_complete !== 'boolean') {
+    return 'meta.images_complete 不是 boolean';
+  }
   if (!Array.isArray(payload.items)) return 'items 不是陣列';
   if (payload.items.length === 0) return 'items 為空';
   const seen = new Set();
@@ -83,6 +89,7 @@ async function load() {
   const bad = contractErrors(payload);
   if (bad) return fatal(`資料格式不符：${bad}`);
 
+  imagesComplete = payload.meta.images_complete !== false;
   items = indexItems(payload.items);
   $('bar').hidden = false;
   $('panel').hidden = false;
@@ -146,7 +153,7 @@ function thumb(item, size) {
   if (size) { box.style.width = size; box.style.height = size; }
   const g = item.imgs[0];
   if (!g || !g.sha256) {
-    box.appendChild(el('span', 'ph', '官方暫無可用圖片'));
+    box.appendChild(el('span', 'ph', imagePlaceholder()));
     return box;
   }
   const img = el('img');
@@ -154,7 +161,7 @@ function thumb(item, size) {
   img.decoding = 'async';
   img.alt = '';                       // 純視覺比對用，品名已在旁邊，避免螢幕閱讀器重複
   // 失敗時換成 placeholder，**不得留下瀏覽器破圖 icon**（F4）
-  img.addEventListener('error', () => box.replaceChildren(el('span', 'ph', '官方暫無可用圖片')));
+  img.addEventListener('error', () => box.replaceChildren(el('span', 'ph', imagePlaceholder())));
   img.src = imgUrl(g);
   box.appendChild(img);
   return box;
@@ -282,11 +289,11 @@ function openDetail(item) {
       const box = el('div', 'thumb');
       if (!g.sha256) {
         // 鏡像缺這一張時仍留下官方原圖連結——那是使用者唯一還看得到外觀的路
-        box.appendChild(el('span', 'ph', '官方暫無可用圖片'));
+        box.appendChild(el('span', 'ph', imagePlaceholder()));
       } else {
         const img = el('img');
         img.loading = 'lazy'; img.decoding = 'async'; img.alt = '';
-        img.addEventListener('error', () => box.replaceChildren(el('span', 'ph', '官方暫無可用圖片')));
+        img.addEventListener('error', () => box.replaceChildren(el('span', 'ph', imagePlaceholder())));
         img.src = imgUrl(g);
         box.appendChild(img);
       }
@@ -302,7 +309,7 @@ function openDetail(item) {
   } else {
     const shot = el('div', 'shot');
     const box = el('div', 'thumb');
-    box.appendChild(el('span', 'ph', '官方暫無可用圖片'));
+    box.appendChild(el('span', 'ph', imagePlaceholder()));
     shot.appendChild(box);
     shots.appendChild(shot);
   }

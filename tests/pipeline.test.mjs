@@ -19,7 +19,7 @@ import { fileURLToPath } from 'node:url';
 import { makeZip, srcRow, srcRows } from './_zip.mjs';
 import {
   dosDateToISO, carryHashes, isSha256, assetKey, findAssetKeyCollisions,
-  watchEmptyFields, checkVocab, readZipEntries, pickDataFile,
+  watchEmptyFields, checkVocab, readZipEntries, pickDataFile, metadataOnlyPayload,
 } from '../tools/fetch-appearance.mjs';
 import { verify } from '../tools/verify-data.mjs';
 
@@ -362,6 +362,32 @@ test('C10b --publish 在沒有 staging 時中止', () => {
   assert.notEqual(r.code, 0);
   assert.match(r.stderr, /沒有可發布的候選版本/);
   assert.equal(fingerprint(ws.dir), before);
+});
+
+test('C10c metadata-only 可先發布搜尋資料，但不放寬完整圖片守門', () => {
+  const ws = workspace();
+  const zip = writeZip(ws.dir, srcRows(5100));
+  assert.equal(run(['--source', zip, '--out', ws.out, '--vocab-lock', ws.lock]).code, 0);
+
+  const stagedPath = `${ws.out}.staging`;
+  const staged = JSON.parse(fs.readFileSync(stagedPath, 'utf8'));
+  staged.items[0].imgs[0].sha256 = 'a'.repeat(64);
+  staged.items[0].imgs[0].src_bytes = 1234;
+  fs.writeFileSync(stagedPath, JSON.stringify(staged), 'utf8');
+
+  const r = run(['--out', ws.out, '--publish-metadata-only']);
+  assert.equal(r.code, 0, r.stderr);
+  const published = JSON.parse(fs.readFileSync(ws.out, 'utf8'));
+  assert.equal(published.meta.images_complete, false);
+  assert.equal(published.meta.images_bytes, 0);
+  assert.ok(published.items.flatMap((it) => it.imgs).every((g) => g.sha256 === null));
+  assert.ok(published.items.flatMap((it) => it.imgs).every((g) => !('src_bytes' in g)));
+  assert.ok(fs.existsSync(stagedPath), 'metadata-only 發布不得消耗完整圖片候選版本');
+
+  const before = fs.readFileSync(ws.out);
+  const full = run(['--out', ws.out, '--publish']);
+  assert.notEqual(full.code, 0, '完整發布仍必須拒絕缺圖版本');
+  assert.ok(before.equals(fs.readFileSync(ws.out)), '完整發布失敗不得改動 metadata-only 正式版');
 });
 
 // ── C11 增量判定 ────────────────────────────────────────────────────

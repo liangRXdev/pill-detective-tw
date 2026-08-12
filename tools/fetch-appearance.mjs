@@ -3,7 +3,8 @@
  * canonical 資料建置管線 — 規格 `.ai-review/plan.md` §6
  *
  *   node tools/fetch-appearance.mjs [--source <本機zip>] [--out data/appearance.json]
- *                                   [--allow-any-delta] [--publish]
+ *                                   [--allow-any-delta]
+ *                                   [--publish | --publish-metadata-only]
  *
  * **預設寫到 `<out>.staging`，不發布**（D12）。
  * 圖片抓完、verify 通過之後才由 `--publish` 做那一次 rename——
@@ -253,6 +254,41 @@ export function carryHashes(items, prevItems) {
  */
 export const isSha256 = (v) => typeof v === 'string' && /^[0-9a-f]{64}$/.test(v);
 
+/**
+ * 建立可先行上線的 metadata-only 快照。
+ *
+ * 這不是放寬完整圖片發布的守門：所有圖片雜湊都刻意清為 null，並以
+ * `meta.images_complete=false` 明確標示狀態。前端因此只顯示 placeholder，
+ * 但搜尋欄位與 TFDA 官方原圖連結可先使用。
+ */
+export function metadataOnlyPayload(staged) {
+  if (!staged || typeof staged !== 'object') die('候選版本不是物件');
+  if (staged.meta?.schema !== 1) die('候選版本 meta.schema 不是 1');
+  if (!Array.isArray(staged.items) || staged.items.length === 0) die('候選版本 items 為空或不是陣列');
+  if (staged.meta.count !== staged.items.length) die('候選版本 meta.count 與 items 筆數不符');
+
+  const seen = new Set();
+  const items = staged.items.map((it) => {
+    if (!it || typeof it.id !== 'string' || !it.id) die('候選版本有記錄缺 id');
+    if (seen.has(it.id)) die(`候選版本 id 重複：${it.id}`);
+    seen.add(it.id);
+    if (!Array.isArray(it.imgs)) die(`${it.id} 的 imgs 不是陣列`);
+    const imgs = it.imgs.map((g) => {
+      if (!g || typeof g.file !== 'string' || typeof g.src !== 'string') {
+        die(`${it.id} 的 imgs 結構損壞`);
+      }
+      return { file: g.file, src: g.src, sha256: null };
+    });
+    return { ...it, imgs };
+  });
+
+  return {
+    ...staged,
+    meta: { ...staged.meta, images_bytes: 0, images_complete: false },
+    items,
+  };
+}
+
 // ── 主流程 ──────────────────────────────────────────────────────────
 
 /**
@@ -289,12 +325,27 @@ async function main() {
   const stagingPath = `${outPath}.staging`;
   const allowAnyDelta = argv.includes('--allow-any-delta');
 
+  // ── metadata-only hotfix：搜尋資料先就緒，圖片仍維持未完成 ─────────
+  if (argv.includes('--publish-metadata-only')) {
+    if (!fs.existsSync(stagingPath)) die(`找不到 ${path.relative(ROOT, stagingPath)}，沒有可發布的候選版本`);
+    const staged = JSON.parse(fs.readFileSync(stagingPath, 'utf8'));
+    const payload = metadataOnlyPayload(staged);
+    const tempPath = `${outPath}.tmp`;
+    fs.writeFileSync(tempPath, JSON.stringify(payload, null, 1) + '\n', 'utf8');
+    fs.renameSync(tempPath, outPath);
+    console.log(`✓ 已發布 metadata-only：${path.relative(ROOT, outPath)}（${payload.items.length.toLocaleString()} 筆）`);
+    console.log('  圖片尚未完成；前端將顯示 placeholder 與 TFDA 官方原圖連結。');
+    return;
+  }
+
   // ── --publish：D12 的資料就緒切換點 ────────────────────────────
   if (argv.includes('--publish')) {
     if (!fs.existsSync(stagingPath)) die(`找不到 ${path.relative(ROOT, stagingPath)}，沒有可發布的候選版本`);
     const staged = JSON.parse(fs.readFileSync(stagingPath, 'utf8'));
     const missing = staged.items.flatMap((it) => it.imgs).filter((g) => !isSha256(g.sha256));
     if (missing.length) die(`還有 ${missing.length} 張圖片未完成，不可切換（先跑 fetch-images）`);
+    staged.meta.images_complete = true;
+    fs.writeFileSync(stagingPath, JSON.stringify(staged, null, 1) + '\n', 'utf8');
     fs.renameSync(stagingPath, outPath);
     console.log(`✓ 已切換：${path.relative(ROOT, outPath)}（${staged.items.length.toLocaleString()} 筆）`);
     console.log('  注意：這只是資料就緒切換點。對外發布快照是 commit。');

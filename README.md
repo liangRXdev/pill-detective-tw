@@ -61,6 +61,7 @@ npm test                          # 86 項：搜尋語意／正規化／管線 f
 npm run build -- --source <zip>   # 建置 canonical（開發時用本機 zip 避免重複打 TFDA）
 uv run tools/fetch-images.py      # 鏡像圖片（需 uv + Pillow）
 npm run verify -- --source <zip> --in data/appearance.json.staging
+npm run publish:metadata          # 先發布可搜尋資料；圖片顯示建置中
 npm run publish:data              # 資料就緒切換點
 ```
 

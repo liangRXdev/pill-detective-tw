@@ -12,6 +12,7 @@
     "expected": "node tools/make-expected.mjs",
     "build": "node tools/fetch-appearance.mjs",
     "verify": "node tools/verify-data.mjs",
+    "publish:metadata": "node tools/fetch-appearance.mjs --publish-metadata-only",
     "publish:data": "node tools/fetch-appearance.mjs --publish"
   },
   "license": "MIT"

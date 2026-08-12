@@ -189,4 +189,6 @@ test('E-img 圖片一律 lazy＋帶內容版本，且失敗時換 placeholder �
   const errHandlers = [...src.matchAll(/addEventListener\('error'/g)];
   assert.equal(errHandlers.length, 2, 'E-img: 卡片與詳細頁都必須有 onerror fallback');
   assert.ok(src.includes('官方暫無可用圖片'));
+  assert.ok(src.includes('鏡像圖片建置中'));
+  assert.ok(src.includes("payload.meta.images_complete !== false"));
 });
