@@ -1,5 +1,7 @@
 # 藥丸偵探 Pill Detective TW — 台灣藥品外觀搜尋
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Pill%20Detective%20TW-3D7A8A?style=for-the-badge&logo=github)](https://liangrxdev.github.io/pill-detective-tw/)
+
 依藥品**外觀特徵**（刻字、顏色、形狀、刻痕）從衛福部食藥署（TFDA）公開資料
 縮小候選藥品清單，供藥師與醫療人員**人工比對確認**。
 
@@ -39,13 +41,23 @@
 顏色與形狀可複選（組內 OR），各條件之間 AND。
 標註一／標註二**不標示為正面／背面**——TFDA 未定義兩欄的面向語意。
 
+## 介面
+
+- **搜尋列 sticky、條件面板隨頁捲動**——吸頂的東西永遠矮於視窗，不遮蔽結果
+- **確定符合展開、低確定性收合**：部分符合與資料未提供以原生 `<details>` 呈現，
+  摘要保留分區名稱與筆數，首次展開才建立卡片（`M 40` 這類查詢的低確定性候選達 2,379 筆）
+- **卡片與詳細視窗顯示官方鏡像圖**（WebP，長邊 640），並可直連 TFDA 官方原圖
+- **詳細視窗提供「查看 TFDA 仿單」**（依許可證字號）
+- 無圖或載入失敗一律換 placeholder，不留破圖
+
 ## 資料
 
 | | |
 |---|---|
 | 來源 | [TFDA Open Data 藥品外觀資料集](https://data.fda.gov.tw/opendata/exportDataList.do?method=openData&infoId=42)（infoId=42） |
-| 筆數 | 6,295 筆（**全量收錄，不做過濾**） |
-| 圖片 | 官方圖鏡像為 WebP（長邊 640）。官方原圖中位 1.5 MB，單頁 20 張約 68 MB，外連在行動網路不可行 |
+| 筆數 | 6,295 筆（**全量收錄，不做過濾**），快照 2026-08-10 |
+| 圖片 | **鏡像已完成**：6,273 筆／6,798 張，轉為 WebP（長邊 640）共 87 MB。官方原圖中位 1.5 MB，單頁 20 張約 68 MB，外連在行動網路不可行 |
+| 圖片版本 | 檔名固定為 `sha1(id)-n.webp`，請求附 `?v=<sha256 前 8 碼>`——官方原地換圖時不會讀到瀏覽器舊快取 |
 | 更新 | GitHub Actions 每週；**任一驗證失敗即整批不發布**，維持上一版 |
 | 新鮮度 | 每季 HEAD 掃全量比對原圖長度 ＋ 隨機抽 100 張深驗；偵測到官方換圖**不自動更新**，開 issue 待人工確認 |
 
@@ -57,16 +69,18 @@
 ## 開發
 
 ```bash
-npm test                          # 86 項：搜尋語意／正規化／管線 fail-closed／回歸 fixtures／靜態契約
+npm test                          # 95 項：搜尋語意／正規化／管線 fail-closed／回歸 fixtures／靜態契約
 npm run build -- --source <zip>   # 建置 canonical（開發時用本機 zip 避免重複打 TFDA）
 uv run tools/fetch-images.py      # 鏡像圖片（需 uv + Pillow）
 npm run verify -- --source <zip> --in data/appearance.json.staging
-npm run publish:metadata          # 先發布可搜尋資料；圖片顯示建置中
-npm run publish:data              # 資料就緒切換點
+npm run publish:metadata          # 圖片尚未就緒時，先發布可搜尋資料
+npm run publish:data              # 資料就緒切換點（圖片未全部完成時會拒絕）
+
+uv run tools/fetch-images.py --in data/appearance.json --freshness   # 季度新鮮度檢查
 ```
 
-零依賴、無 build step、Node ≥ 22。規格在 `.ai-review/plan.md`，
-兩輪獨立覆審報告與判定在同一目錄。工程慣例見 `CLAUDE.md`。
+零依賴、無 build step、Node ≥ 22，GitHub Pages 靜態部署。
+規格在 `.ai-review/plan.md`，兩輪獨立覆審報告與判定在同一目錄。工程慣例見 `CLAUDE.md`。
 
 ## 免責
 
