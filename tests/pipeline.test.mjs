@@ -603,7 +603,28 @@ test('C-zip 讀取器：store 與 deflate 都能讀，截斷的 ZIP 會被擋下
   assert.throws(() => readZipEntries(truncated), /End of Central Directory/);
 });
 
-// ── C14 狀態檔（D28）──────────────────────────────────────────────
+// ── C14 狀態檔（D28）／C18–C19 workflow 契約 ──────────────────────
+
+/**
+ * 逐一讀出 `.github/workflows/` 底下的 workflow，**先剝掉 YAML 註解**。
+ *
+ * 剝註解是必要的：解釋規則的註解本身會含有被搜尋的字串
+ * （C18 的 `issues: write` 就是），掃全檔的話把真正的設定拿掉也會通過
+ * ——變異 F12 實跑存活過一次。同 `ui-smoke` 的 `stripComments` 理由。
+ */
+function workflows() {
+  const dir = path.join(ROOT, '.github/workflows');
+  return fs.readdirSync(dir).filter((f) => /\.ya?ml$/.test(f)).map((file) => {
+    const lines = fs.readFileSync(path.join(dir, file), 'utf8')
+      .split('\n').map((l) => l.replace(/(^|\s)#.*$/, ''));
+    const start = lines.findIndex((l) => /^permissions:/.test(l));
+    const block = [];
+    if (start >= 0) {
+      for (let i = start + 1; i < lines.length && /^\s+\S/.test(lines[i]); i++) block.push(lines[i].trim());
+    }
+    return { file, lines, block };
+  });
+}
 
 test('C14 buildStatus：欄位齊全、來源缺 mtime 時寧可缺欄位也不拿檢查日頂替', () => {
   const now = new Date('2026-08-09T20:17:00Z');   // 台北 2026-08-10 04:17（排程時刻）
@@ -659,34 +680,53 @@ test('C14c 已發布的 status.json 與 appearance.json 一致（漂移即紅燈
     'C14c: last_checked 早於 source_version');
 });
 
-test('C15 workflow 宣告的 permissions 必須涵蓋它實際用到的 API', () => {
+test('C18 workflow 宣告的 permissions 必須涵蓋它實際用到的 API', () => {
   // 這條守的是一個**曾經一直是斷的**安全網：`permissions:` 一旦指定，
   // 未列出的權限全部變成 none，於是「失敗時開 issue」會靜靜地 403，
   // 週更失敗就只紅在 Actions 頁裡沒人看到。
   //
   // **必須先剝掉 YAML 註解再掃。** 解釋這條規則的註解本身含有 `issues: write`，
   // 掃全檔的話拿掉真正的權限也會通過（實跑變異 F12 存活過）。
-  const raw = fs.readFileSync(path.join(ROOT, '.github/workflows/update-data.yml'), 'utf8');
-  const lines = raw.split('\n').map((l) => l.replace(/(^|\s)#.*$/, ''));
-
-  const start = lines.findIndex((l) => /^permissions:/.test(l));
-  assert.ok(start >= 0, 'C15: 找不到 permissions 區塊，掃描失效');
-  const block = [];
-  for (let i = start + 1; i < lines.length && /^\s+\S/.test(lines[i]); i++) block.push(lines[i].trim());
-  assert.ok(block.length > 0, 'C15: permissions 區塊是空的');
-
-  const body = lines.join('\n');
-  // 「用到什麼 API」→「需要什麼權限」。要加新的 API 就在這裡登記。
-  const NEEDS = [
-    [/issues\.create|issues\.createComment/, 'issues: write'],
-    [/git push/, 'contents: write'],
-  ];
-  for (const [api, perm] of NEEDS) {
-    if (!api.test(body)) continue;
-    assert.ok(block.includes(perm),
-      `C15: workflow 用到 ${api} 但 permissions 沒有 ${perm}（未列出的權限一律為 none）`);
+  // 掃**全部** workflow，不是只有 update-data.yml：同一個坑在姊妹檔一樣會發生，
+  // 而「只檢查出過事的那一支」等於等下一支自己出事。
+  let sawIssues = 0;
+  let sawPush = 0;
+  for (const { file, lines, block } of workflows()) {
+    const body = lines.join('\n');
+    // 「用到什麼 API」→「需要什麼權限」。要加新的 API 就在這裡登記。
+    const NEEDS = [
+      [/issues\.create|issues\.createComment/, 'issues: write'],
+      [/git push/, 'contents: write'],
+    ];
+    for (const [api, perm] of NEEDS) {
+      if (!api.test(body)) continue;
+      assert.ok(block.length > 0, `C18: ${file} 用到 ${api} 卻沒有 permissions 區塊`);
+      assert.ok(block.includes(perm),
+        `C18: ${file} 用到 ${api} 但 permissions 沒有 ${perm}（未列出的權限一律為 none）`);
+    }
+    if (/issues\.create/.test(body)) sawIssues++;
+    if (/git push/.test(body)) sawPush++;
   }
-  // 對照組：確認這個 workflow 真的有用到上面兩者，否則整條靠「都沒用到」通過
-  assert.match(body, /issues\.create/, 'C15: 對照組失效 —— 找不到 issues.create');
-  assert.match(body, /git push/, 'C15: 對照組失效 —— 找不到 git push');
+  // 對照組：真的有 workflow 用到這兩者，否則整條靠「都沒用到」通過
+  assert.ok(sawIssues >= 2, `C18: 對照組失效 —— 只有 ${sawIssues} 支 workflow 用到 issues.create`);
+  assert.ok(sawPush >= 1, 'C18: 對照組失效 —— 沒有 workflow 用到 git push');
+});
+
+test('C19 workflow 的 action 一律 pin 到完整 commit SHA，不得用可移動的 tag', () => {
+  // tag 是可移動的：上游被接管或誤推，`@v7` 下一次跑就換成別的程式碼，
+  // 而這個 workflow 有 contents: write 與 issues: write。
+  // repo 其餘三個 action 一直都是 pin 的，`actions/github-script` 是唯一漏網的。
+  const offenders = [];
+  let total = 0;
+  for (const { file, lines } of workflows()) {
+    lines.forEach((l, i) => {
+      const m = l.match(/^\s*(?:-\s*)?uses:\s*(\S+)/);
+      if (!m) return;
+      total++;
+      const ref = m[1].split('@')[1];
+      if (!/^[0-9a-f]{40}$/.test(ref ?? '')) offenders.push(`${file}:${i + 1} → ${m[1]}`);
+    });
+  }
+  assert.ok(total >= 8, `C19: 只掃到 ${total} 個 uses —— 掃描已失效，不是「沒有 action」`);
+  assert.deepEqual(offenders, [], `C19: 未 pin SHA 的 action：\n  ${offenders.join('\n  ')}`);
 });
