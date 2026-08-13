@@ -13,6 +13,7 @@ import {
   isOfficialImgUrl, officialLeafletUrl, IMG_ORIGIN,
   normalizeName, imprintQueryState, QueryState, toItem,
   hasActiveCriteria, SCORE_ANY,
+  taipeiDate, daysSinceISODate, STALE_DAYS, freshnessView,
 } from '../search.js';
 
 /** B1 的非空對照組——沒有它，「一律回空陣列」也會通過整組 B1 */
@@ -231,4 +232,114 @@ test('B15 零條件是資料庫入口狀態，不是全資料集完全符合', (
     { imprint: '10' },
     { name: '蘇打' },
   ]) assert.equal(hasActiveCriteria(criteria), true, JSON.stringify(criteria));
+});
+
+// ── D28 資料新鮮度的日期運算 ───────────────────────────────────────
+//
+// 期望值全部是手寫的字面常數，**不由受測函式產生**。
+// 拿 taipeiDate() 的輸出去斷言 taipeiDate() 只會證明它自洽。
+
+test('B16 taipeiDate 是台北日曆日，不是 UTC 日', () => {
+  // 排程時刻：UTC 週日 20:17 ＝ 台北週一 04:17。用 UTC 會少一天。
+  assert.equal(taipeiDate(new Date('2026-08-09T20:17:00Z')), '2026-08-10');
+  // 台北午夜前一分鐘與後一分鐘落在不同日
+  assert.equal(taipeiDate(new Date('2026-08-12T15:59:00Z')), '2026-08-12');
+  assert.equal(taipeiDate(new Date('2026-08-12T16:00:00Z')), '2026-08-13');
+  // 跨月與跨年邊界
+  assert.equal(taipeiDate(new Date('2026-08-31T16:00:00Z')), '2026-09-01');
+  assert.equal(taipeiDate(new Date('2026-12-31T16:00:00Z')), '2027-01-01');
+});
+
+test('B17 daysSinceISODate 壞輸入一律回 null —— 絕不可回 0', () => {
+  // 0 會被頁尾判讀成「今天剛檢查過」，把壞掉的狀態檔偽裝成最新鮮的狀態。
+  const now = new Date('2026-08-13T02:00:00Z');   // 台北 2026-08-13 10:00
+  for (const bad of [
+    null, undefined, 0, 20260813, '', '  ',
+    '2026-8-13',            // 未補零
+    '2026/08/13',           // 分隔符不符
+    '2026-08-13T00:00:00Z', // 帶時間
+    '2026-13-01',           // 月份不存在
+    '2026-02-31',           // 曆法上不存在的日
+    'yyyy-mm-dd',
+  ]) {
+    assert.equal(daysSinceISODate(bad, now), null, `B17: ${JSON.stringify(bad)} 未回 null`);
+  }
+  // 非空對照組：合法輸入必須真的算得出來，否則「一律回 null」也會通過上面整段
+  assert.equal(daysSinceISODate('2026-08-13', now), 0);
+});
+
+test('B18 daysSinceISODate 的天數與過期門檻', () => {
+  const now = new Date('2026-08-13T02:00:00Z');   // 台北 2026-08-13
+  assert.equal(daysSinceISODate('2026-08-12', now), 1);
+  assert.equal(daysSinceISODate('2026-07-30', now), 14);
+  assert.equal(daysSinceISODate('2026-07-29', now), 15);
+  // 未來日期回負數而非 null：那是「狀態檔有問題」，交給呼叫端處理，不假裝正常
+  assert.equal(daysSinceISODate('2026-08-20', now), -7);
+
+  // 門檻的語意：14 天（＝錯過兩次週更）仍算新鮮，第 15 天才過期
+  assert.equal(STALE_DAYS, 14);
+  assert.equal(daysSinceISODate('2026-07-30', now) > STALE_DAYS, false);
+  assert.equal(daysSinceISODate('2026-07-29', now) > STALE_DAYS, true);
+});
+
+test('B19 freshnessView：版本與筆數取自 meta，狀態檔只能決定「最後檢查」', () => {
+  const now = new Date('2026-08-13T02:00:00Z');           // 台北 2026-08-13
+  const meta = { schema: 1, source_version: '2026-08-10', count: 6295 };
+  const ok = { schema: 1, source_version: '2026-08-10', last_checked: '2026-08-12', count: 6295 };
+
+  // 正常：三項齊全、不過期
+  assert.deepEqual(freshnessView(meta, ok, now), {
+    sourceVersion: '2026-08-10', count: 6295, lastChecked: '2026-08-12', days: 1, stale: false,
+  });
+
+  // 狀態檔缺席／壞掉 → 仍顯示版本與筆數，但不顯示最後檢查
+  for (const bad of [null, undefined, 'nope', 42, {}, { schema: 2, source_version: '2026-08-10', last_checked: '2026-08-12' }]) {
+    const v = freshnessView(meta, bad, now);
+    assert.equal(v.lastChecked, null, `B19: ${JSON.stringify(bad)} 不該產生 lastChecked`);
+    assert.equal(v.stale, false);
+    assert.equal(v.sourceVersion, '2026-08-10', 'B19: 降級時仍應顯示 meta 的版本');
+    assert.equal(v.count, 6295);
+  }
+});
+
+test('B19b freshnessView：跨版本組合不得把舊狀態檔的檢查日貼到新資料上', () => {
+  const now = new Date('2026-08-13T02:00:00Z');
+  const meta = { schema: 1, source_version: '2026-08-10', count: 6295 };
+
+  // SW 只有一邊退快取時會發生：appearance 是新的、status 是上一版的
+  const stale = { schema: 1, source_version: '2026-07-01', last_checked: '2026-08-12', count: 6100 };
+  const v = freshnessView(meta, stale, now);
+  assert.equal(v.lastChecked, null, 'B19b: source_version 不符仍顯示了最後檢查');
+  assert.equal(v.sourceVersion, '2026-08-10', 'B19b: 版本被舊狀態檔覆蓋');
+  assert.equal(v.count, 6295, 'B19b: 筆數被舊狀態檔覆蓋');
+
+  // 對照組：同一份資料就要顯示，否則上面那條靠「永遠不顯示」也會通過
+  assert.equal(
+    freshnessView(meta, { ...stale, source_version: '2026-08-10' }, now).lastChecked,
+    '2026-08-12');
+
+  // 兩邊都沒有 source_version 視為一致（來源未提供 mtime 的情境）
+  assert.equal(
+    freshnessView({ schema: 1, count: 10 }, { schema: 1, last_checked: '2026-08-12', count: 10 }, now)
+      .lastChecked,
+    '2026-08-12');
+});
+
+test('B19c freshnessView：未來日期不得顯示成「剛檢查過」', () => {
+  const now = new Date('2026-08-13T02:00:00Z');
+  const meta = { schema: 1, source_version: '2026-08-10', count: 6295 };
+  const at = (d) => freshnessView(meta, { schema: 1, source_version: '2026-08-10', last_checked: d }, now);
+
+  // days > STALE_DAYS 對負數為 false —— 不擋的話壞掉的狀態檔會偽裝成最新鮮
+  for (const future of ['2026-08-14', '2026-09-01', '2027-01-01']) {
+    const v = at(future);
+    assert.equal(v.lastChecked, null, `B19c: 未來日期 ${future} 仍被顯示`);
+    assert.equal(v.stale, false);
+    assert.equal(v.days, null);
+  }
+
+  // 門檻邊界：14 天仍新鮮、15 天過期、今天為 0 天
+  assert.deepEqual([at('2026-08-13').days, at('2026-08-13').stale], [0, false]);
+  assert.deepEqual([at('2026-07-30').days, at('2026-07-30').stale], [14, false]);
+  assert.deepEqual([at('2026-07-29').days, at('2026-07-29').stale], [15, true]);
 });

@@ -9,9 +9,11 @@ import {
   COLORS, SHAPES, SCORE_MARKS, SCORE_ANY,
   indexItems, search, resultStates, relaxSuggestions, ResultState, hasActiveCriteria,
   isOfficialImgUrl, officialLeafletUrl,
+  freshnessView,
 } from './search.js';
 
 const DATA_URL = 'data/appearance.json';
+const STATUS_URL = 'data/status.json';
 const PAGE = 24;              // 首屏卡片數，其餘捲動載入（D11）
 const DEBOUNCE_MS = 120;
 
@@ -34,6 +36,9 @@ const fmt = (v) => {
 const criteria = { color: [], shape: [], score: SCORE_ANY, imprint: '', name: '' };
 let items = null;
 let imagesComplete = true;
+/** SW 通報「這份資料來自快取」。訊息可能早於資料載入完成，故存成狀態而非直接畫 */
+let offlineData = false;
+let dataVersion = null;
 
 const imagePlaceholder = () => imagesComplete ? '官方暫無可用圖片' : '鏡像圖片建置中';
 
@@ -91,10 +96,103 @@ async function load() {
 
   imagesComplete = payload.meta.images_complete !== false;
   items = indexItems(payload.items);
+  dataVersion = payload.meta.source_version ?? null;
   $('bar').hidden = false;
   $('panel').hidden = false;
   buildChips();
   render();
+  if (offlineData) renderOfflineBanner();
+  // 刻意不 await：頁尾是裝飾性資訊，不得讓它擋住搜尋可用的時間點
+  renderFreshness(payload.meta);
+}
+
+// ── 離線模式（D29）────────────────────────────────────────────────
+
+/**
+ * SW 端出快取資料時**必須看得見**。
+ *
+ * 沒有 SW 的時候，資料載不到會走 D16 的 fail-closed，畫面明講「這不代表查無此藥」。
+ * 有了 SW，同一個情境變成「安靜地端出上次抓到的資料」——搜尋看起來完全正常，
+ * 但那份資料可能已經是幾週前的。**這個橫幅就是那個差額。**
+ *
+ * 監聽必須在 `load()` 之前註冊：SW 的訊息是在資料回應**之前**送出的
+ * （`networkFirstData` 會 await 完 notifyClients 才回應），晚註冊就收不到。
+ */
+function renderOfflineBanner() {
+  const host = $('offline');
+  host.replaceChildren(document.createTextNode('目前無法連線，顯示的是先前存下的資料'));
+  if (dataVersion) {
+    host.append(document.createTextNode('（來源版本 '), el('b', null, dataVersion),
+      document.createTextNode('）'));
+  }
+  host.append(document.createTextNode('。恢復連線後重新整理即可取得最新版本。'));
+  host.hidden = false;
+}
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('message', (e) => {
+    if (e.data?.type !== 'OFFLINE_MODE') return;
+    // **只有搜尋資料退快取才掛橫幅。**
+    // status.json 單獨退快取時，畫面上的搜尋結果其實是剛從網路取得的最新資料，
+    // 這時說「顯示的是先前存下的資料」是一句關於資料新鮮度的錯誤陳述。
+    // 那一格由 freshnessView 的版本對帳處理（不符就不顯示最後檢查日）。
+    if (!String(e.data.path ?? '').endsWith('/data/appearance.json')) return;
+    offlineData = true;
+    // 資料可能還沒載完（訊息先到）。載完後 load() 會補叫一次。
+    if (items) renderOfflineBanner();
+  });
+  // 註冊失敗不影響任何功能：SW 是加值，不是相依
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+
+// ── 資料新鮮度頁尾（D28）──────────────────────────────────────────
+
+/**
+ * 讀 `status.json` 並填頁尾。**與 D16 相反，這裡一律不 fail-closed。**
+ *
+ * 狀態檔是裝飾性資訊，抓不到不得阻斷搜尋、不得顯示 fatal。
+ * **要顯示什麼由 `freshnessView()` 決定**（`search.js`，純函式，可測）——
+ * 這裡只負責取檔與畫 DOM，不做任何新鮮度判斷。
+ *
+ * 危險的方向不是「少顯示」，是「顯示一個過期或壞掉的檢查日期」，
+ * 那會讓人相信資料是新的。三條防線都在 `freshnessView` 裡。
+ */
+async function renderFreshness(meta) {
+  let status = null;
+  try {
+    const res = await fetch(STATUS_URL, { cache: 'no-cache' });
+    if (res.ok) status = await res.json();
+  } catch {
+    // 網路或 JSON 解析失敗都走降級，不上報、不阻斷
+  }
+
+  const host = $('freshness');
+  const view = freshnessView(meta, status);
+
+  const parts = [];
+  if (view.sourceVersion) parts.push(['資料版本：', view.sourceVersion, '（TFDA 來源日期）']);
+  if (view.lastChecked) parts.push(['最後檢查：', view.lastChecked, null]);
+  if (view.count !== null) parts.push(['收錄：', `${view.count.toLocaleString()} 筆`, null]);
+
+  if (!parts.length) {
+    host.hidden = true;
+    return;
+  }
+
+  host.replaceChildren();
+  parts.forEach(([label, value, suffix], i) => {
+    if (i) host.append(el('span', 'sep', '·'));
+    host.append(document.createTextNode(label), el('b', null, value));
+    if (suffix) host.append(document.createTextNode(suffix));
+  });
+
+  host.classList.toggle('is-stale', view.stale);
+  host.append(el('span', 'cadence', view.stale
+    ? `已超過 ${view.days} 天未成功更新，資料可能不是最新的`
+    : '每週一自動檢查 TFDA 來源更新'));
+  host.hidden = false;
 }
 
 // ── 條件面板 ──────────────────────────────────────────────────────

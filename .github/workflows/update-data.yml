@@ -13,8 +13,12 @@ concurrency:
   group: data-update-${{ github.ref }}
   cancel-in-progress: false
 
+# 一旦指定 permissions，**未列出的一律變成 none**。
+# `issues: write` 是最後那個「失敗時開 issue」步驟需要的——沒有它會靜靜地 403，
+# 而那個步驟的全部用意就是不讓週更失敗只紅在 Actions 頁裡沒人看到。
 permissions:
   contents: write
+  issues: write
 
 jobs:
   update:
@@ -49,19 +53,36 @@ jobs:
       - name: 切換到新版本
         run: node tools/fetch-appearance.mjs --publish
 
-      # ⑥ 唯一對外發布快照：一次帶入 JSON 與圖片
+      # ⑥ 唯一對外發布快照：一次帶入 JSON、圖片與狀態檔
+      #
+      # D28：`appearance.json` 維持冪等（meta 不含執行時間），「最後檢查時間」另放
+      # `data/status.json`。因此**這一步一定會有 diff**，每週固定產生一個 commit——
+      # 那正是目的：讓「檢查過但來源沒變」和「根本沒在維護」在頁面上分得開。
+      #
+      # 順序很重要：先只 stage 資料與圖片來判定來源是否真的變了，
+      # 再寫 status.json。反過來的話 status.json 的 diff 會讓每週都被判成「資料有更新」。
       - name: 提交
         run: |
           git config user.name  'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
           git add data/appearance.json data/img
+          if git diff --cached --quiet; then DATA_CHANGED=0; else DATA_CHANGED=1; fi
+
+          # 只在守門／鏡像／verify／npm test／publish 全部通過後才推進 last_checked
+          node tools/write-status.mjs
+          git add data/status.json
           if git diff --cached --quiet; then
-            echo '來源未變，無需提交（meta 不含執行時間，冪等）'
+            echo '狀態檔亦無變動（同日重跑），無需提交'
             exit 0
           fi
+
           VER=$(node -p "JSON.parse(require('fs').readFileSync('data/appearance.json','utf8')).meta.source_version ?? 'unknown'")
           N=$(node -p "JSON.parse(require('fs').readFileSync('data/appearance.json','utf8')).meta.count")
-          git commit -m "chore(data): 更新 TFDA 藥品外觀資料至 ${VER}（${N} 筆）"
+          if [ "$DATA_CHANGED" = '1' ]; then
+            git commit -m "chore(data): 更新 TFDA 藥品外觀資料至 ${VER}（${N} 筆）"
+          else
+            git commit -m "chore(data): 週檢無變更（來源仍為 ${VER}）"
+          fi
           git push
 
       # 失敗時開 issue，讓「幅度超門檻需人工裁決」不會靜靜地紅在 Actions 頁裡
