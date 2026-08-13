@@ -54,6 +54,80 @@
 | 官方原圖中位 **1.5 MB**、最大 18 MB、`?c=` 無縮圖參數 | 單頁 20 張約 68 MB → 必須鏡像（D10） |
 | `info.fda.gov.tw` TLS 握手失敗 | 逐藥深連結無法驗證 → 不做 |
 
+## 兩個時間欄位分屬兩個檔案，合併就會廢掉冪等
+
+`appearance.json` 的 `meta` **刻意不含執行時間**——來源未變時位元組要完全相同，
+否則每週都會產生假 diff。「最後檢查時間」因此另放 `data/status.json`（D28）。
+
+**不要把 `last_checked` 搬進 `meta`**，那是把冪等直接拆了。
+反過來也不行：`source_version`（TFDA 端資料產生日）與 `last_checked`（我方成功跑完的日）
+**不同義**，缺 `source_version` 時寧可欄位不存在，也不得拿 `last_checked` 頂替。
+
+`tools/write-status.mjs` **必須排在 `--publish` 之後**（它讀已發布的 `appearance.json`），
+且**只在守門／鏡像／verify／npm test／publish 全過之後**才跑。
+失敗的 run 推進了 `last_checked`，等於在頁面上宣稱資料是新的。
+
+頁尾這條與 D16 **方向相反：不 fail-closed**。狀態檔壞掉只能降級顯示，
+不得阻斷搜尋。`daysSinceISODate()` 對壞輸入回 `null` 而**不是 0**——
+0 會被讀成「今天剛檢查過」，把壞掉的狀態檔偽裝成最新鮮的。
+
+`taipeiDate()` 放在 `search.js` 而不是各自實作：寫入端與判讀端的日期定義必須是同一份，
+理由同 `IMG_ORIGIN`。排程是 UTC `17 20 * * 0`＝台北週一 04:17，用 UTC 會少一天。
+
+## Service Worker 的六條不可改（D29）
+
+前三條是設計時就想到的，後三條是 Codex 覆審抓出來的——**都只有執行期才顯形**。
+
+1. **`activate` 只刪 `pill-` 前綴的 cache。** Cache Storage 是 origin-wide，
+   `liangrxdev.github.io` 上還有十幾個姊妹工具，無前綴的清理會刪掉別人的離線資源。
+2. **圖片比對不得 `ignoreSearch`。** `?v=<sha8>` 是 D10.1 的內容版本，
+   忽略 query＝TFDA 換圖後永遠命中舊圖。孤兒條目由 `IMG_CACHE_LIMIT` 吸收，
+   而那個淘汰是 **FIFO 不是 LRU**（Cache API 沒有存取時間），別在別處講成 LRU。
+3. **資料檔 network-first，且無快取時要讓例外往上拋。**
+   合成一個 200 空殼會讓 `items: []` 被讀成「查無此藥」——
+   加 SW 之前那個情境會走 D16 明講「這不代表查無此藥」，別把它換成更糟的東西。
+4. **shell 不得用 stale-while-revalidate。** 導覽已經是 network-first，
+   模組若走 SWR 就會出現**新的 `index.html` 配舊的 `app.js`**；
+   而且部署修正漏檢規則後，首次重訪仍會靜默套用舊規則。兩支模組合計 35 KB，網路優先划算。
+5. **每一處 `cache.put` 都要經 `putSafe`。** 寫快取和抓網路共用一個 `try` 的話，
+   配額爆掉（同 origin 十幾個工具共用）會被當成離線：
+   **網路明明成功拿到最新資料，畫面卻端出舊快取還誤報離線。**
+6. **`trimImageCache()` 必須掛在 `event.waitUntil()` 上。** 沒人等的 Promise 只是
+   「有機會跑完」，SW 回應後隨時可能被終止，那樣上限就不是保證而是願望。
+   實測：620 張請求後停在 500——這條靜態掃描驗不到，改了要重跑 E11。
+
+`OFFLINE_MODE` 的橫幅**只在 `path` 是 `appearance.json` 時才掛**。
+`status.json` 單獨退快取時，畫面上的結果其實是剛從網路拿的，
+說「顯示的是先前存下的資料」是一句關於資料新鮮度的錯誤陳述。
+
+## 頁尾要顯示什麼由 `freshnessView()` 決定，不在 app.js 裡判
+
+`search.js` 的 `freshnessView(meta, status, now)` 有三條防線，拿掉任何一條都會
+**顯示一個看起來正常、其實是錯的新鮮度**：
+
+1. 版本與筆數**取自 `meta`**（已通過 D16 契約）而非 `status`
+2. `source_version` 不符就不顯示 `last_checked`——兩個檔各自走 SW 快取，
+   會出現「appearance 是新的、status 退了舊快取」的跨版本組合
+3. 未來日期（`days < 0`）不顯示——`days > STALE_DAYS` 對負數為 false，
+   不擋的話壞掉的狀態檔會偽裝成「剛檢查過」
+
+抽成純函式**是為了測得到**：本專案沒有 jsdom，留在 `renderFreshness` 裡就只剩原始碼掃描。
+
+## workflow 的 permissions 是「全有全無」
+
+一旦寫了 `permissions:`，**未列出的權限一律變成 `none`**。
+`update-data.yml` 曾經只有 `contents: write`，於是「失敗時開 issue」一直靜靜地 403——
+週更失敗只紅在 Actions 頁裡沒人看到。C15 守著這條。
+
+**C15 必須先剝掉 YAML 註解再掃**：解釋這條規則的註解本身含有 `issues: write`，
+掃全檔的話把真正的權限拿掉也會通過（變異 F12 實跑存活過）。
+
+`appearance.json`（3.7 MB）**不進 install 預抓**。代價是首次造訪後要再載入一次才有離線能力
+（SW 那時才接管），這是刻意接受的：預抓會讓只點進來看一眼的人先付 3.7 MB。
+
+`OFFLINE_MODE` 的監聽必須註冊在 `load()` 之前——SW 會 await 完 `notifyClients` 才回應資料，
+晚註冊就收不到，而橫幅不出現＝離線舊資料完全沒有標示。
+
 ## 發布是兩個層次，別混用
 
 `rename appearance.json.staging → appearance.json` 是**資料就緒切換點**（工作目錄內）；

@@ -20,8 +20,13 @@ import { COLORS, SHAPES, SCORE_MARKS } from '../search.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-/** 會被發布到 GitHub Pages 的程式碼與樣板檔案 */
-const PUBLISHABLE = ['index.html', 'app.js', 'search.js'];
+/**
+ * 會被發布到 GitHub Pages 的程式碼與樣板檔案。
+ *
+ * v0.2 加入 `sw.js` 與 `manifest.webmanifest`：它們同樣會被發布，
+ * 同樣能夾帶外部 origin 或禁語，漏掃等於 E4b 記過的那個坑再犯一次。
+ */
+const PUBLISHABLE = ['index.html', 'app.js', 'search.js', 'sw.js', 'manifest.webmanifest'];
 const read = (f) => fs.readFileSync(path.join(ROOT, f), 'utf8');
 
 /**
@@ -129,12 +134,74 @@ test('E5b 外部 origin 允許清單：只有 TFDA 資料集頁與官方原圖 o
 test('E5d 沒有分析工具、沒有對外送出搜尋輸入', () => {
   const src = read('app.js');
   assert.ok(!/gtag|dataLayer|analytics|plausible|umami/i.test(src), 'E5d: 疑似分析工具');
-  // 只允許一次 fetch，且對象是自己的相對路徑資料檔
-  const fetches = [...src.matchAll(/fetch\(([^)]*)\)/g)].map((m) => m[1]);
-  assert.equal(fetches.length, 1, `E5d: fetch 呼叫數應為 1，實際 ${fetches.length}`);
-  assert.match(fetches[0], /DATA_URL/);
+
+  // **這條刻意不是「fetch 呼叫數 === N」。**
+  // v0.2 加 status.json 時那個版本只會逼人把 1 改成 2——常數推大、守門力歸零。
+  // 改成列舉：每一個 fetch 的第一個引數都必須是這裡具名的白名單常數，
+  // 新增任何請求目標都得先在測試裡登記。
+  const ALLOWED_FETCH_TARGETS = ['DATA_URL', 'STATUS_URL'];
+  const fetches = [...src.matchAll(/fetch\(\s*([^,)\s]*)/g)].map((m) => m[1]);
+  assert.ok(fetches.length > 0, 'E5d: app.js 找不到任何 fetch —— 掃描已失效，不是「沒有請求」');
+  for (const f of fetches) {
+    assert.ok(ALLOWED_FETCH_TARGETS.includes(f), `E5d: fetch 目標不在白名單：${f}`);
+  }
+  // 常數名對了不代表值是安全的：白名單常數本身必須是硬編的**相對路徑**
   assert.match(src, /const DATA_URL = 'data\/appearance\.json'/);
+  assert.match(src, /const STATUS_URL = 'data\/status\.json'/);
   assert.ok(!/XMLHttpRequest|WebSocket|EventSource|\.submit\(/.test(src), 'E5d: 有其他對外傳輸管道');
+});
+
+test('E7 資料新鮮度頁尾不得 fail-closed，且不得寫死任何日期', () => {
+  const src = read('app.js');
+  const body = stripComments(src);
+
+  // status.json 是裝飾性資訊。它掛掉時若走 fatal()，等於讓一個週更狀態檔
+  // 有權停掉整個搜尋——比不顯示更糟。
+  const fn = body.slice(body.indexOf('async function renderFreshness'));
+  assert.ok(fn.startsWith('async function renderFreshness'), 'E7: 找不到 renderFreshness，掃描失效');
+  const fnBody = fn.slice(0, fn.indexOf('\n}\n') + 2);
+  assert.ok(!/\bfatal\(/.test(fnBody), 'E7: renderFreshness 內出現 fatal()');
+  assert.match(fnBody, /try\s*\{[\s\S]*fetch\(\s*STATUS_URL/, 'E7: status.json 的 fetch 不在 try 內');
+  assert.match(fnBody, /catch/, 'E7: 沒有 catch，狀態檔失敗會變成 unhandled rejection');
+  // 新鮮度判斷一律由共用純函式決定，app.js 不得自己判（同 D15 的理由）
+  assert.match(fnBody, /freshnessView\(meta, status\)/, 'E7: 沒有走共用的 freshnessView');
+  assert.ok(!/status\.(source_version|count|last_checked)/.test(fnBody),
+    'E7: app.js 直接讀 status 的欄位 —— 版本對帳會被繞過');
+  // 什麼都沒有就整段不顯示
+  assert.match(fnBody, /hidden = true/, 'E7: 缺少「什麼都沒有就不顯示」的路徑');
+
+  // 頁面不得預先寫死日期：一個靜態的假「最後檢查」比空白更危險
+  const html = stripComments(read('index.html'));
+  const holder = html.match(/<p class="freshness"[^>]*>([\s\S]*?)<\/p>/);
+  assert.ok(holder, 'E7: index.html 找不到 #freshness');
+  assert.match(holder[0], /\bhidden\b/, 'E7: #freshness 預設不是 hidden');
+  assert.equal(holder[1].trim(), '', 'E7: #freshness 有寫死的內容');
+  assert.ok(!/\d{4}-\d{2}-\d{2}/.test(html), 'E7: index.html 出現寫死的日期');
+});
+
+test('E8 過期警示與版本對帳都在共用純函式裡，前端不得另抄', () => {
+  const app = stripComments(read('app.js'));
+  const fv = stripComments(read('search.js'));
+
+  // 前端只能拿 view 的結果，不得自己算天數或抄門檻
+  assert.ok(!/>\s*14\b/.test(app), 'E8: app.js 自己抄了天數字面值');
+  assert.ok(!/STALE_DAYS|daysSinceISODate/.test(app),
+    'E8: app.js 自己做新鮮度判斷 —— 那會與 freshnessView 漂移');
+  assert.match(app, /view\.stale/, 'E8: 沒有使用 view.stale');
+  assert.match(app, /view\.lastChecked/, 'E8: 沒有使用 view.lastChecked');
+  assert.match(read('index.html'), /\.freshness\.is-stale/, 'E8: 缺少 is-stale 樣式');
+
+  // freshnessView 的三條防線，各自對應一種「顯示了看起來正常、其實是錯的東西」。
+  // 行為由 B19 實跑覆蓋，這裡只擋「整段被拿掉」。
+  const fn = fv.slice(fv.indexOf('export function freshnessView'));
+  const fnBody = fn.slice(0, fn.indexOf('\n}\n') + 2);
+  assert.ok(fnBody.startsWith('export function freshnessView'), 'E8: 找不到 freshnessView，掃描失效');
+  assert.match(fnBody, /=== sourceVersion/, 'E8: 缺少 source_version 的跨版本對帳');
+  assert.match(fnBody, /days >= 0/, 'E8: 未來日期沒有被擋掉，會顯示成剛檢查過');
+  assert.match(fnBody, /days > STALE_DAYS/, 'E8: 過期判定沒有比對 STALE_DAYS');
+  // 版本與筆數必須取自 meta（已通過 D16 契約），不得取 status
+  assert.match(fnBody, /meta\?\.source_version/, 'E8: sourceVersion 不是取自 meta');
+  assert.match(fnBody, /meta\?\.count/, 'E8: count 不是取自 meta');
 });
 
 test('E6-static UI chips 的可選值集合 === search.js 常數 === vocab.lock（集合相等，非數量相等）', () => {
@@ -225,4 +292,148 @@ test('E-img 圖片一律 lazy＋帶內容版本，且失敗時換 placeholder �
   assert.match(src, /res\.partial, true, true/, '部分符合區須預設收合');
   assert.match(src, /res\.unknown, true, true/, '資料未提供區須預設收合');
   assert.ok(src.includes("s.addEventListener('toggle'"), '收合區應在首次展開時才建立卡片');
+});
+
+// ── E9／E10 PWA 契約（D29）─────────────────────────────────────────
+
+/** PNG IHDR：宣稱的 sizes 與檔案實際尺寸不符是靜默失效，安裝提示會直接不出現 */
+function pngSize(rel) {
+  const b = fs.readFileSync(path.join(ROOT, rel));
+  assert.equal(b.readUInt32BE(0), 0x89504e47, `${rel} 不是 PNG`);
+  return { w: b.readUInt32BE(16), h: b.readUInt32BE(20) };
+}
+
+test('E9 manifest 的圖示都存在，且宣稱尺寸等於實際像素', () => {
+  const m = JSON.parse(read('manifest.webmanifest'));
+  assert.equal(m.scope, './', 'E9: scope 不是相對路徑（會越界到 origin 上的姊妹站）');
+  assert.equal(m.start_url, './');
+  assert.equal(m.display, 'standalone');
+  assert.equal(m.theme_color, '#3D7A8A', 'E9: theme_color 與 index.html 的 meta 漂移');
+  assert.match(read('index.html'), /<meta name="theme-color" content="#3D7A8A">/);
+
+  assert.ok(m.icons.length >= 3, 'E9: 圖示不足');
+  for (const icon of m.icons) {
+    assert.ok(!/^https?:|^\//.test(icon.src), `E9: 圖示不是相對路徑：${icon.src}`);
+    assert.ok(fs.existsSync(path.join(ROOT, icon.src)), `E9: 圖示不存在：${icon.src}`);
+    const { w, h } = pngSize(icon.src);
+    assert.equal(`${w}x${h}`, icon.sizes, `E9: ${icon.src} 宣稱 ${icon.sizes}、實際 ${w}x${h}`);
+  }
+  // Android 自適應圖示與 iOS 各自需要專屬檔案，缺了只會安靜地退成醜圖
+  assert.ok(m.icons.some((i) => i.purpose === 'maskable'), 'E9: 缺 maskable 圖示');
+  assert.ok(m.icons.some((i) => i.purpose === 'any' && i.sizes === '192x192'), 'E9: 缺 192 any');
+  assert.ok(m.icons.some((i) => i.purpose === 'any' && i.sizes === '512x512'), 'E9: 缺 512 any');
+
+  const html = read('index.html');
+  assert.match(html, /<link rel="manifest" href="manifest\.webmanifest">/, 'E9: index.html 未連 manifest');
+  assert.match(html, /<link rel="apple-touch-icon" href="icons\/apple-touch-icon\.png">/,
+    'E9: 缺 apple-touch-icon（iOS 不吃 manifest 的圖示）');
+  assert.equal(pngSize('icons/apple-touch-icon.png').w, 180);
+});
+
+test('E10 SW：只清自己前綴的 cache，且資料檔 network-first', () => {
+  const src = read('sw.js');
+  const body = stripComments(src);
+
+  // Cache Storage 是 origin-wide，liangrxdev.github.io 上還有十幾個姊妹工具。
+  // 沒有前綴限制的 activate 會刪掉別人的離線資源（recall dashboard 的 CR-12）。
+  assert.match(body, /const CACHE_PREFIX = 'pill-'/, 'E10: 沒有 pill- 前綴常數');
+  const activate = body.slice(body.indexOf("addEventListener('activate'"));
+  const activateBody = activate.slice(0, activate.indexOf('\n});') + 4);
+  assert.ok(activateBody.includes('caches.delete'), 'E10: 找不到 activate 的清理路徑，掃描失效');
+  assert.match(activateBody, /startsWith\(CACHE_PREFIX\)/,
+    'E10: activate 未限定前綴，會刪掉同 origin 其他專案的 cache');
+
+  // `?v=<sha8>` 是 D10.1 的內容版本。忽略 query 比對＝TFDA 換圖後永遠命中舊圖。
+  assert.ok(!/ignoreSearch/.test(body), 'E10: 使用了 ignoreSearch，內容版本機制被廢掉');
+
+  // 資料檔必須 network-first：fetch 要出現在退快取之前
+  const nf = body.slice(body.indexOf('async function networkFirstData'));
+  const nfBody = nf.slice(0, nf.indexOf('\n}\n') + 2);
+  assert.ok(nfBody.includes('await fetch(req)'), 'E10: 找不到 networkFirstData 的網路路徑');
+  assert.ok(nfBody.indexOf('await fetch(req)') < nfBody.indexOf('cache.match'),
+    'E10: 先讀快取再打網路 —— 那是 cache-first，會靜默端出舊資料');
+  // 沒有快取時必須讓例外往上拋，D16 的 fail-closed 才會生效。
+  // 合成一個成功回應（空 items／200 空殼）會被讀成「查無此藥」。
+  assert.match(nfBody, /throw err/, 'E10: 無快取時沒有把例外拋出');
+  assert.ok(!/new Response\(/.test(nfBody), 'E10: networkFirstData 合成了回應');
+  assert.match(nfBody, /notifyClients\(\{ type: 'OFFLINE_MODE'/, 'E10: 退快取時沒有通報前端');
+
+  // A+B 範圍：3.7 MB 的資料檔不得進 install 的預抓清單
+  const shell = body.slice(body.indexOf('const SHELL = ['), body.indexOf('];', body.indexOf('const SHELL = [')));
+  assert.ok(!shell.includes('appearance.json'), 'E10: appearance.json 進了 install 預抓（3.7 MB）');
+  assert.ok(shell.includes('index.html') && shell.includes('app.js') && shell.includes('search.js'),
+    'E10: 預抓清單不完整，掃描失效');
+
+  // 圖片全量 87 MB，必須有數量上限與淘汰路徑
+  const limit = body.match(/const IMG_CACHE_LIMIT = (\d+);/);
+  assert.ok(limit, 'E10: 圖片快取沒有上限常數');
+  assert.ok(Number(limit[1]) > 0 && Number(limit[1]) < 6798,
+    `E10: 圖片上限 ${limit[1]} 不在合理範圍（全量 6,798 張／87 MB）`);
+  assert.match(body, /keys\.length - IMG_CACHE_LIMIT/, 'E10: 有上限常數但沒有淘汰路徑');
+  // 淘汰必須掛在 event 上。沒人等的 Promise 只是「有機會跑完」——
+  // SW 回應後隨時可能被終止，那樣上限就不是保證而是願望。
+  // （**執行期行為由 E11 負責**；這一條只擋原始碼層的移除。）
+  assert.match(body, /event\.waitUntil\(trimImageCache\(\)\)/,
+    'E10: 圖片淘汰未受 fetch event lifetime 保護');
+
+  // 跨源一律不攔截（§9／F11）
+  assert.match(body, /url\.origin !== self\.location\.origin\) return;/, 'E10: 未排除跨源請求');
+
+  // 模組不得 stale-while-revalidate：導覽已是 network-first，
+  // SWR 會造成「新 index.html 配舊 app.js」的版本偏移，
+  // 且部署修正漏檢規則後首次重訪仍會靜默套用舊規則。
+  assert.ok(!/staleWhileRevalidate/.test(body),
+    'E10: shell 走了 stale-while-revalidate，部署後首次重訪會執行舊模組');
+
+  // 寫快取失敗不得被當成網路失敗（配額爆掉 ≠ 離線）。
+  // 每一處 cache.put 都必須經由 putSafe，且 putSafe 自己要吞掉例外。
+  const puts = [...body.matchAll(/(\w+)\.put\(/g)].map((m) => m[1]);
+  assert.ok(puts.length > 0, 'E10: 找不到任何 cache.put —— 掃描已失效');
+  for (const receiver of puts) {
+    assert.equal(receiver, 'cache', `E10: 非預期的 put 接收者：${receiver}`);
+  }
+  const safe = body.slice(body.indexOf('async function putSafe'));
+  const safeBody = safe.slice(0, safe.indexOf('\n}\n') + 2);
+  assert.ok(safeBody.startsWith('async function putSafe'), 'E10: 找不到 putSafe，掃描失效');
+  assert.match(safeBody, /try\s*\{[\s\S]*cache\.put[\s\S]*catch/,
+    'E10: putSafe 沒有吞掉寫入例外');
+  // putSafe 以外不得有裸 cache.put —— 有的話那一處仍會把配額錯誤當成離線
+  const bareputs = body.split('\n')
+    .filter((l) => l.includes('cache.put(') && !safeBody.includes(l));
+  assert.deepEqual(bareputs, [], `E10: putSafe 之外還有裸 cache.put：${bareputs.join(' / ')}`);
+});
+
+test('E10b 離線橫幅：不得預先寫死，且監聽必須早於 load()', () => {
+  const html = read('index.html');
+  const holder = html.match(/<p class="offline"[^>]*>([\s\S]*?)<\/p>/);
+  assert.ok(holder, 'E10b: index.html 找不到 #offline');
+  assert.match(holder[0], /\bhidden\b/, 'E10b: #offline 預設不是 hidden');
+  assert.equal(holder[1].trim(), '', 'E10b: #offline 有寫死的內容');
+
+  const app = stripComments(read('app.js'));
+  const listener = app.indexOf("e.data?.type !== 'OFFLINE_MODE'");
+  assert.ok(listener > 0, 'E10b: app.js 沒有監聽 OFFLINE_MODE');
+  // SW 在回應資料**之前**送訊息（networkFirstData 會先 await notifyClients）。
+  // 監聽晚於 load() 就永遠收不到，而橫幅不出現＝離線舊資料完全沒有標示。
+  assert.ok(listener < app.lastIndexOf('\nload();'),
+    'E10b: OFFLINE_MODE 的監聽註冊晚於 load()，會漏掉 SW 送出的訊息');
+  // 訊息可能早於資料載入完成，故必須存成狀態再補畫，不能只在收到時畫一次
+  assert.match(app, /offlineData = true/, 'E10b: 沒有把離線狀態存下來');
+  assert.match(app, /if \(offlineData\) renderOfflineBanner\(\)/,
+    'E10b: 資料載入完成後沒有補畫橫幅（訊息早到就會漏）');
+  // 註冊失敗不得影響任何功能
+  assert.match(app, /navigator\.serviceWorker\.register\('sw\.js'\)\.catch\(/,
+    'E10b: SW 註冊沒有吞掉失敗');
+
+  // 橫幅只在**搜尋資料**退快取時掛。status.json 單獨退快取時，畫面上的結果
+  // 其實是剛從網路取得的，說「顯示的是先前存下的資料」就是錯誤陳述。
+  assert.match(app, /endsWith\('\/data\/appearance\.json'\)/,
+    'E10b: OFFLINE_MODE 未分辨 path，status 單獨失敗也會宣稱資料來自快取');
+  const guard = app.split('\n').findIndex((l) => l.includes("endsWith('/data/appearance.json')"));
+  const setFlag = app.split('\n').findIndex((l) => l.includes('offlineData = true'));
+  assert.ok(guard > 0 && guard < setFlag,
+    'E10b: path 判斷沒有擋在設定 offlineData 之前');
+  // SW 那端必須真的送出 path，否則前端的判斷永遠為 false（橫幅再也不會出現）
+  assert.match(stripComments(read('sw.js')), /OFFLINE_MODE', path: url\.pathname/,
+    'E10b: SW 沒有送出 path');
 });

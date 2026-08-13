@@ -7,6 +7,12 @@
 <meta name="description" content="藥丸偵探 Pill Detective TW — 依藥品外觀特徵（刻字、顏色、形狀、刻痕）從 TFDA 公開資料縮小候選藥品清單，供藥師與醫療人員人工比對確認。">
 <title>藥丸偵探 Pill Detective TW — 台灣藥品外觀搜尋</title>
 <link rel="icon" href="icon.svg" type="image/svg+xml">
+<!-- PWA（D29）。icons/ 的 PNG 由 icon.svg 的同一組座標與色碼產生。
+     iOS 不吃 manifest 的 SVG 圖示，apple-touch-icon 必須另外給。 -->
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="藥丸偵探">
 <style>
 /* ── house style token（pharmacy-portal 共用）─────────────────────
    刻意**不**載入 Google Fonts CDN：本站宣稱搜尋輸入不離開瀏覽器、
@@ -151,6 +157,26 @@ dialog::backdrop{background:rgba(44,44,44,.45)}
 .disclaimer{margin-top:1.25rem;font-size:.72rem;color:var(--text-muted);text-align:center;line-height:1.6}
 .disclaimer a{color:var(--accent)}
 
+/* ── 離線模式橫幅（D29）──────────────────────────────────────────
+   SW 端出快取資料時**必須看得見**。加了 SW 之後，原本會走 D16 fail-closed
+   的情境會變成「安靜地端出舊資料」，那比原本更危險。
+   放在 #bar 之前、不 sticky（吸頂的東西永遠不得高於視窗，§8.1）。 */
+.offline{margin-top:.6rem;border:1px solid var(--warning);border-radius:var(--radius);
+  background:rgba(230,126,34,.08);color:var(--warning);
+  padding:.6rem .8rem;font-size:.78rem;line-height:1.55}
+.offline b{font-family:var(--mono);font-weight:500}
+
+/* ── 資料新鮮度（D28）────────────────────────────────────────────
+   只顯示 source_version 的話，TFDA 三個月不更新就會讓站看起來像廢站。
+   「來源資料日期」與「我方最後檢查日期」是兩件事，必須分開講。 */
+.freshness{margin-top:1.25rem;font-size:.72rem;color:var(--text-muted);text-align:center;line-height:1.7}
+.freshness b{font-family:var(--mono);font-weight:500;color:var(--text-primary)}
+.freshness .sep{margin:0 .45rem;opacity:.45}
+.freshness .cadence{display:block;font-size:.68rem;opacity:.85}
+/* 超過兩次週更沒成功 → 讓「靜靜地壞掉」看得見 */
+.freshness.is-stale{color:var(--warning)}
+.freshness.is-stale b{color:var(--warning)}
+
 @media (max-width:480px){
   .wrap{padding:.5rem .7rem 3rem}
   .grid{grid-template-columns:1fr}
@@ -182,6 +208,9 @@ dialog::backdrop{background:rgba(44,44,44,.45)}
     <p class="hint" id="fatalWhy"></p>
     <p style="font-size:.85rem;margin:0">請稍後再試。<b>這不代表查無此藥</b>，搜尋功能已停用。</p>
   </section>
+
+  <!-- D29：SW 退快取時由 app.js 填入並顯示。內容不得預先寫死。 -->
+  <p class="offline" id="offline" hidden></p>
 
   <!-- 吸頂的只有搜尋列（§8.1）。刻字輸入與即時計數留在畫面上，
        條件面板則隨頁捲走，否則它會蓋住結果。 -->
@@ -224,6 +253,10 @@ dialog::backdrop{background:rgba(44,44,44,.45)}
     本工具依 TFDA 公開藥品外觀資料提供候選結果，外觀相似不代表為同一藥品。
     實際藥品仍應依原包裝、藥袋、許可證資訊或由醫療專業人員確認。
   </p>
+
+  <!-- D28：內容全由 app.js 填。狀態檔抓不到時整段維持 hidden，**不得**進 fatal，
+       也不得預先寫死任何日期——頁面上一個假的「最後檢查」比不顯示更糟。 -->
+  <p class="freshness" id="freshness" hidden></p>
 
   <p class="disclaimer">
     資料來源：衛生福利部食品藥物管理署 Open Data「藥品外觀資料集」（infoId=42）。

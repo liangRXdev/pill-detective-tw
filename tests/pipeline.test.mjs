@@ -22,6 +22,7 @@ import {
   watchEmptyFields, checkVocab, readZipEntries, pickDataFile, metadataOnlyPayload,
 } from '../tools/fetch-appearance.mjs';
 import { verify } from '../tools/verify-data.mjs';
+import { buildStatus } from '../tools/write-status.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CLI = path.join(ROOT, 'tools/fetch-appearance.mjs');
@@ -600,4 +601,92 @@ test('C-zip 讀取器：store 與 deflate 都能讀，截斷的 ZIP 會被擋下
   }
   const truncated = makeZip([{ name: '42_5.json', content: JSON.stringify(rows) }]).subarray(0, 40);
   assert.throws(() => readZipEntries(truncated), /End of Central Directory/);
+});
+
+// ── C14 狀態檔（D28）──────────────────────────────────────────────
+
+test('C14 buildStatus：欄位齊全、來源缺 mtime 時寧可缺欄位也不拿檢查日頂替', () => {
+  const now = new Date('2026-08-09T20:17:00Z');   // 台北 2026-08-10 04:17（排程時刻）
+
+  const full = buildStatus(
+    { schema: 1, count: 6295, source_version: '2026-08-10' }, now);
+  assert.deepEqual(full, {
+    schema: 1, last_checked: '2026-08-10', source_version: '2026-08-10', count: 6295,
+  });
+
+  // 來源沒給 mtime 時：欄位整個不存在，**不得**用 last_checked 填。
+  // 那會把「我方檢查日」講成「TFDA 資料日」，是頁尾上最誤導的一種錯。
+  const noVer = buildStatus({ schema: 1, count: 6295 }, now);
+  assert.equal('source_version' in noVer, false);
+  assert.deepEqual(noVer, { schema: 1, last_checked: '2026-08-10', count: 6295 });
+
+  // 對照組：不同時刻確實會算出不同的 last_checked（證明不是寫死）
+  assert.equal(
+    buildStatus({ schema: 1, count: 1 }, new Date('2026-08-12T16:00:00Z')).last_checked,
+    '2026-08-13');
+});
+
+test('C14b buildStatus 對壞掉的 meta 一律中止，不產生看起來正常的狀態檔', () => {
+  for (const bad of [
+    null, undefined, 'meta',
+    { count: 6295 },                          // 缺 schema
+    { schema: 2, count: 6295 },               // schema 不是 1
+    { schema: 1 },                            // 缺 count
+    { schema: 1, count: 0 },                  // 0 筆不是合法的已發布狀態
+    { schema: 1, count: -1 },
+    { schema: 1, count: 6295.5 },
+    { schema: 1, count: '6295' },             // 字串會讓前端的 toLocaleString 靜默失效
+  ]) {
+    assert.throws(() => buildStatus(bad), /appearance\.json|meta\./,
+      `C14b: ${JSON.stringify(bad)} 未中止`);
+  }
+});
+
+test('C14c 已發布的 status.json 與 appearance.json 一致（漂移即紅燈）', () => {
+  const statusPath = path.join(ROOT, 'data/status.json');
+  const dataPath = path.join(ROOT, 'data/appearance.json');
+  if (!fs.existsSync(statusPath) || !fs.existsSync(dataPath)) return;   // 首建前允許不存在
+
+  const status = JSON.parse(fs.readFileSync(statusPath, 'utf8'));
+  const meta = JSON.parse(fs.readFileSync(dataPath, 'utf8')).meta;
+  assert.equal(status.schema, 1);
+  assert.match(status.last_checked, /^\d{4}-\d{2}-\d{2}$/, 'C14c: last_checked 不是 YYYY-MM-DD');
+  assert.equal(status.count, meta.count, 'C14c: 筆數與 appearance.json 不一致');
+  assert.equal(status.source_version, meta.source_version,
+    'C14c: 來源版本與 appearance.json 不一致');
+  // 檢查日不得早於來源資料日——那代表狀態檔是舊的，或有人手改過
+  assert.ok(status.last_checked >= meta.source_version,
+    'C14c: last_checked 早於 source_version');
+});
+
+test('C15 workflow 宣告的 permissions 必須涵蓋它實際用到的 API', () => {
+  // 這條守的是一個**曾經一直是斷的**安全網：`permissions:` 一旦指定，
+  // 未列出的權限全部變成 none，於是「失敗時開 issue」會靜靜地 403，
+  // 週更失敗就只紅在 Actions 頁裡沒人看到。
+  //
+  // **必須先剝掉 YAML 註解再掃。** 解釋這條規則的註解本身含有 `issues: write`，
+  // 掃全檔的話拿掉真正的權限也會通過（實跑變異 F12 存活過）。
+  const raw = fs.readFileSync(path.join(ROOT, '.github/workflows/update-data.yml'), 'utf8');
+  const lines = raw.split('\n').map((l) => l.replace(/(^|\s)#.*$/, ''));
+
+  const start = lines.findIndex((l) => /^permissions:/.test(l));
+  assert.ok(start >= 0, 'C15: 找不到 permissions 區塊，掃描失效');
+  const block = [];
+  for (let i = start + 1; i < lines.length && /^\s+\S/.test(lines[i]); i++) block.push(lines[i].trim());
+  assert.ok(block.length > 0, 'C15: permissions 區塊是空的');
+
+  const body = lines.join('\n');
+  // 「用到什麼 API」→「需要什麼權限」。要加新的 API 就在這裡登記。
+  const NEEDS = [
+    [/issues\.create|issues\.createComment/, 'issues: write'],
+    [/git push/, 'contents: write'],
+  ];
+  for (const [api, perm] of NEEDS) {
+    if (!api.test(body)) continue;
+    assert.ok(block.includes(perm),
+      `C15: workflow 用到 ${api} 但 permissions 沒有 ${perm}（未列出的權限一律為 none）`);
+  }
+  // 對照組：確認這個 workflow 真的有用到上面兩者，否則整條靠「都沒用到」通過
+  assert.match(body, /issues\.create/, 'C15: 對照組失效 —— 找不到 issues.create');
+  assert.match(body, /git push/, 'C15: 對照組失效 —— 找不到 git push');
 });

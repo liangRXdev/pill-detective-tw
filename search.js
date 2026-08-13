@@ -136,6 +136,80 @@ export function isOfficialImgUrl(src) {
   }
 }
 
+// ── 資料新鮮度的日期運算（D28）──────────────────────────────────────
+//
+// 與 IMG_ORIGIN 同一條理由放在這裡：**寫入端與判讀端必須用同一套日期定義**。
+// `write-status.mjs` 用 taipeiDate 產生 last_checked，app.js 用同一支算「距今幾天」。
+// 兩邊各抄一份的話，漂移的那天會是「頁尾說剛檢查過、其實已經兩週沒跑」。
+
+/** 超過這個天數未成功更新即視為過期（＝錯過兩次週更）。 */
+export const STALE_DAYS = 14;
+
+/**
+ * `Date` → 台北日期字串 `YYYY-MM-DD`。
+ *
+ * 排程是 UTC `17 20 * * 0`（＝台北週一 04:17）。**直接用 `toISOString()` 會顯示成前一天**。
+ * 台灣無日光節約時間，固定 +8 小時即可，不需要 Intl（前端也就不必扛時區資料庫）。
+ */
+export function taipeiDate(now = new Date()) {
+  return new Date(now.getTime() + 8 * 60 * 60 * 1000).toISOString().slice(0, 10);
+}
+
+/**
+ * `YYYY-MM-DD` 距今幾天（台北日曆日相減）。
+ *
+ * 格式不符或不是真實存在的日期一律回 `null`——**不可回 0**：
+ * 0 會被判讀成「今天剛檢查過」，把壞掉的狀態檔偽裝成最新鮮的狀態。
+ * 未來日期回負數，由呼叫端決定怎麼處理（目前視同不過期，但不隱藏）。
+ */
+export function daysSinceISODate(iso, now = new Date()) {
+  if (typeof iso !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return null;
+  const t = Date.parse(`${iso}T00:00:00Z`);
+  if (Number.isNaN(t)) return null;
+  // Date.parse 會把 2026-02-31 之類不存在的日期視為無效，但不同引擎行為不一致，
+  // 因此再做一次 round-trip 檢查（同 dosDateToISO 的理由）
+  if (new Date(t).toISOString().slice(0, 10) !== iso) return null;
+  const today = Date.parse(`${taipeiDate(now)}T00:00:00Z`);
+  return Math.round((today - t) / 86_400_000);
+}
+
+/**
+ * 頁尾要顯示什麼（D28）。
+ *
+ * 抽成純函式是因為**這組判斷唯一測得到的方式就是把它抽出來**——
+ * 本專案沒有 jsdom（理由見 `tests/ui-smoke.test.mjs` 檔頭），
+ * 留在 `renderFreshness` 裡就只能靠原始碼掃描，那擋不住邏輯錯誤。
+ *
+ * 三條規則，每條都對應一個「顯示了看起來正常、其實是錯的東西」的失效：
+ *
+ * 1. **版本與筆數一律取自 `meta`，不取 `status`。**
+ *    兩個檔各自走 SW 快取，可能出現「`appearance.json` 是新的、`status.json`
+ *    退了舊快取」的跨版本組合。`meta` 已通過 D16 契約檢查，且確實就是
+ *    畫面上這批結果的來源；`status` 只是旁證。
+ * 2. **`source_version` 不符就不顯示 `last_checked`。** 那代表狀態檔在講另一份資料，
+ *    把它的檢查日貼到這份上就是憑空捏造的新鮮度。
+ * 3. **未來日期（`days < 0`）一律不顯示。** 那代表狀態檔壞了（時鐘或人為），
+ *    而 `days > STALE_DAYS` 對負數為 false，會把它顯示成「剛檢查過」——
+ *    正是 D28 要避免的「壞掉的狀態檔偽裝成最新鮮」。
+ */
+export function freshnessView(meta, status, now = new Date()) {
+  const sourceVersion = meta?.source_version ?? null;
+  const count = Number.isInteger(meta?.count) ? meta.count : null;
+
+  const sameData = status != null && typeof status === 'object' && status.schema === 1
+    && (status.source_version ?? null) === sourceVersion;
+  const days = sameData ? daysSinceISODate(status.last_checked, now) : null;
+  const show = days !== null && days >= 0;
+
+  return {
+    sourceVersion,
+    count,
+    lastChecked: show ? status.last_checked : null,
+    days: show ? days : null,
+    stale: show && days > STALE_DAYS,
+  };
+}
+
 /**
  * 許可證字號 → TFDA 官方仿單資料頁。
  *

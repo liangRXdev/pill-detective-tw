@@ -1,6 +1,6 @@
-# 藥丸偵探 Pill Detective TW — 台灣藥品外觀搜尋　規劃文件 v1.8
+# 藥丸偵探 Pill Detective TW — 台灣藥品外觀搜尋　規劃文件 v1.10
 
-- 修訂時間：2026-08-12（最新 v1.8；v1.2 依 `plan-verdict-2.md`，v1.3–v1.8 為實作階段裁決。修訂紀錄見 §14）
+- 修訂時間：2026-08-13（最新 v1.10；v1.2 依 `plan-verdict-2.md`，v1.3–v1.10 為實作階段裁決。修訂紀錄見 §14）
 - repo：https://github.com/liangRXdev/pill-detective-tw （GitHub Pages 靜態站）
 - 資料源：衛生福利部食品藥物管理署 Open Data「藥品外觀資料集」（opendata infoId=42）
 - 姊妹專案：`TFDA-drug-id-quiz`（藥品辨識王，同一資料源，已上線）
@@ -53,7 +53,7 @@
 | N4 | 自建 backend／PostgreSQL／Firebase | 靜態站足夠 |
 | N5 | Elasticsearch／Algolia／任何搜尋函式庫 | 6,295 筆線性掃描即可 |
 | N6 | 藥名 fuzzy／編輯距離容錯 | 本工具不判定對錯，只列候選 |
-| N7 | Service Worker／離線／PWA 可安裝性 | 上線穩定後另議 |
+| ~~N7~~ | ~~Service Worker／離線／PWA 可安裝性~~ | **v1.10 解除，範圍限 A＋B（D29）**：app shell 與搜尋資料離線可用、圖片 runtime 上限快取。**87 MB 完整離線包（C）仍不做** |
 | N8 | 逐藥的官方深連結（info.fda.gov.tw） | 實測該站 TLS 握手失敗、無法驗證 URL 樣式 |
 | N9 | 雙面 imprint（正面／背面）分開搜尋 | **資料不支持**，見 D7 |
 | N10 | 尺寸／特殊劑型／許可證狀態／廠牌等進階 filter | 後續版本 |
@@ -750,8 +750,14 @@ touch target ≥ 44 × 44 px；**只有搜尋列 sticky，條件面板隨頁捲�
 | **E2** | （人工）記錄 **rendered image box 實測寬高**，涵蓋直式、橫式、多圖、無圖四種卡片 |
 | **E3** | （人工）分別以缺顏色、缺形狀、缺刻痕、缺 imprint 各觸發一次「主區 0／未提供區 > 0」，記錄條件、兩區計數與完整文案 |
 | **E4** | （自動）身份宣稱片語掃描範圍涵蓋**所有可發布檔**（`index.html`、`app.js`、`search.js`、以及輸出到前端的 JSON 文案），非只有兩個檔；禁語以片語為單位；臨床安全提示字串必須存在 |
-| **E5** | （自動＋人工）自動：所有可發布檔不得出現 `localStorage`／`sessionStorage`／`document.cookie`／第三方 origin。人工：完整操作一次並留存 network 與 storage 檢查證據。**靜態掃描不宣稱完備**（別名與 computed property 繞得過），人工證據是這條的主要依據 |
+| **E5** | （自動＋人工）自動：所有可發布檔（**含 `sw.js`、`manifest.webmanifest`**）不得出現 `localStorage`／`sessionStorage`／`document.cookie`／第三方 origin；`app.js` 的每個 `fetch` 目標必須是**列舉**的白名單常數（`DATA_URL`／`STATUS_URL`），**不得用「呼叫數 === N」**——那種寫法在新增請求時只會被改大。人工：完整操作一次並留存 network 與 storage 檢查證據。**靜態掃描不宣稱完備**（別名與 computed property 繞得過），人工證據是這條的主要依據 |
 | **E6** | （人工）每筆 A12／E1–E3 的證據須含六欄且**每欄非空、可回鏈到具體案例**：資料版本、輸入、預期、實際、裁決理由（須引用可觀察證據，不得只寫「合理」）、是否導致規則變更。**若導致變更**須記錄對應的規則版本；**若不變更**須寫出不變更的理由。空字串或共用樣板視為未完成 |
+| **E7** | （自動）D28 頁尾**不得 fail-closed**：`renderFreshness` 內不得出現 `fatal(`，狀態檔的 `fetch` 必須在 `try` 內，且降級鏈三段齊備（status.json → `meta.source_version` → 整段 hidden）。`index.html` 的 `#freshness` 預設 hidden、內容為空，且**全檔不得出現寫死的 `YYYY-MM-DD`** |
+| **E8** | （自動）過期警示必須比對共用常數 `STALE_DAYS`，前端不得另抄天數字面值；「最後檢查」的輸出行**必須被 `days !== null` 守著**且不得有 `??` 預設值——日期解析失敗要整項不顯示，不得落進「今天剛檢查過」 |
+| **E9** | （自動）`manifest.webmanifest` 的每個圖示都存在、路徑為相對路徑，且**宣稱的 `sizes` 等於 PNG IHDR 的實際像素**；具備 192／512 `any` 與 512 `maskable`；`scope` 與 `start_url` 為 `./`；`theme_color` 與 `index.html` 的 meta 一致；`index.html` 連上 manifest 與 180px 的 `apple-touch-icon` |
+| **E10** | （自動）SW 契約：`activate` **只刪 `pill-` 前綴**的 cache；全檔不得出現 `ignoreSearch`；`networkFirstData` 的 `fetch` 必須早於 `cache.match`，無快取時 `throw` 且**不得合成 `new Response`**，退快取時必須 `notifyClients({type:'OFFLINE_MODE', path})`；install 預抓清單**不得含 `appearance.json`**；圖片快取上限為 0 < N < 6798 的常數、有淘汰路徑、且淘汰掛在 `event.waitUntil()` 上；shell **不得**使用 stale-while-revalidate；每一處 `cache.put` 都必須經 `putSafe`；跨源請求不攔截。**這條只擋原始碼層的移除**——「上限真的成立」「首次重載真的拿到新版」屬執行期行為，由 E11 負責 |
+| **E10b** | （自動）`#offline` 預設 hidden 且內容為空；`OFFLINE_MODE` 的監聽**註冊位置早於 `load()`**（SW 在回應資料之前送訊息）；離線狀態存成變數並在資料載入後補畫；SW 註冊失敗必須被吞掉 |
+| **E11** | （人工）本機起靜態站實測並留存證據：①SW active、cache key 只有 `pill-` 前綴 ②install 預抓清單不含 `appearance.json` ③二次載入後 `appearance.json` 進 `pill-data-*` ④圖片進 `pill-img-*` 且 URL **保留 `?v=`** ⑤**關閉伺服器後重載**：`#fatal` 仍 hidden、搜尋可用、`#offline` 可見、快取圖片正常顯示 ⑥注入 `last_checked` 過期的狀態檔驗 `is-stale`。每項附截圖或實測輸出 |
 
 ### F 組 — 整體驗收
 
@@ -779,10 +785,15 @@ tools/fetch-appearance.mjs        新增（移植 build-pool.mjs 的 ZIP reader�
 tools/fetch-images.py             新增（自 quiz 搬移；資產鍵加序號、支援多圖、例外清單）
 tools/fetch-images.py.lock        新增
 tools/verify-data.mjs             新增（詞彙快照、資產鍵不變量、例外清單一致性）
-search.js                         新增（純函式；三值語意、token 化、分區、排序）
+tools/write-status.mjs            v1.10（D28；**必須在 --publish 之後**跑，讀已發布的 appearance.json）
+search.js                         新增（純函式；三值語意、token 化、分區、排序、D28 日期運算）
 app.js                            新增（UI 接線，不含搜尋邏輯）
 index.html                        新增
+sw.js                             v1.10（D29；A＋B 快取策略）
+manifest.webmanifest              v1.10（D29）
+icons/*.png                       v1.10（192／512／maskable-512／apple-touch-180，由 icon.svg 光柵化）
 data/appearance.json              產物（rename 即資料就緒切換點，D12）
+data/status.json                  產物（D28；**與 appearance.json 分離以保住冪等**，週更必寫）
 data/vocab.lock.json              人工 review 後才更新
 data/image-exceptions.json        人工審核的永久壞圖例外
 data/img/*.webp                   產物
@@ -823,12 +834,107 @@ CLAUDE.md / README.md / LICENSE / .gitignore / package.json
   NHI 藥價與 ATC 資料集 join
 - Phase 4：Camera-assisted（拍照 → 影像前處理 → 特徵萃取 → **轉為搜尋條件** →
   仍由 deterministic 檢索產生候選）。AI 只負責萃取外觀特徵，不得決定最終藥品身份
-- PWA 可安裝性與 pharmacy-portal 收錄（N7）
+- PWA 的 **C 範圍**：87 MB 完整離線包（opt-in 下載）。A＋B 已於 v1.10 實作（D29）
+- pharmacy-portal 收錄
 - 「只找無標註的藥」filter（N12）
 
 ---
 
 ## 14. 修訂紀錄
+
+### v1.9 → v1.10（資料更新時間頁尾 ＋ PWA A＋B，2026-08-13）
+
+兩件事，都由使用者裁決後動工。
+
+#### D28 資料更新時間頁尾
+
+**問題**：頁面上唯一的時間資訊是 `meta.source_version`（TFDA 端的資料產生日）。
+若 TFDA 三個月不更新，頁尾就停在同一個日期，**看起來像廢站**——
+而實際上週更每週都在跑。「檢查過但來源沒變」與「根本沒在維護」在畫面上分不開。
+
+**為什麼不塞進 `appearance.json`**：那份的 `meta` 刻意不含執行時間
+（`fetch-appearance.mjs` §[9/9]），來源未變時位元組必須完全相同才不會產生假 diff。
+「最後檢查時間」每次執行都會變，塞進去等於直接廢掉冪等。
+
+**決策**：另立 `data/status.json`（`schema` / `last_checked` / `source_version` / `count`），
+由 `tools/write-status.mjs` 在 **`--publish` 之後**寫出。頁尾兩個日期分開講：
+
+> 資料版本：2026-08-10（TFDA 來源日期）· 最後檢查：2026-08-13 · 收錄：6,295 筆
+> 每週一自動檢查 TFDA 來源更新
+
+- **與 D16 相反，這條不 fail-closed**。狀態檔是裝飾性資訊，抓不到不得阻斷搜尋、不得進
+  `#fatal`。降級鏈：`status.json` → 只顯示 `meta.source_version` → 整段 hidden。
+  危險的方向不是「少顯示」，是**顯示一個過期或壞掉的檢查日期**——那會讓人相信資料是新的。
+  因此 `daysSinceISODate()` 對壞輸入一律回 `null`，**絕不可回 0**（0 會被讀成「今天剛檢查過」）。
+- **失敗的 run 絕不推進 `last_checked`**：write-status 排在守門／鏡像／verify／npm test／
+  publish 全部通過之後。workflow 失敗時頁尾停在上次成功日，那是正確行為不是 bug。
+- `last_checked` 距今 **> `STALE_DAYS`（14 天，＝錯過兩次週更）**時頁尾轉警示色並標出天數。
+  這條讓「靜靜地壞掉」看得見。
+- **時區**：排程是 UTC `17 20 * * 0`（＝台北週一 04:17）。直接用 `toISOString()` 會顯示成
+  前一天。`taipeiDate()` 放 `search.js`，與 `IMG_ORIGIN` 同一條理由——
+  **寫入端（管線）與判讀端（前端）必須用同一套日期定義**，各抄一份必然漂移。
+- workflow 的提交步驟改為先 stage 資料與圖片判定 `DATA_CHANGED`，再寫 status.json，
+  依此選兩種 commit message。代價是每週一個 ~200 bytes 的 commit，**那正是目的**。
+
+#### D29 PWA（範圍 A＋B）
+
+解除 N7。範圍經使用者裁決收在 A＋B：
+
+| | 內容 | 大小 |
+|---|---|---|
+| **A** | app shell 預抓 ＋ `appearance.json` 首次載入後入快取 | ~52 KB ＋ 3.7 MB |
+| **B** | 圖片 runtime 快取，上限 500 張 | ~6–8 MB |
+| ~~C~~ | ~~87 MB 完整離線包~~ | **不做**，最多留 opt-in 給後續版本 |
+
+- **最危險的事是離線靜默回舊資料**。加 SW 之前，資料載不到會走 D16 的 fail-closed，
+  畫面明講「這不代表查無此藥」；加 SW 之後，同一個失敗會變成安靜地端出舊快取，
+  **比原本更不安全**。故 `appearance.json`／`status.json` 一律 network-first，
+  退快取時 `postMessage('OFFLINE_MODE')`，前端掛出可見橫幅（`#offline`）。
+  **沒有快取時必須讓例外往上拋**，讓 D16 生效；不得合成 200 空殼（空 items 會被讀成「查無此藥」）。
+- **`activate` 只刪 `pill-` 前綴**。Cache Storage 是 origin-wide，
+  `liangrxdev.github.io` 上還有十幾個姊妹工具（recall dashboard 的 CR-12 已踩過）。
+  SW scope 本身不必擔心：專案頁在 `/pill-detective-tw/` 路徑下，天然受限。
+- **圖片不得 `ignoreSearch`**：`?v=<sha8>` 是 D10.1 的內容版本，忽略 query 比對＝
+  TFDA 換圖後永遠命中舊圖。代價是舊 `?v=` 留成孤兒，由 `IMG_CACHE_LIMIT` 吸收。
+  淘汰是 **FIFO 不是 LRU**（Cache API 沒有存取時間），上限的目的只是不無限長大。
+- `appearance.json`（3.7 MB）**不進 install 預抓**：那會讓只是點進來看一眼的人先付 3.7 MB。
+  它由 app.js 自己那次載入順帶入快取，等於零額外流量。代價是**首次造訪後需再載入一次**
+  才具備離線能力（SW 尚未接管），實測確認。
+- iOS 不吃 manifest 的 SVG 圖示，`apple-touch-icon` 必須另給；PNG 由 `icon.svg`
+  的同一組座標與色碼光柵化，maskable 與 apple-touch 版本滿版不留圓角（OS 自己套遮罩）。
+- `OFFLINE_MODE` 的監聽**必須註冊在 `load()` 之前**：SW 會 await 完 `notifyClients`
+  才回應資料，晚註冊就收不到，而橫幅不出現＝離線舊資料完全沒有標示。
+
+#### 覆審後修正（Codex 獨立覆審，判定見 `verdict.md`）
+
+覆審抓到 6 條**執行期才會顯形**的問題，全部已修並以 E11 實測驗證：
+
+| | 問題 | 失效方向 |
+|---|---|---|
+| C1 | shell 走 stale-while-revalidate | 部署後首次重訪執行舊模組；且導覽已是 network-first → **新 index.html 配舊 app.js** |
+| C2 | `cache.put` 與 `fetch` 共用一個 `try` | 配額爆掉時**網路明明成功卻靜默端出舊快取並誤報離線** |
+| C3 | 未與 `meta` 對帳、未來日期視為新鮮 | 舊狀態檔的檢查日被貼到新資料上；壞掉的日期顯示成「剛檢查過」 |
+| C4 | `trimImageCache()` 無人等 | SW 被終止時淘汰沒跑完，500 張上限只是願望 |
+| C5 | workflow `permissions` 缺 `issues: write` | **既有問題**：一旦指定 `permissions`，未列出的一律為 `none`，「失敗時開 issue」從未成功過 |
+| C6 | `OFFLINE_MODE` 未分辨 `path` | status 單獨退快取時，橫幅對臨床人員謊稱搜尋資料來自快取 |
+
+C3 的判定邏輯抽成 `search.js` 的 `freshnessView()`——本專案沒有 jsdom，
+留在 `renderFreshness` 裡就只能靠原始碼掃描，那擋不住邏輯錯誤。
+C5 另加 **C15**（workflow 宣告的權限必須涵蓋它用到的 API），
+該條**必須先剝掉 YAML 註解**：解釋規則的註解本身含有 `issues: write`，
+掃全檔的話拿掉真正的權限也會通過（變異 F12 實跑存活過）。
+
+**測試**：新增 B16–B18（日期運算）、B19／B19b／B19c（`freshnessView` 組合）、
+C14／C14b／C14c（狀態檔）、C15（workflow 權限）、E7–E11。
+E5d 由「fetch 呼叫數 === 1」改為**列舉白名單常數**——舊寫法在加第二個請求時
+只會被改大，守門力歸零。共 **38 條變異實跑全數轉紅**：D28 的 11 條、D29 的 15 條、
+覆審修正的 12 條。其中兩條首輪存活，成因是同一種：
+
+- **M9**（把 `days !== null` 守衛從輸出點拿掉）——斷言掃到的是別處的同字串
+- **F12**（拿掉 workflow 的 `issues: write`）——檢查掃到的是**解釋規則的註解**
+
+兩條都已收緊到違規實際發生的位置。這個坑本 repo 已記過（E4b、E4d），
+**斷言掃描的位置必須是違規會發生的那一行，不是「檔案裡有沒有這個字串」**。
 
 ### v1.7 → v1.8（TFDA 官方仿單連結，2026-08-12）
 
