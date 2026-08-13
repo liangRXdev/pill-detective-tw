@@ -48,7 +48,7 @@ jobs:
       # 官方換圖可能代表藥品外觀真的變了，需要人看過。
       - name: 有發現時開 issue
         if: failure()
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b  # v7.1.0
         with:
           script: |
             const url = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
