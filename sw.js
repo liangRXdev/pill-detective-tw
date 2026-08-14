@@ -26,7 +26,10 @@
  * 代價是舊 `?v=` 會留成孤兒，由 `IMG_CACHE_LIMIT` 的淘汰吸收。
  */
 
-const VERSION = 'v1';
+// v2（2026-08-14）：新增第五結果分區「刻字可能看反或字形相近」（D30–D37）。
+// **改版必須升版號**——shell 走 network-first，但圖片與資料快取要換掉舊 key，
+// 否則使用者會拿到舊的離線資源。
+const VERSION = 'v2';
 
 /** 只管理本專案自己的 cache（見檔頭「Cache Storage 是 origin-wide」） */
 const CACHE_PREFIX = 'pill-';

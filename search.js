@@ -1,7 +1,9 @@
 /**
  * 藥丸偵探 Pill Detective TW — 搜尋核心（純函式）
  *
- * 規格：`.ai-review/plan.md` v1.2。**動這個檔前先讀 D1.1、D3、D4。**
+ * 規格：`.ai-review/plan.md`（D1.1／D3／D4／D17／D18）
+ *      ＋ `.ai-review/plan-imprint-variant.md` v0.3（刻字變體：D30–D37）。
+ * **動這個檔前先讀 plan-imprint-variant.md 的 §5 admission contract——那是變體語意的唯一來源。**
  *
  * 這份檔案同時被**建置管線**（Node）與**前端**（瀏覽器）import。
  * 沿用姊妹專案 `TFDA-drug-id-quiz` 的紀律「正規化只有一份」：
@@ -107,6 +109,84 @@ export function recordTokens(item) {
 /** 查詢字串 → token 陣列。與 `normalizeImprintField` 同一套規則（必須同一套）。 */
 export function tokenizeQuery(q) {
   return normalizeImprintField(q);
+}
+
+// ── 刻字變體：倒讀與字形相近（D32／D33）─────────────────────────────
+//
+// 這兩個函式是**規格凍結的有限字元表**，不是 fuzzy 比對（D36）。
+// 改動任一格都必須走 D13 的四處同步：改規則 → 改 EXPECTED_COUNTS → 重跑 → 改測試。
+
+/**
+ * 180° 旋轉後仍是合法字元的映射表（D32，**A 核心表 14 字元**）。
+ *
+ * 自映射 10 個：`0 1 8 H I N O S X Z`；互映射 2 對：`6↔9`、`M↔W`。
+ *
+ * **不含 `3↔E`**：鏡像關係只在特定字體成立，而 `E` 是高頻字母，誤放行成本高於收益。
+ * **不含 `L↔7`、`2`／`5` 自映射**：`2` 與 `5` 倒讀後更像彼此而非自己，
+ * 該情境由 `canon()` 的 `2/Z`、`5/S` 覆蓋；放進倒讀表會讓兩條規則重複觸發同一筆。
+ */
+const FLIP_TABLE = Object.freeze({
+  0: '0', 1: '1', 8: '8', 6: '9', 9: '6',
+  H: 'H', I: 'I', N: 'N', O: 'O', S: 'S', X: 'X', Z: 'Z',
+  M: 'W', W: 'M',
+});
+
+/**
+ * token 倒讀（D32）。**只作用於查詢 token**，再與原始記錄 token 比對。
+ *
+ * 撤回字首級（D34）後「轉查詢」與「轉記錄」因對合而等價，
+ * 但**語意不得靠「碰巧等價」成立**——方向寫在這裡，B22 只負責驗證。
+ *
+ * @returns 倒讀結果；**任一字元不在表中回 `null`**。
+ *
+ * 回 `null` 而非回原字串是刻意的：若回原字串，「這個 token 沒有倒讀變體」
+ * 與「倒讀後恰好等於自己」（如 `69`、`MW`）就無法區分，
+ * 而 B20 的對合斷言在那種錯誤實作下**仍然會通過**（驗收 B20 第 2 條）。
+ */
+export function flip(token) {
+  let out = '';
+  for (const ch of [...String(token)].reverse()) {
+    const mapped = FLIP_TABLE[ch];
+    if (mapped === undefined) return null;
+    out += mapped;
+  }
+  return out;
+}
+
+/**
+ * 字形相近的等價類（D33，**Q 中間 5 類**）。每類第一個字元為代表字。
+ *
+ * **不用 R 8 類**（再加 `D/Q`、`6/G`、`U/V`、`3/E`）：`D` 是高頻字母，
+ * 放大倍率與誤放行同步上升而真實情境增量有限。
+ * **不用 P 2 類**（只有 `0/O`、`1/I/L`）：會漏掉 `5/S`——那正是藥師實際最常看錯的一組。
+ */
+const CANON_CLASSES = Object.freeze([
+  Object.freeze(['0', 'O']),
+  Object.freeze(['1', 'I', 'L']),
+  Object.freeze(['5', 'S']),
+  Object.freeze(['2', 'Z']),
+  Object.freeze(['8', 'B']),
+]);
+
+/**
+ * 字形壓平（D33）。**查詢與記錄雙邊都壓平**——這是一個**對稱**的等價關係：
+ * 查詢 `0` 能接住記錄 `O`，查詢 `O` 也能接住記錄 `0`。
+ *
+ * **壓平而不展開變體**：展開是笛卡兒積，`S15` 會生 12 個查詢；
+ * 壓平把同一件事變成兩邊各算一次再比一次。
+ */
+export function canon(token) {
+  let out = '';
+  for (const ch of String(token)) {
+    const cls = CANON_CLASSES.find((c) => c.includes(ch));
+    out += cls ? cls[0] : ch;
+  }
+  return out;
+}
+
+/** 記錄層的壓平 token 集合。於 `indexItems()` 一次算好，**不持久化進 JSON**（D15／N19）。 */
+export function recordCanonTokens(item) {
+  return recordTokens(item).map(canon);
 }
 
 /** 名稱比較一律先大寫（D1.1）。中文與許可證字號無大小寫，不受影響。 */
@@ -274,7 +354,31 @@ export const Cond = {
    * 排除它不是漏檢。
    */
   PARTIAL: 'partial',
+  /**
+   * 只有 imprint 會產生（D30／D31）。
+   *
+   * 「原樣比對是 MISMATCH，但在倒讀或字形相近的假設下全中」。
+   *
+   * **這個狀態是由 MISMATCH「置換」而來，不是與它並存**（§5.2）——
+   * 若實作成並存，按 `evaluate()` 的優先序 `mismatch > variant`，
+   * 記錄仍會被排除：**功能靜默地完全不存在，而所有正例測試看起來都合理**（變異 F13-13）。
+   *
+   * 為什麼需要它：使用者把藥錠倒著拿（`6` 讀成 `9`）、或把 `S` 讀成 `5`，
+   * 目前一律落入 MISMATCH → 完全排除 → 看到「找不到」。
+   * 現有四區都接不住：`unknown` 要求欄位沒填、`partial` 要求至少一個 token 原樣命中。
+   *
+   * 為什麼不混進主區：實測查詢 `SH` 主區 37 筆、倒讀成 `HS` 後另有 42 筆——
+   * 混進去等於讓 42 筆猜測與 37 筆事實不可分辨。
+   */
+  VARIANT: 'variant',
 };
+
+/**
+ * 變體的觸發理由（D37）。**與記錄身份不可分離**——見 `search()` 的回傳說明。
+ *
+ * 陣列而非 Set：oracle 要逐筆對帳，需要穩定的序。序固定為 flip 先於 canon。
+ */
+export const VariantReason = { FLIP: 'flip', CANON: 'canon' };
 
 /**
  * imprint 查詢的三種狀態（D3）。**不得由空集合量詞自行推導。**
@@ -342,6 +446,58 @@ export function imprintCondition(tokens, queryTokens) {
   return { state: Cond.PARTIAL, tier: null, hit, total: queryTokens.length };
 }
 
+// ── 變體判定（§5.2 admission contract）──────────────────────────────
+//
+// 兩條 predicate **各自獨立**，每一條都必須**單獨覆蓋全部查詢 token**。
+// **不得把不同 token 的不同規則命中拼成一次全中**——那就是 N15 禁止的組合變體，
+// 而 v0.1 的規格只寫「變體全中」而未定義全中的單位，等於從後門把它放進來（變異 F13-10）。
+//
+// 兩條都**只接受 token 完全相等**（D34）：不啟用字首級、不啟用包含級。
+// 依據是實測——放行字首級時變體區最壞 801 筆（查詢 `I`），只接受完全相等時最大 111 筆。
+
+/**
+ * 倒讀 predicate。**每個**查詢 token 的 `flip()` 都要與某個記錄 token 完全相等。
+ *
+ * 兩個前置否決：
+ * 1. **任一** token 的 `flip()` 為 `null` → 整條 false。不是「略過該 token」——
+ *    略過等於讓其餘 token 單獨成立，那是逐 token OR 的變形。
+ * 2. **全部** token 都是 fixed point（`flip(q) === q`）→ 整條 false。
+ *    倒讀後等於自己不構成「看反了」的證據（如 `69`、`MW`、`OSO`）。
+ */
+export function flipPredicate(tokens, queryTokens) {
+  const flipped = queryTokens.map(flip);
+  if (flipped.some((f) => f === null)) return false;
+  if (flipped.every((f, i) => f === queryTokens[i])) return false;
+  return flipped.every((f) => tokens.includes(f));
+}
+
+/**
+ * 字形 predicate。**每個**查詢 token 的 `canon()` 都要與某個記錄 token 的 `canon()` 完全相等。
+ *
+ * 前置否決：**任一**查詢 token 長度為 1 → 整條 false（D33）。
+ *
+ * 單字元壓平實質上是「這顆藥的刻字第一個字母看起來像 5」，
+ * 與 D18 判定不可用的「包含」級同性質。實測若啟用：查 `I` 變體區 801 筆、`5` 768 筆、`L` 643 筆。
+ * **單字元的倒讀則保留**——把藥翻過來 `6` 變 `9` 是真實的物理情境，實測只多 10 筆。
+ */
+export function canonPredicate(canonTokens, queryTokens) {
+  if (queryTokens.some((q) => q.length === 1)) return false;
+  return queryTokens.map(canon).every((c) => canonTokens.includes(c));
+}
+
+/**
+ * 兩條 predicate 的合成。**只在 imprint 原樣比對為 MISMATCH 時呼叫**（D31）。
+ *
+ * @returns 理由陣列（序固定：flip 先於 canon）；兩條皆不成立時回 `null`。
+ *          **不回空陣列**——空陣列會被 `if (reasons)` 讀成「有變體」（D37）。
+ */
+export function variantReasons(tokens, canonTokens, queryTokens) {
+  const reasons = [];
+  if (flipPredicate(tokens, queryTokens)) reasons.push(VariantReason.FLIP);
+  if (canonPredicate(canonTokens, queryTokens)) reasons.push(VariantReason.CANON);
+  return reasons.length ? Object.freeze(reasons) : null;
+}
+
 /**
  * 名稱條件。**沒有 unknown**：`en` 與 `id` 恆非空，永遠可判定（D1.1）。
  *
@@ -365,10 +521,11 @@ export function nameCondition(item, query) {
  *
  * 分區：任一 mismatch → 排除；否則任一 unknown → 未提供區；否則 → 主區。
  */
-export function evaluate(item, criteria, tokens) {
+export function evaluate(item, criteria, tokens, canonTokens) {
   const { color = [], shape = [], score = null, imprint = '', name = '' } = criteria;
   const conds = [];
   let tier = Tier.EXACT;
+  let reasons = null;
 
   if (color.length) conds.push(setCondition(item.color, color));
   if (shape.length) conds.push(setCondition(item.shape, shape));
@@ -376,24 +533,46 @@ export function evaluate(item, criteria, tokens) {
 
   const qs = imprintQueryState(imprint);
   if (qs === QueryState.VALID) {
-    const r = imprintCondition(tokens ?? recordTokens(item), tokenizeQuery(imprint));
-    conds.push(r.state);
+    const recTokens = tokens ?? recordTokens(item);
+    const queryTokens = tokenizeQuery(imprint);
+    const r = imprintCondition(recTokens, queryTokens);
+
+    // D31：**只有 MISMATCH 才計算變體。** 其餘四種狀態一律照舊，
+    // 因此 main／partial／unknown 三區的成員逐筆不變，excluded 只會變少（驗收 A13）。
+    //
+    // 把 guard 拿掉會讓 PARTIAL／MATCH 的記錄被搶進變體區（變異 F13-1）。
+    if (r.state === Cond.MISMATCH) {
+      reasons = variantReasons(recTokens, canonTokens ?? recordCanonTokens(item), queryTokens);
+    }
+
+    // **置換，不是並存**（§5.2）。若這裡寫成 `conds.push(r.state)` 之後再
+    // `if (reasons) conds.push(Cond.VARIANT)`，MISMATCH 仍在陣列裡，
+    // 底下的優先序會先命中它 → 記錄照樣被排除 → 功能靜默不存在（變異 F13-13）。
+    conds.push(reasons ? Cond.VARIANT : r.state);
     if (r.tier !== null) tier = r.tier;
   }
-  // QueryState.OFF 與 NO_TOKEN 皆不套用 imprint 篩選（D3）。
+  // QueryState.OFF 與 NO_TOKEN 皆不套用 imprint 篩選（D3），因此也不計算變體。
   // 兩者的差別只在 UI 是否顯示提示，不在篩選結果。
 
   if (String(name ?? '').trim() !== '') conds.push(nameCondition(item, name));
 
-  // 分區優先序（D1.1 ＋ D17）：mismatch > unknown > partial > main。
+  // 分區優先序（D1.1 ＋ D17 ＋ D30）：mismatch > variant > unknown > partial > main。
   //
   // unknown 排在 partial 前面的理由：兩者都是「無法排除」，但 unknown 是
   // 「TFDA 這個欄位根本沒填」，partial 是「填了、只是不完整」。
   // 前者的不確定性更大，歸在更保守的那一區。
-  if (conds.includes(Cond.MISMATCH)) return { bucket: 'excluded', tier: null };
-  if (conds.includes(Cond.UNKNOWN)) return { bucket: 'unknown', tier: null };
-  if (conds.includes(Cond.PARTIAL)) return { bucket: 'partial', tier: null };
-  return { bucket: 'main', tier };
+  //
+  // variant 排在 unknown／partial 之前**不是因為它更確定**，而是因為它只可能由
+  // 「原本會被排除」產生，所以擺在哪裡都不會從既有分區搬走任何一筆；擺前面則保證
+  // 卡片顯示使用者最需要知道的理由（「你可能看反了」）而不是被「TFDA 沒填顏色」蓋掉。
+  // 代價是變體區不完整揭露其他 unknown 原因，這是刻意接受的取捨（D31 第 2 點）。
+  //
+  // 其他條件的 mismatch 仍然壓過 variant——變體不得繞過條件間的 AND。
+  if (conds.includes(Cond.MISMATCH)) return { bucket: 'excluded', tier: null, reasons: null };
+  if (conds.includes(Cond.VARIANT)) return { bucket: 'variant', tier: null, reasons };
+  if (conds.includes(Cond.UNKNOWN)) return { bucket: 'unknown', tier: null, reasons: null };
+  if (conds.includes(Cond.PARTIAL)) return { bucket: 'partial', tier: null, reasons: null };
+  return { bucket: 'main', tier, reasons: null };
 }
 
 // ── 排序（D4）───────────────────────────────────────────────────────
@@ -421,24 +600,35 @@ export function compareItems(a, b) {
  * @param items    canonical items（已由 toItem 產生）
  * @param criteria { color: string[], shape: string[], score: string|null,
  *                   imprint: string, name: string }
- * @returns {{ tiers: item[][], unknown: item[], excludedCount: number,
+ * @returns {{ tiers: item[][], partial: item[], unknown: item[],
+ *             variant: {item, reasons: string[]}[], excludedCount: number,
  *             mainCount: number, imprintQueryState: string }}
  *
  * `tiers` 是**三個互斥分區**（完全／字首／包含），不是累計集合。
  * 未輸入 imprint 時全部落在 tiers[0]（等級一律視為 EXACT）。
  *
+ * `variant` 的元素是 `{ item, reasons }` 而不是裸 item——**身份與理由不可分離**（D37）。
+ * 若拆成 `variant[]` 與另一個 `variantReasons`，兩者的對齊方式（ID 鍵控？陣列位置？）
+ * 會由 oracle、搜尋核心與 UI **各自選一種**，排序之後理由就會貼到別張卡片上。
+ *
+ * `reasons` 是**每次搜尋新產生**的凍結陣列，**絕不寫回 item**。
+ * `app.js` 有 120 ms debounce，快速輸入時連續搜尋是常態——理由若掛回 item，
+ * 上一個查詢的 stale reason 會顯示在這一個查詢的卡片上（變異 F13-11）。
+ *
  * **不回傳分數、不回傳相似度、不回傳排名百分比**（規格 F8）。
- * 唯一的分層是上面三個規則型等級。
+ * 唯一的分層是上面三個規則型等級；變體區內沒有任何分層。
  */
 export function search(items, criteria = {}) {
   const tiers = [[], [], []];
   const partial = [];
   const unknown = [];
+  const variant = [];
   let excludedCount = 0;
 
   for (const it of items) {
-    const r = evaluate(it, criteria, it._tok);
+    const r = evaluate(it, criteria, it._tok, it._tokCanon);
     if (r.bucket === 'excluded') { excludedCount++; continue; }
+    if (r.bucket === 'variant') { variant.push({ item: it, reasons: r.reasons }); continue; }
     if (r.bucket === 'unknown') { unknown.push(it); continue; }
     if (r.bucket === 'partial') { partial.push(it); continue; }
     tiers[r.tier].push(it);
@@ -447,11 +637,13 @@ export function search(items, criteria = {}) {
   for (const t of tiers) t.sort(compareItems);
   partial.sort(compareItems);
   unknown.sort(compareItems);
+  variant.sort((a, b) => compareItems(a.item, b.item));
 
   return {
     tiers,
     partial,
     unknown,
+    variant,
     excludedCount,
     mainCount: tiers[0].length + tiers[1].length + tiers[2].length,
     imprintQueryState: imprintQueryState(criteria.imprint ?? ''),
@@ -459,13 +651,20 @@ export function search(items, criteria = {}) {
 }
 
 /**
- * 預先算好每筆的 token 集合，掛在 `_tok` 上。
+ * 預先算好每筆的 token 集合（`_tok`）與壓平集合（`_tokCanon`），掛在 item 上。
  *
- * 載入時做一次（6,295 筆是毫秒級），而不是持久化在 JSON 裡（D15）——
+ * 載入時做一次（6,295 筆實測 12 ms），而不是持久化在 JSON 裡（D15／N19）——
  * 衍生欄與 raw 必然漂移，現算保證只有一份。
+ *
+ * **索引階段允許這一次性的記憶體衍生；搜尋階段則不得修改 item。**
+ * 兩者的界線就是 D37：`_tok`／`_tokCanon` 只跟資料有關（跨查詢不變），
+ * 變體理由只跟這一次查詢有關（跨查詢必須不同），所以理由絕不能掛到這裡來。
  */
 export function indexItems(items) {
-  for (const it of items) it._tok = recordTokens(it);
+  for (const it of items) {
+    it._tok = recordTokens(it);
+    it._tokCanon = it._tok.map(canon);
+  }
   return items;
 }
 
@@ -473,8 +672,8 @@ export function indexItems(items) {
 
 export const ResultState = {
   NO_TOKEN_NOTICE: 'no_token_notice',   // imprint 有輸入但無有效 token
-  EMPTY: 'empty',                       // 主區 0、部分符合 0、未提供區 0
-  ONLY_UNCERTAIN: 'only_uncertain',     // 主區 0，但部分符合或未提供區有值 —— **不得說「找不到」**
+  EMPTY: 'empty',                       // 主區 0、部分符合 0、未提供區 0、變體區 0
+  ONLY_UNCERTAIN: 'only_uncertain',     // 主區 0，但部分符合／未提供／變體區有值 —— **不得說「找不到」**
   NORMAL: 'normal',                     // 1–20
   TOO_MANY_CAN_REFINE: 'too_many_can_refine',
   TOO_MANY_EXHAUSTED: 'too_many_exhausted',
@@ -499,7 +698,10 @@ export function resultStates(result, criteria) {
   if (result.imprintQueryState === QueryState.NO_TOKEN) states.push(ResultState.NO_TOKEN_NOTICE);
 
   if (result.mainCount === 0) {
-    const uncertain = result.partial.length + result.unknown.length;
+    // D35：**變體區必須計入 uncertain。** 漏掉它會讓「主區 0、只有變體區有值」
+    // 回 EMPTY → UI 顯示「找不到」，而畫面上明明列著候選——
+    // 那是本工具最怕的漏檢以最糟的形式出現（實測查詢 `S15` 正是此情境：主 0／變 1）。
+    const uncertain = result.partial.length + result.unknown.length + result.variant.length;
     states.push(uncertain > 0 ? ResultState.ONLY_UNCERTAIN : ResultState.EMPTY);
   } else if (result.mainCount <= 20) {
     states.push(ResultState.NORMAL);

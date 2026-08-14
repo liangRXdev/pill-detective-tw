@@ -8,13 +8,27 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 import {
   normalizeImprintField, tokenizeQuery, recordTokens, splitMulti,
   isOfficialImgUrl, officialLeafletUrl, IMG_ORIGIN,
   normalizeName, imprintQueryState, QueryState, toItem,
   hasActiveCriteria, SCORE_ANY,
   taipeiDate, daysSinceISODate, STALE_DAYS, freshnessView,
+  flip, canon, flipPredicate, canonPredicate, variantReasons,
 } from '../search.js';
+
+const B_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+/** 凍結 baseline 的全部真實 token（B20-3／B21-3 的母體）。 */
+const REAL_TOKENS = (() => {
+  const rows = JSON.parse(fs.readFileSync(path.join(B_ROOT, 'tests/baseline-2026-08-12.json'), 'utf8'));
+  const s = new Set();
+  for (const r of rows) for (const t of recordTokens(toItem(r))) s.add(t);
+  return [...s];
+})();
 
 /** B1 的非空對照組——沒有它，「一律回空陣列」也會通過整組 B1 */
 const GOLDEN = [
@@ -342,4 +356,150 @@ test('B19c freshnessView：未來日期不得顯示成「剛檢查過」', () =>
   assert.deepEqual([at('2026-08-13').days, at('2026-08-13').stale], [0, false]);
   assert.deepEqual([at('2026-07-30').days, at('2026-07-30').stale], [14, false]);
   assert.deepEqual([at('2026-07-29').days, at('2026-07-29').stale], [15, true]);
+});
+
+// ── B20–B22 刻字變體（D32／D33／D34）────────────────────────────────
+
+const ALNUM = [...'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'];
+/** D32 的 14 字元表，逐字列出。**這份表是斷言，不是從 search.js 讀來的。** */
+const FLIP_MAP = {
+  0: '0', 1: '1', 8: '8', 6: '9', 9: '6',
+  H: 'H', I: 'I', N: 'N', O: 'O', S: 'S', X: 'X', Z: 'Z',
+  M: 'W', W: 'M',
+};
+const OUT_OF_TABLE = ALNUM.filter((c) => !(c in FLIP_MAP));
+
+test('B20 flip：逐字驗完整 14 個映射 —— 對合證明不了映射正確', () => {
+  // 把兩個自映射字互換（例如 H↔I）**仍然是對合**，所以 B20-3 抓不到它。
+  // 唯一擋得住的是逐字斷言。
+  assert.equal(Object.keys(FLIP_MAP).length, 14, 'B20: 表大小變了');
+  assert.equal(OUT_OF_TABLE.length, 22, 'B20: 表外字元數變了，掃描母體已失效');
+  for (const [from, to] of Object.entries(FLIP_MAP)) {
+    assert.equal(flip(from), to, `B20: flip('${from}') 應為 '${to}'`);
+  }
+});
+
+test('B20-2 flip：表外字元在首／中／尾任一位置都必須回 null', () => {
+  // 只檢查首字元的實作會讓 'OST'（T 在尾）漏掉；
+  // 回「原字串」而非 null 的實作則會讓 B20-3 的對合斷言仍然通過（變異 F13-9）。
+  for (const ch of OUT_OF_TABLE) {
+    for (const [label, s] of [['首', `${ch}OS`], ['中', `O${ch}S`], ['尾', `OS${ch}`]]) {
+      assert.equal(flip(s), null, `B20-2: '${s}'（表外字元在${label}）應回 null`);
+    }
+  }
+  assert.equal(flip('OST'), null, 'B20-2: OST 具名案例');
+});
+
+test('B20-3 flip：對合只對「可倒讀」的 token 成立，表外由 null 契約分開驗', () => {
+  let flippable = 0;
+  for (const t of REAL_TOKENS) {
+    const f = flip(t);
+    if (f === null) continue;             // 表外 → 由 B20-2 負責，這裡不宣稱對合
+    flippable++;
+    assert.equal(flip(f), t, `B20-3: flip 對 '${t}' 不是對合`);
+  }
+  assert.ok(flippable >= 100, `B20-3: 只有 ${flippable} 個可倒讀 token —— 母體已失效`);
+});
+
+test('B20-4 flip：具名向量（含長度 > 3）', () => {
+  assert.equal(flip('6'), '9');
+  assert.equal(flip('69'), '69');         // fixed point，且不是單字元
+  assert.equal(flip('MW'), 'MW');         // fixed point，跨字元對
+  assert.equal(flip('WM'), 'WM');
+  assert.equal(flip('SH'), 'HS');
+  assert.equal(flip('TA'), null);
+  assert.equal(flip('OSSIXNI'), 'INXISSO', 'B20-4: 長度 > 3 的具名向量');
+});
+
+/** D33 的 5 類，逐字列出。 */
+const CANON_MEMBERS = { O: '0', I: '1', L: '1', S: '5', Z: '2', B: '8' };
+const COLLAPSED = Object.keys(CANON_MEMBERS);
+
+test('B21 canon：逐字驗五個等價類的每個成員，其餘字元一律 identity', () => {
+  // 冪等 ＋ 值域仍然放行「Z 被刪掉」或「Z 映成 8」——兩者都滿足那兩條。
+  for (const [member, rep] of Object.entries(CANON_MEMBERS)) {
+    assert.equal(canon(member), rep, `B21: canon('${member}') 應為 '${rep}'`);
+    assert.equal(canon(rep), rep, `B21: 代表字 '${rep}' 必須映到自己`);
+  }
+  for (const ch of ALNUM) {
+    if (ch in CANON_MEMBERS) continue;
+    assert.equal(canon(ch), ch, `B21: '${ch}' 不屬任何等價類，必須原樣保留`);
+  }
+});
+
+test('B21-2 canon：對全部真實 token 冪等，且值域不含被壓平的字元', () => {
+  for (const t of REAL_TOKENS) {
+    const c = canon(t);
+    assert.equal(canon(c), c, `B21-2: canon 對 '${t}' 不冪等`);
+    for (const bad of COLLAPSED) {
+      assert.ok(!c.includes(bad), `B21-2: canon('${t}') = '${c}' 仍含被壓平的 '${bad}'`);
+    }
+  }
+  assert.ok(REAL_TOKENS.length >= 2000, `B21-2: 母體只有 ${REAL_TOKENS.length} 個 token`);
+});
+
+test('B21-3 canon：具名向量 —— 值域斷言擋不住「把字母全刪掉」', () => {
+  assert.equal(canon('SILO'), '5110');
+  assert.equal(canon('B2'), '82');
+  assert.equal(canon('012'), '012');
+  assert.equal(canon('APO'), 'AP0');      // 類外字元保留
+});
+
+test('B22 變體只接受完全相等 —— 字首與包含都不算（含對照組）', () => {
+  const q = ['SH'];                        // flip → 'HS'
+  assert.equal(flipPredicate(['HSY'], q), false, 'B22: HS 是 HSY 的字首，仍不得放行');
+  assert.equal(flipPredicate(['XHSY'], q), false, 'B22: HS 被 XHSY 包含，仍不得放行');
+  // 對照組：沒有它，「變體功能整個沒接上」也會讓上面兩條全綠
+  assert.equal(flipPredicate(['HS'], q), true, 'B22 對照組: 完全相等必須放行');
+
+  const q2 = ['B2'];                       // canon → '82'
+  assert.equal(canonPredicate(['82X'], q2), false, 'B22: canon 側字首不得放行');
+  assert.equal(canonPredicate(['X82'], q2), false, 'B22: canon 側包含不得放行');
+  assert.equal(canonPredicate(['82'], q2), true, 'B22 對照組: canon 完全相等必須放行');
+});
+
+test('B22-1b 每條 predicate 必須覆蓋**全部**查詢 token —— every 不是 some', () => {
+  // **這條是變異測試 F13-5b 逼出來的。** 原本 B22 的三個 flip 案例全是單 token 查詢，
+  // 而單 token 之下 `every` 與 `some` 完全等價：把 every 改成 some，整組 B22 照樣全綠。
+  // 要分辨得出來，必須是「多 token、兩者都可倒讀、但只有一個命中」。
+  const q = ['SH', 'MM'];                  // flip → ['HS', 'WW']，兩者都在表內
+  assert.deepEqual(q.map(flip), ['HS', 'WW'], 'B22-1b 前提: 兩個 token 都可倒讀');
+  assert.equal(flipPredicate(['HS'], q), false, 'B22-1b: 只中一個 token 不得放行（every 不是 some）');
+  assert.equal(flipPredicate(['WW'], q), false, 'B22-1b: 只中另一個也不行');
+  assert.equal(flipPredicate(['HS', 'WW'], q), true, 'B22-1b 對照組: 全中才放行');
+
+  // canon 側同理
+  const q2 = ['B2', 'SL'];                 // canon → ['82', '51']
+  assert.deepEqual(q2.map(canon), ['82', '51'], 'B22-1b 前提: canon 值');
+  assert.equal(canonPredicate(['82'], q2), false, 'B22-1b: canon 側只中一個不得放行');
+  assert.equal(canonPredicate(['82', '51'], q2), true, 'B22-1b 對照組: canon 側全中才放行');
+});
+
+test('B22-2 兩條規則不得拼接 —— 這是 N15 的守門（變異 F13-10）', () => {
+  // 真實 witness：記錄 衛署藥製字第034807號 的 token 是 [M, T, 130, HOPER]，
+  // 查詢 'W L30' 之下 W 靠倒讀命中 M、L30 靠字形命中 130，
+  // **但單一規則都不全中**：flip('L30') 因 L 表外回 null，W 是單字元使 canon 停用。
+  const tokens = ['M', 'T', '130', 'HOPER'];
+  const canonTokens = tokens.map(canon);
+  const q = ['W', 'L30'];
+
+  assert.equal(flip('L30'), null, 'B22-2 前提: L 在表外');
+  assert.equal(flipPredicate(tokens, q), false, 'B22-2: 倒讀整條必須 false（不得略過表外 token）');
+  assert.equal(canonPredicate(canonTokens, q), false, 'B22-2: 單字元使字形整條 false');
+  assert.equal(variantReasons(tokens, canonTokens, q), null,
+    'B22-2: 兩條規則各中一個 token 時**必須排除** —— 逐 token OR 就是 N15 禁止的組合變體');
+
+  // 對照組一：同一規則覆蓋全部 token → 必須放行
+  assert.deepEqual(variantReasons(['M', 'W'], ['M', 'W'].map(canon), ['W', 'M']), ['flip'],
+    'B22-2 對照組: 同一規則全中必須放行');
+  // 對照組二：兩條規則**各自獨立**全中 → 雙理由
+  const both = variantReasons(['10', '01'], ['10', '01'].map(canon), ['01']);
+  assert.deepEqual(both, ['flip', 'canon'], 'B22-2 對照組: 各自獨立全中才給雙理由');
+});
+
+test('B22-3 變體理由永不為空集合 —— 空集合會被讀成「有變體但不知為何」', () => {
+  assert.equal(variantReasons(['ABC'], ['ABC'], ['ZZQ']), null, 'B22-3: 沒中就要回 null');
+  const r = variantReasons(['HS'], ['H5'], ['SH']);
+  assert.ok(Array.isArray(r) && r.length > 0, 'B22-3: 有中就必須是非空陣列');
+  assert.ok(Object.isFrozen(r), 'B22-3: 理由陣列必須凍結 —— 呼叫端改到它就會污染別筆');
 });
