@@ -437,3 +437,90 @@ test('E10b 離線橫幅：不得預先寫死，且監聽必須早於 load()', ()
   assert.match(stripComments(read('sw.js')), /OFFLINE_MODE', path: url\.pathname/,
     'E10b: SW 沒有送出 path');
 });
+
+// ── E12 變體區（D30／D37）────────────────────────────────────────────
+//
+// **本條的自動化範圍是靜態契約，不是渲染結果。**
+// 本專案刻意不引入 jsdom（檔頭已說明理由：在那種樁上寫的斷言必然永遠是綠的）。
+// 「每張卡片的理由標籤貼在正確的卡片上」只能由人工瀏覽器留檔證明，
+// 見 `.ai-review/evidence/e12-2026-08-14.md`。**這裡不宣稱它證明了那件事。**
+// 底下的斷言負責的是另一半：理由確實逐筆流進 card()，而不是掛在分區標題上。
+
+test('E12 變體區：逐筆理由流進 card()，不是掛在分區標題上', () => {
+  const src = stripComments(read('app.js'));
+
+  // (1) 變體區的元素是 { item, reasons }，且理由**逐筆**傳進 card()。
+  // 若寫成 card(v.item) 而把理由畫在 section 標題，這條會紅。
+  assert.match(src, /card\(\s*v\.item\s*,\s*v\.reasons\s*\)/,
+    'E12: 理由沒有逐筆傳進 card() —— 那就無法保證它貼在對的卡片上');
+
+  // (2) 理由標籤必須建在**卡片內文**（body）裡，不是 section。
+  // 這是靜態掃描能做到的最接近「逐卡定位」的斷言。
+  assert.match(src, /body\.appendChild\(\s*why\s*\)/,
+    'E12: 理由標籤沒有掛進卡片內文');
+
+  // (3) 兩個理由必須是**可分辨的兩個詞**。
+  // 合併成「可能相似」這類統一文案，使用者就分不出該翻過來看還是換角度看。
+  const map = src.match(/VARIANT_WHY\s*=\s*\{([^}]*)\}/);
+  assert.ok(map, 'E12: 找不到 VARIANT_WHY 對應表');
+  const labels = [...map[1].matchAll(/'([^']+)'/g)].map((m) => m[1]);
+  assert.equal(labels.length, 2, 'E12: 理由標籤應恰有兩個');
+  assert.notEqual(labels[0], labels[1], 'E12: 兩個理由的文案不得相同');
+  for (const l of labels) assert.ok(l.length >= 2, `E12: 理由文案「${l}」過短`);
+
+  // (4) 分區順序：變體區必須排在未提供區**之後**，且預設收合。
+  const uAt = src.indexOf("section('資料未提供'");
+  const vAt = src.indexOf("'刻字可能看反或字形相近'");
+  assert.ok(uAt > 0, 'E12: 找不到未提供區');
+  assert.ok(vAt > uAt, 'E12: 變體區必須排在未提供區之後');
+  const variantCall = src.slice(vAt, vAt + 400);
+  assert.match(variantCall, /res\.variant/, 'E12: 變體區沒有讀 res.variant');
+  assert.match(variantCall, /true,\s*true,\s*variantCard/,
+    'E12: 變體區必須是 soft＋預設收合，且用 variantCard 繪製');
+
+  // (5) uncertain 計數必須納入變體，否則「符合條件 0 項」旁邊不會有任何提示
+  assert.match(src, /res\.partial\.length \+ res\.unknown\.length \+ res\.variant\.length/,
+    'E12: 標題列的 uncertain 沒有納入變體');
+});
+
+test('E12b 變體區文案不得出現分數／相似度／排名（F8）', () => {
+  const html = read('index.html');
+  const app = stripComments(read('app.js'));
+
+  // 只掃 **UI 自產生**的理由與標題文字，不掃資料欄位——
+  // 藥品品名本來就可能含 `%`（例如「5%葡萄糖」），掃全區會誤觸而讓這條變成雜訊。
+  const uiStrings = [
+    ...app.matchAll(/'([^']*(?:刻字|理由|倒讀|字形|變體)[^']*)'/g),
+  ].map((m) => m[1]);
+  assert.ok(uiStrings.length >= 3, `E12b: 只掃到 ${uiStrings.length} 段變體文案 —— 掃描已失效`);
+  for (const s of uiStrings) {
+    for (const banned of ['%', '分數', '相似度', '排名', '評分', '信心']) {
+      assert.ok(!s.includes(banned), `E12b: 變體文案「${s}」含禁語「${banned}」`);
+    }
+  }
+
+  // 變體區的樣式不得用顏色區分兩種理由——顏色會被讀成強弱，而變體沒有分數
+  const vwhy = html.match(/\.pill \.vwhy span\{([^}]*)\}/);
+  assert.ok(vwhy, 'E12b: 找不到理由標籤樣式');
+  assert.ok(!/--danger|--success|--warning|--accent[^-]/.test(vwhy[1]),
+    'E12b: 理由標籤用了語意色 —— 那會被讀成強弱');
+});
+
+test('E12c app.js 不得自己實作變體語意（正規化只有一份）', () => {
+  const src = stripComments(read('app.js'));
+  // E-arch 的同一條，擴到變體規則。app.js 只能消費 search() 的輸出。
+  for (const leak of ['reverse(', 'FLIP', 'CANON', 'canon(', 'flip(']) {
+    assert.ok(!src.includes(leak), `E12c: app.js 疑似自行實作變體規則（${leak}）`);
+  }
+});
+
+test('E12d 人工留檔存在且對應本次規則版本', () => {
+  // 逐卡定位、行動版版面這兩件事只有人工留檔證明得了（見本區塊開頭的說明）。
+  // 沒有這條的話，留檔漏做也不會有任何東西變紅。
+  const p = path.join(ROOT, '.ai-review/evidence/e12-2026-08-14.md');
+  assert.ok(fs.existsSync(p), 'E12d: 缺少 E12 人工留檔');
+  const doc = fs.readFileSync(p, 'utf8');
+  for (const must of ['倒讀', '字形相近', '衛署藥輸字第025901號', '386']) {
+    assert.ok(doc.includes(must), `E12d: 留檔未涵蓋「${must}」`);
+  }
+});
