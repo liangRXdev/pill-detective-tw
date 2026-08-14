@@ -18,6 +18,15 @@
  *     分析腳本算出來的（見 `.ai-review/plan-verdict.md` 的事實查核段）。
  *     `verify-expected` 這道自檢就是在驗這件事——不符即中止，不得手動改常數。
  *
+ * **刻字變體（D30–D37）的獨立性錨點（2026-08-14 追加）**
+ *   - 變體規則在本檔**第三次**被寫出來，且刻意換一套資料結構：
+ *     倒讀用「兩條平行字串 ＋ indexOf」而非物件字面值，字形用「成員→代表字的扁平對」
+ *     而非類別陣列 ＋ find。抄寫錯誤在兩種表示法下不會長成同一個樣子。
+ *   - 外部錨點是 `scratchpad/measure8.mjs`：它在 `search.js` 出現任何變體程式碼**之前**
+ *     就算出了 21 個具名查詢的變體筆數與理由分佈（見 `plan-verdict-imprint-variant-2.md`
+ *     的事實查核段）。`VARIANT_EXPECTED` 就是那份數字，**不得改它來讓自檢通過**。
+ *   - 三方一致才算數：本檔（獨立 tokenize ＋ 獨立變體）↔ `search.js` ↔ `measure8.mjs`。
+ *
  * **產物是要人工核准後凍結的**。重跑本檔只在 baseline 或規則有意變更時才做，
  * 且變更必須同時更新 `.ai-review/plan.md` §10 的數字與本檔的 EXPECTED_COUNTS。
  * 測試碼中**不得**有任何回寫 expected 的路徑。
@@ -64,6 +73,74 @@ const EXPECTED_COUNTS = {
   literalWuWithOtherTokens: 3,
 };
 
+/**
+ * 刻字變體的凍結數字（D30–D37）。格式：`[變體區筆數, 倒讀, 字形, 雙理由]`。
+ *
+ * **來源是 `scratchpad/measure8.mjs`，寫於 search.js 有任何變體程式碼之前。**
+ * 改這裡的任何一個數字＝宣稱規則有意變更，必須同步 plan-imprint-variant.md 與測試。
+ *
+ * 三個「必須為 0」的類別各自守著一條規則，**不是湊數的**：
+ *   - `MW`／`69`：倒讀後等於自己（fixed point 不算變體）
+ *   - `TA`／`T`／`I JCP`：含表外字元 → 倒讀整條 false
+ *   - `S`／`5`／`0`／`M 40`：查詢含單字元 token → 字形整條 false
+ *   - `W L30`：兩條規則各中一個 token，**單一規則都不全中** → 必須排除（N15 守門）
+ */
+const VARIANT_EXPECTED = {
+  'imprint:10': [22, 7, 15, 0],
+  'imprint:T': [0, 0, 0, 0],
+  'imprint:S': [0, 0, 0, 0],
+  'imprint:M 40': [0, 0, 0, 0],
+  'imprint:40 M': [0, 0, 0, 0],
+  'imprint:I JCP': [0, 0, 0, 0],
+  'imprint:ZZZZ9': [0, 0, 0, 0],
+  'white-round-noscore+S': [0, 0, 0, 0],
+  'imprint:SH': [42, 42, 0, 0],
+  'imprint:HS': [4, 3, 1, 0],
+  'imprint:01': [73, 71, 1, 1],      // 唯一自然出現的雙理由案例（A15f）
+  'imprint:12': [4, 0, 4, 0],
+  'imprint:B2': [4, 0, 4, 0],
+  'imprint:S15': [1, 0, 1, 0],       // 主區 0、變體 1 → ONLY_UNCERTAIN（A16）
+  'imprint:MS': [44, 43, 1, 0],      // F13-3 的 M/W witness
+  // A15(e)：五個等價類各自的**雙向** witness，長度皆 ≥2（單字元證明不了雙向性，
+  // 因為 canon 在那個情境根本沒啟用）。每組兩個拼法 canon 到同一個 key，
+  // 但變體筆數不同——因為各自的「原樣已命中」不同，那些記錄不會重複進變體區。
+  'imprint:O0': [2, 0, 2, 0],        // 0/O
+  'imprint:0O': [2, 0, 2, 0],
+  'imprint:15': [6, 0, 6, 0],        // 1/I/L
+  'imprint:L5': [27, 0, 27, 0],
+  'imprint:IS': [27, 0, 27, 0],
+  'imprint:AS': [2, 0, 2, 0],        // 5/S ← F13-4 的 witness
+  'imprint:A5': [18, 0, 18, 0],
+  'imprint:M5': [2, 0, 2, 0],
+  'imprint:Z2': [7, 0, 7, 0],        // 2/Z
+  'imprint:2Z': [7, 0, 7, 0],
+  'imprint:1Z': [16, 0, 16, 0],
+  'imprint:8B': [1, 0, 1, 0],        // 8/B
+  'imprint:B8': [1, 0, 1, 0],
+  'imprint:82': [2, 0, 2, 0],
+  'imprint:MW': [0, 0, 0, 0],
+  'imprint:69': [0, 0, 0, 0],
+  'imprint:OSO': [1, 0, 1, 0],
+  'imprint:TA': [0, 0, 0, 0],
+  'imprint:6': [10, 10, 0, 0],
+  'imprint:9': [15, 15, 0, 0],
+  'imprint:0': [0, 0, 0, 0],
+  'imprint:5': [0, 0, 0, 0],
+  'imprint:W L30': [0, 0, 0, 0],     // N15 守門（F13-10）
+  'imprint:Y5P': [111, 0, 111, 0],   // 可達查詢閉包的最壞值（A17）
+};
+
+/**
+ * A17：可達查詢閉包的**規則指紋**（不是政策上界）。
+ *
+ * 查詢域＝真實 token ∪ `flip(t)` ∪ 各 canon 類代表字。
+ * v0.2 曾以「2,357 個真實 token」為母體，那是取樣偏誤——`Y5P` 是合法輸入、
+ * 可達 111 筆，卻不在該母體內（見 plan-imprint-variant.md §3.4.1）。
+ *
+ * **任一數字變動即中止。** 放行字首級會讓 worst 上升、單字元啟用字形會讓它衝到 801。
+ */
+const CLOSURE_FINGERPRINT = { worst: 111, worstFlip: 84, worstCanon: 111 };
+
 // ── 直白版的正規化（刻意與 search.js 各寫一次）─────────────────────
 
 function splitOn(value) {
@@ -97,7 +174,7 @@ function rowTokens(row) {
 
 // ── 直白版的三值判定 ────────────────────────────────────────────────
 
-const MATCH = 1, MISMATCH = 2, UNKNOWN = 3, PARTIAL = 4;
+const MATCH = 1, MISMATCH = 2, UNKNOWN = 3, PARTIAL = 4, VARIANT = 5;
 
 function setCond(values, selected) {
   if (values.length === 0) return UNKNOWN;
@@ -128,6 +205,85 @@ function imprintCond(tokens, queryTokens) {
   return [PARTIAL, null];
 }
 
+// ── 直白版的刻字變體（D32／D33／D34）───────────────────────────────
+//
+// **刻意換一套表示法**：`search.js` 用物件字面值 ＋ 類別陣列 ＋ `find`，
+// 這裡用「兩條平行字串 ＋ indexOf」與「成員→代表字的扁平對」。
+// 抄寫錯誤在兩種表示法下不會長成同一個樣子——那才是雙實作的意義。
+
+/** 倒讀表：FROM[i] 旋轉 180° 之後變成 TO[i]。兩條長度必須相等（下方立即自檢）。 */
+const FLIP_FROM = '01869HINOSXZMW';
+const FLIP_TO   = '01896HINOSXZWM';
+if (FLIP_FROM.length !== FLIP_TO.length || new Set(FLIP_FROM).size !== FLIP_FROM.length) {
+  console.error('✖ 倒讀表自身不一致（長度不等或有重複字元）');
+  process.exit(1);
+}
+
+/** 字形類：每一對是「成員, 代表字」。代表字自己不列（映射到自己是預設行為）。 */
+const CANON_PAIRS = [['O', '0'], ['I', '1'], ['L', '1'], ['S', '5'], ['Z', '2'], ['B', '8']];
+
+/** token 倒讀。**表外字元回 null**，不是回原字串（D32）。 */
+function flipToken(token) {
+  let out = '';
+  for (let i = 0; i < token.length; i++) {
+    const at = FLIP_FROM.indexOf(token[i]);
+    if (at < 0) return null;
+    out = FLIP_TO[at] + out;     // 前置 ＝ 一邊映射一邊反轉（search.js 是先反轉再映射）
+  }
+  return out;
+}
+
+/** token 字形壓平。類外字元原樣保留（D33）。 */
+function canonToken(token) {
+  let out = '';
+  for (let i = 0; i < token.length; i++) {
+    let ch = token[i];
+    for (const [member, rep] of CANON_PAIRS) if (ch === member) { ch = rep; break; }
+    out += ch;
+  }
+  return out;
+}
+
+/**
+ * 變體判定（§5.2）。**只在 imprint 原樣比對為 MISMATCH 時呼叫。**
+ *
+ * 兩條 predicate 各自獨立，**每一條都必須單獨覆蓋全部查詢 token**。
+ * 逐 token 混用兩條規則就是 N15 禁止的組合變體。
+ *
+ * @returns 理由陣列（序固定 flip→canon），兩條皆不成立時回 null。
+ */
+function variantOf(tokens, queryTokens) {
+  const reasons = [];
+
+  // 倒讀：任一 token 無合法倒讀 → 整條 false；全部是 fixed point → 整條 false
+  let flipOk = true;
+  let allFixed = true;
+  for (const q of queryTokens) {
+    const f = flipToken(q);
+    if (f === null) { flipOk = false; break; }
+    if (f !== q) allFixed = false;
+    let found = false;
+    for (const t of tokens) if (t === f) { found = true; break; }   // 只接受完全相等（D34）
+    if (!found) { flipOk = false; break; }
+  }
+  if (flipOk && !allFixed) reasons.push('flip');
+
+  // 字形：任一查詢 token 長度為 1 → 整條 false
+  let canonOk = true;
+  for (const q of queryTokens) if (q.length === 1) { canonOk = false; break; }
+  if (canonOk) {
+    for (const q of queryTokens) {
+      const c = canonToken(q);
+      let found = false;
+      for (const t of tokens) if (canonToken(t) === c) { found = true; break; }
+      if (!found) { canonOk = false; break; }
+    }
+  }
+  if (canonOk) reasons.push('canon');
+
+  return reasons.length > 0 ? reasons : null;
+}
+
 /**
  * 對全量 baseline 跑一次搜尋，回傳三個互斥主區與未提供區的 id 清單。
  * 條件未啟用時**完全不看記錄的值**（規格 D1.1 階段 ①）。
@@ -138,33 +294,91 @@ function run(rows, { color = [], shape = [], score = null, imprint = '' } = {}) 
   const tiers = [[], [], []];
   const partial = [];
   const unknown = [];
+  const variant = [];
 
   for (const row of rows) {
     const states = [];
     let tier = 0;
+    let reasons = null;
 
     if (color.length > 0) states.push(setCond(splitOn(row['顏色']), color));
     if (shape.length > 0) states.push(setCond(splitOn(row['形狀']), shape));
     if (score !== null) states.push(setCond(splitOn(row['刻痕']), [score]));
     if (imprintOn) {
-      const [st, tr] = imprintCond(rowTokens(row), queryTokens);
-      states.push(st);
+      const tokens = rowTokens(row);
+      const [st, tr] = imprintCond(tokens, queryTokens);
+      // D31：只有 MISMATCH 才計算變體。其餘四種狀態照舊，
+      // 因此 main／partial／unknown 三區逐筆不變、excluded 只會變少。
+      if (st === MISMATCH) reasons = variantOf(tokens, queryTokens);
+      // **置換**，不是並存——並存時底下的 hasMismatch 會先命中，記錄照樣被排除。
+      states.push(reasons ? VARIANT : st);
       if (tr !== null) tier = tr;
     }
 
-    let hasMismatch = false, hasUnknown = false, hasPartial = false;
+    let hasMismatch = false, hasUnknown = false, hasPartial = false, hasVariant = false;
     for (const s of states) {
       if (s === MISMATCH) hasMismatch = true;
       if (s === UNKNOWN) hasUnknown = true;
       if (s === PARTIAL) hasPartial = true;
+      if (s === VARIANT) hasVariant = true;
     }
     const id = String(row['許可證字號']).trim();
+    // 優先序 mismatch > variant > unknown > partial > main（D30）。
+    // 其他條件的 mismatch 仍然壓過 variant——變體不得繞過條件間的 AND。
     if (hasMismatch) continue;
-    if (hasUnknown) unknown.push(id);
+    if (hasVariant) variant.push({ id, reasons });
+    else if (hasUnknown) unknown.push(id);
     else if (hasPartial) partial.push(id);
     else tiers[tier].push(id);
   }
-  return { tiers, partial, unknown };
+  return { tiers, partial, unknown, variant };
+}
+
+/**
+ * A17：掃完整可達查詢閉包，算出三個規則指紋。
+ *
+ * 查詢域＝真實 token ∪ `flip(t)` ∪ `canon(t)`。**不是只有真實 token**——
+ * `Y5P` 是合法輸入、可達 111 筆，卻不是任何記錄的 token（規格 §3.4.1）。
+ *
+ * 為了跑得完，記錄側的 token 只算一次（每列一次），而不是每個查詢重算。
+ */
+function closureFingerprint(rows) {
+  const perRow = rows.map((r) => {
+    const toks = rowTokens(r);
+    return { toks, canon: toks.map(canonToken) };
+  });
+
+  const real = new Set();
+  for (const r of perRow) for (const t of r.toks) real.add(t);
+  const closure = new Set(real);
+  for (const t of real) {
+    const f = flipToken(t);
+    if (f !== null) closure.add(f);
+    closure.add(canonToken(t));
+  }
+
+  let worst = 0, worstQ = '', worstFlip = 0, worstFlipQ = '', worstCanon = 0, worstCanonQ = '';
+  for (const q of closure) {
+    const queryTokens = fieldTokens(q);
+    if (queryTokens.length === 0) continue;
+    let n = 0, nf = 0, nc = 0;
+    for (const r of perRow) {
+      const [st] = imprintCond(r.toks, queryTokens);
+      if (st !== MISMATCH) continue;
+      const reasons = variantOf(r.toks, queryTokens);
+      if (!reasons) continue;
+      n++;
+      if (reasons.includes('flip')) nf++;
+      if (reasons.includes('canon')) nc++;
+    }
+    if (n > worst) { worst = n; worstQ = q; }
+    if (nf > worstFlip) { worstFlip = nf; worstFlipQ = q; }
+    if (nc > worstCanon) { worstCanon = nc; worstCanonQ = q; }
+  }
+  return {
+    closureSize: closure.size, realTokens: real.size,
+    worst, worstQ, worstFlip, worstFlipQ, worstCanon, worstCanonQ,
+  };
 }
 
 // ── 主流程 ──────────────────────────────────────────────────────────
@@ -190,20 +404,62 @@ const cases = {
   'color:白+黃': { color: ['白', '黃'] },
   'white-round-noscore': { color: ['白'], shape: ['圓形'], score: '無' },
   'white-round-noscore+S': { color: ['白'], shape: ['圓形'], score: '無', imprint: 'S' },
+
+  // ── 刻字變體（D30–D37）的具名查詢。每一個都守著規格裡一條具體的規則。
+  'imprint:SH': { imprint: 'SH' },        // 變體區(42) > 主區(37)：不得混區（A15a）
+  'imprint:HS': { imprint: 'HS' },        // 反向不對稱
+  'imprint:01': { imprint: '01' },        // 唯一自然出現的雙理由記錄（A15f）
+  'imprint:12': { imprint: '12' },
+  'imprint:B2': { imprint: 'B2' },
+  'imprint:S15': { imprint: 'S15' },      // 主區 0、變體 1 → ONLY_UNCERTAIN（A16）
+  'imprint:MS': { imprint: 'MS' },        // M/W 具名查詢（F13-3）
+  'imprint:MW': { imprint: 'MW' },        // fixed point（A15c）
+  'imprint:69': { imprint: '69' },        // fixed point，跨字元對
+  'imprint:OSO': { imprint: 'OSO' },      // 倒讀為自身，但字形仍可命中 → 理由不得含 flip
+  'imprint:TA': { imprint: 'TA' },        // 表外字元（A15d）
+  'imprint:6': { imprint: '6' },          // 單字元倒讀保留
+  'imprint:9': { imprint: '9' },
+  'imprint:0': { imprint: '0' },          // 單字元不做字形
+  'imprint:5': { imprint: '5' },
+  'imprint:W L30': { imprint: 'W L30' },  // N15 守門：兩規則各中一個 token 仍須排除（F13-10）
+  'imprint:Y5P': { imprint: 'Y5P' },      // 可達查詢閉包最壞值 111（A17）
+  // A15(e)：五個等價類的雙向 witness，長度皆 ≥2
+  'imprint:O0': { imprint: 'O0' }, 'imprint:0O': { imprint: '0O' },
+  'imprint:15': { imprint: '15' }, 'imprint:L5': { imprint: 'L5' }, 'imprint:IS': { imprint: 'IS' },
+  'imprint:AS': { imprint: 'AS' }, 'imprint:A5': { imprint: 'A5' }, 'imprint:M5': { imprint: 'M5' },
+  'imprint:Z2': { imprint: 'Z2' }, 'imprint:2Z': { imprint: '2Z' }, 'imprint:1Z': { imprint: '1Z' },
+  'imprint:8B': { imprint: '8B' }, 'imprint:B8': { imprint: 'B8' }, 'imprint:82': { imprint: '82' },
 };
 
 const out = { cases: {} };
 const problems = [];
 
 for (const [name, criteria] of Object.entries(cases)) {
-  const { tiers, partial, unknown } = run(rows, criteria);
-  out.cases[name] = { criteria, tiers, partial, unknown };
+  const { tiers, partial, unknown, variant } = run(rows, criteria);
+  // 變體區的元素是 { id, reasons }——**身份與理由不可分離**（D37）。
+  // 拆成兩個平行陣列的話，排序之後理由就會貼到別筆記錄上。
+  out.cases[name] = { criteria, tiers, partial, unknown, variant };
+
   const want = EXPECTED_COUNTS[name];
   const got = tiers.map((t) => t.length);
   if (want && String(want) !== String(got)) {
     problems.push(`${name} 主區三級 期望 ${want} 實際 ${got}`);
   }
-  console.log(`  ${name.padEnd(24)} 主區 ${got.join('/')}　部分 ${String(partial.length).padStart(4)}　未提供 ${unknown.length}`);
+
+  const byReason = [variant.length, 0, 0, 0];
+  for (const v of variant) {
+    if (v.reasons.length === 2) byReason[3]++;
+    else if (v.reasons[0] === 'flip') byReason[1]++;
+    else byReason[2]++;
+  }
+  const wantVar = VARIANT_EXPECTED[name];
+  if (wantVar && String(wantVar) !== String(byReason)) {
+    problems.push(`${name} 變體區 [總,倒讀,字形,雙] 期望 ${wantVar} 實際 ${byReason}`);
+  }
+
+  console.log(`  ${name.padEnd(24)} 主區 ${got.join('/')}　部分 ${String(partial.length).padStart(4)}`
+    + `　未提供 ${unknown.length}　變體 ${String(variant.length).padStart(3)}`
+    + ` (${byReason[1]}/${byReason[2]}/${byReason[3]})`);
 }
 
 // D17 的迴歸護欄：**第四區不得改變既有三級與未提供區的任何成員**。
@@ -212,6 +468,28 @@ for (const [name, c] of Object.entries(out.cases)) {
   const qTokens = fieldTokens(c.criteria.imprint ?? '');
   if (qTokens.length <= 1 && c.partial.length !== 0) {
     problems.push(`${name} 的查詢只有 ${qTokens.length} 個 token，部分符合區必須為 0，實際 ${c.partial.length}`);
+  }
+
+  // ── 變體區的結構不變量（D37）。這些不靠凍結數字，任何 baseline 都必須成立。
+  const seen = new Set();
+  for (const v of c.variant) {
+    if (seen.has(v.id)) problems.push(`${name} 的變體區有重複 id ${v.id}`);
+    seen.add(v.id);
+    if (!Array.isArray(v.reasons) || v.reasons.length === 0) {
+      problems.push(`${name} 的變體 ${v.id} 理由為空——空集合會被讀成「有變體但不知為何」`);
+    }
+    for (const r of v.reasons) {
+      if (r !== 'flip' && r !== 'canon') problems.push(`${name} 的變體 ${v.id} 出現未知理由 ${r}`);
+    }
+  }
+  // 變體區與其他四區不得重疊（原樣命中的記錄不進變體，是 D31 的推論而非另一條規則）
+  const others = new Set([...c.tiers.flat(), ...c.partial, ...c.unknown]);
+  for (const v of c.variant) {
+    if (others.has(v.id)) problems.push(`${name} 的 ${v.id} 同時出現在變體區與其他分區`);
+  }
+  // imprint 未啟用或無有效 token 時，變體區必須為空（§5.1 前兩列）
+  if (qTokens.length === 0 && c.variant.length !== 0) {
+    problems.push(`${name} 沒有有效 imprint token，變體區必須為 0，實際 ${c.variant.length}`);
   }
 }
 
@@ -257,6 +535,23 @@ const checks = [
 ];
 for (const [label, got, want] of checks) {
   if (got !== want) problems.push(`${label} 期望 ${want} 實際 ${got}`);
+}
+
+// ── A17：可達查詢閉包的規則指紋 ────────────────────────────────────
+const fp = closureFingerprint(rows);
+console.log(`\n可達查詢閉包 ${fp.closureSize}（真實 token ${fp.realTokens}）`);
+console.log(`  最壞變體區       ${String(fp.worst).padStart(4)}  ("${fp.worstQ}")`);
+console.log(`  flip  上界       ${String(fp.worstFlip).padStart(4)}  ("${fp.worstFlipQ}")`);
+console.log(`  canon 上界       ${String(fp.worstCanon).padStart(4)}  ("${fp.worstCanonQ}")`);
+out.closureFingerprint = {
+  closure_size: fp.closureSize, real_tokens: fp.realTokens,
+  worst: fp.worst, worst_query: fp.worstQ,
+  worst_flip: fp.worstFlip, worst_flip_query: fp.worstFlipQ,
+  worst_canon: fp.worstCanon, worst_canon_query: fp.worstCanonQ,
+  note: '規則指紋，非政策上界。任一數字變動＝規則漂移，見 plan-imprint-variant.md A17。',
+};
+for (const [k, want] of Object.entries(CLOSURE_FINGERPRINT)) {
+  if (fp[k] !== want) problems.push(`A17 閉包指紋 ${k} 期望 ${want} 實際 ${fp[k]}`);
 }
 
 // A2：M 40 與 40 M 必須完全相等（順序不敏感）

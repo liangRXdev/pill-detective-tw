@@ -730,3 +730,122 @@ test('C19 workflow 的 action 一律 pin 到完整 commit SHA，不得用可移�
   assert.ok(total >= 8, `C19: 只掃到 ${total} 個 uses —— 掃描已失效，不是「沒有 action」`);
   assert.deepEqual(offenders, [], `C19: 未 pin SHA 的 action：\n  ${offenders.join('\n  ')}`);
 });
+
+// ── C20 oracle 獨立性（D13 ＋ plan-imprint-variant.md C20）───────────
+//
+// **在此之前，「oracle 不 import search.js」只寫在註解裡，沒有任何測試在守。**
+// 一次「順手 import 一下 flip()」的編輯就會讓雙實作靜默塌縮成單實作，
+// 而所有測試照樣全綠——因為兩邊會同時錯。
+
+/**
+ * 剝掉 JS 註解，避免註解裡出現的 import 語句被當成真的依賴。
+ *
+ * 與 C18 剝 YAML 註解是同一條教訓：**解釋規則的註解本身含有規則要找的字串**——
+ * `make-expected.mjs` 的檔頭就寫著「刻意不 import search.js」。
+ */
+function stripJsComments(src) {
+  let out = '';
+  let i = 0;
+  while (i < src.length) {
+    const two = src.slice(i, i + 2);
+    if (two === '//') { while (i < src.length && src[i] !== '\n') i++; out += '\n'; continue; }
+    if (two === '/*') {
+      i += 2;
+      while (i < src.length && src.slice(i, i + 2) !== '*/') i++;
+      i += 2; out += ' '; continue;
+    }
+    const ch = src[i];
+    if (ch === '"' || ch === "'" || ch === '`') {
+      let j = i + 1;
+      while (j < src.length && src[j] !== ch) { if (src[j] === '\\') j++; j++; }
+      out += src.slice(i, j + 1);
+      i = j + 1; continue;
+    }
+    out += ch; i++;
+  }
+  return out;
+}
+
+/** 一個模組的所有**相對路徑**依賴：static import／export from／dynamic import／require。 */
+function localDeps(file) {
+  const src = stripJsComments(fs.readFileSync(file, 'utf8'));
+  const specs = [];
+  const patterns = [
+    /\b(?:import|export)\b[^;]*?\bfrom\s*(['"`])([^'"`]+)\1/g,
+    /\bimport\s*\(\s*(['"`])([^'"`]+)\1\s*\)/g,
+    /\brequire\s*\(\s*(['"`])([^'"`]+)\1\s*\)/g,
+    /\bimport\s*(['"`])([^'"`]+)\1\s*;/g,
+  ];
+  for (const re of patterns) for (const m of src.matchAll(re)) specs.push(m[2]);
+  return [...new Set(specs)]
+    .filter((s) => s.startsWith('.'))
+    .map((s) => path.resolve(path.dirname(file), s));
+}
+
+const resolveModule = (p) =>
+  [p, `${p}.js`, `${p}.mjs`, path.join(p, 'index.js'), path.join(p, 'index.mjs')]
+    .find((c) => fs.existsSync(c) && fs.statSync(c).isFile());
+
+test('C20 oracle 不得依賴 production 搜尋語意 —— 遞迴掃整個 dependency closure', () => {
+  const FORBIDDEN = new Set([path.resolve(path.join(ROOT, 'search.js'))]);
+  const ORACLES = [
+    path.join(ROOT, 'tools/make-expected.mjs'),
+    path.join(ROOT, 'tools/make-fixtures.mjs'),
+  ].filter((p) => fs.existsSync(p));
+
+  assert.ok(ORACLES.length >= 1, 'C20: 一個 oracle 都沒掃到 —— 掃描已失效');
+
+  for (const oracle of ORACLES) {
+    const seen = new Set([path.resolve(oracle)]);
+    const queue = [path.resolve(oracle)];
+    const via = new Map([[path.resolve(oracle), [path.basename(oracle)]]]);
+
+    while (queue.length) {
+      const cur = queue.shift();
+      for (const dep of localDeps(cur)) {
+        const resolved = resolveModule(dep);
+        if (!resolved) continue;
+        const abs = path.resolve(resolved);
+        if (seen.has(abs)) continue;
+        seen.add(abs);
+        via.set(abs, [...(via.get(cur) ?? []), path.relative(ROOT, abs)]);
+
+        assert.ok(
+          !FORBIDDEN.has(abs),
+          `C20: ${path.basename(oracle)} 經由 ${via.get(abs).join(' → ')} 依賴了 production 搜尋語意。\n`
+          + '  oracle 只要間接 import 到 search.js，兩邊就會同時錯、同時綠。\n'
+          + '  「只禁檔名」擋不住把共用語意搬到第三個模組（變異 F13-14）。',
+        );
+        queue.push(abs);
+      }
+    }
+  }
+});
+
+test('C20b 掃描器本身有效 —— 對照組（沒有這條，C20 可能是空的）', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'c20-'));
+  const decoy = path.join(tmp, 'decoy.mjs');
+  const shared = path.join(tmp, 'shared.mjs');
+
+  fs.writeFileSync(shared, "export { flip } from '../search.js';\n");
+  fs.writeFileSync(decoy, "import { flip } from './shared.mjs';\n");
+  assert.deepEqual(
+    localDeps(decoy).map((p) => path.basename(p)), ['shared.mjs'],
+    'C20b: 掃不到相對 import —— C20 是空的',
+  );
+  assert.deepEqual(
+    localDeps(shared).map((p) => path.basename(p)), ['search.js'],
+    'C20b: 掃不到 re-export —— 把語意搬到第三個模組就能繞過 C20',
+  );
+
+  fs.writeFileSync(decoy, "const m = await import('./shared.mjs');\n");
+  assert.deepEqual(
+    localDeps(decoy).map((p) => path.basename(p)), ['shared.mjs'],
+    'C20b: 掃不到 dynamic import',
+  );
+
+  fs.writeFileSync(decoy, "// import { flip } from './shared.mjs';\nexport const x = 1;\n");
+  assert.deepEqual(localDeps(decoy), [], 'C20b: 註解裡的 import 被誤判為真的依賴');
+
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
