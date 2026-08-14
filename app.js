@@ -265,7 +265,22 @@ function thumb(item, size) {
   return box;
 }
 
-function card(item) {
+/**
+ * 變體理由的顯示文字（D37）。**這張表是理由代碼與中文的唯一對應。**
+ *
+ * 兩個詞必須可分辨——把它們合併成「可能相似」之類的統一文案，
+ * 使用者就無法判斷該顆藥是「被拿反了」還是「字看錯了」，
+ * 而那兩件事在藥車前要做的下一個動作不同（一個是翻過來看，一個是換角度看）。
+ */
+const VARIANT_WHY = { flip: '倒讀', canon: '字形相近' };
+
+/**
+ * @param item     canonical item
+ * @param reasons  變體理由陣列；非變體區傳 null。
+ *                 **理由跟著這一次搜尋的結果進來，不是從 item 上讀的**——
+ *                 掛在 item 上的話，上一個查詢的理由會顯示在這一個查詢的卡片上（D37）。
+ */
+function card(item, reasons = null) {
   const b = el('button', 'pill');
   b.type = 'button';
   b.appendChild(thumb(item));
@@ -277,13 +292,26 @@ function card(item) {
   body.appendChild(el('div', 'ap', [fmt(item.color), fmt(item.shape), fmt(item.score_mark)]
     .map((v) => v ?? NA).join('｜')));
   body.appendChild(el('div', 'lic', item.id));
+  if (reasons && reasons.length) {
+    const why = el('div', 'vwhy');
+    for (const r of reasons) why.appendChild(el('span', null, VARIANT_WHY[r] ?? r));
+    body.appendChild(why);
+  }
   b.appendChild(body);
   b.addEventListener('click', () => openDetail(item));
   return b;
 }
 
-/** 分區：標題 + 說明 + 卡片格 + 捲動載入；低確定性分區可延遲展開 */
-function section(title, why, list, soft, collapsed = false) {
+/** 變體區的元素是 `{ item, reasons }`，不是裸 item——身份與理由不可分離（D37）。 */
+const variantCard = (v) => card(v.item, v.reasons);
+
+/**
+ * 分區：標題 + 說明 + 卡片格 + 捲動載入；低確定性分區可延遲展開。
+ *
+ * `renderCard` 讓變體區共用同一套分頁／捲動載入邏輯而不必複製一份——
+ * 複製出來的第二份遲早會跟這份漂移。
+ */
+function section(title, why, list, soft, collapsed = false, renderCard = card) {
   if (!list.length) return null;
   const s = el(collapsed ? 'details' : 'section',
     `sect${soft ? ' soft' : ''}${collapsed ? ' result-drawer' : ''}`);
@@ -303,7 +331,7 @@ function section(title, why, list, soft, collapsed = false) {
   const more = el('div', 'more');
   const draw = () => {
     const next = list.slice(shown, shown + PAGE);
-    grid.append(...next.map(card));
+    grid.append(...next.map((entry) => renderCard(entry)));
     shown += next.length;
     if (shown >= list.length) { more.replaceChildren(); return; }
     more.replaceChildren(el('span', null, `已顯示 ${shown} / ${list.length}`));
@@ -361,7 +389,9 @@ function render() {
 
   $('noToken').hidden = !states.includes(ResultState.NO_TOKEN_NOTICE);
 
-  const uncertain = res.partial.length + res.unknown.length;
+  // 與 `resultStates()` 的 uncertain 同一個定義（D35）——變體區必須計入。
+  // 漏掉的話，「符合條件 0 項」旁邊不會有任何提示，而下面卻列著一整區候選。
+  const uncertain = res.partial.length + res.unknown.length + res.variant.length;
   c.append('符合條件 ', Object.assign(el('b'), { textContent: String(res.mainCount) }), ' 項');
   if (uncertain) c.appendChild(el('span', 'aux', `（另有 ${uncertain} 項無法排除）`));
 
@@ -380,7 +410,13 @@ function render() {
     const box = el('section', 'card empty');
     box.appendChild(Object.assign(el('p', 'lead'),
       { textContent: '沒有可以確定符合的藥品，但以下藥品無法排除' }));
-    box.appendChild(el('p', 'hint', 'TFDA 未提供該欄位資料，或只記錄了部分刻字。'));
+    // 說明必須對應**實際存在的那幾區**。查詢 `S15` 是主區 0、只有變體區 1 筆——
+    // 講「TFDA 未提供資料或只記錄部分刻字」在那個情境是**一句關於資料的錯誤陳述**。
+    const causes = [];
+    if (res.unknown.length) causes.push('TFDA 未提供該欄位資料');
+    if (res.partial.length) causes.push('TFDA 只記錄了部分刻字');
+    if (res.variant.length) causes.push('刻字可能被看反或字形相近');
+    box.appendChild(el('p', 'hint', `${causes.join('，或')}。`));
     out.appendChild(box);
   } else if (states.includes(ResultState.TOO_MANY_EXHAUSTED)) {
     acts.appendChild(el('span', 'aux', '已無更多條件可縮小，請以圖片人工比對'));
@@ -396,6 +432,15 @@ function render() {
   if (p) out.appendChild(p);
   const u = section('資料未提供', 'TFDA 未填該欄位，不代表不符合，無法排除', res.unknown, true, true);
   if (u) out.appendChild(u);
+
+  // 變體區排在**最後**（規格 §8）：未提供區至少「這顆藥沒有和你的輸入牴觸」，
+  // 變體區是「你的輸入和它牴觸，但如果你看反了就不牴觸」——多疊一層假設。
+  const v = section(
+    '刻字可能看反或字形相近',
+    '這些藥的刻字與你的輸入不同，但在轉向或字形相近的情況下可能是同一顆',
+    res.variant, true, true, variantCard,
+  );
+  if (v) out.appendChild(v);
 }
 
 // ── 詳細 ──────────────────────────────────────────────────────────
