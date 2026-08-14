@@ -66,9 +66,13 @@ const naiveTier = (row, q) => {
 // ── 測試工具 ────────────────────────────────────────────────────────
 const ids = (list) => list.map((i) => i.id).sort();
 const sorted = (a) => [...a].sort();
-const buckets = (res) => [...res.tiers.map(ids), ids(res.partial), ids(res.unknown)];
+/** 變體區的元素是 `{ item, reasons }`，不是裸 item（D37：身份與理由不可分離）。 */
+const variantIds = (res) => res.variant.map((v) => v.item.id).sort();
+const buckets = (res) => [
+  ...res.tiers.map(ids), ids(res.partial), ids(res.unknown), variantIds(res),
+];
 
-/** 五區 pairwise disjoint、無重複，且五區 ∪ 排除 === 全量（窮盡性） */
+/** 六區 pairwise disjoint、無重複，且六區 ∪ 排除 === 全量（窮盡性） */
 function assertPartition(res, label) {
   const bs = buckets(res);
   for (const b of bs) assert.equal(new Set(b).size, b.length, `${label}: 分區內有重複 id`);
@@ -80,7 +84,17 @@ function assertPartition(res, label) {
   }
   const union = bs.flat();
   assert.equal(new Set(union).size, union.length, `${label}: 跨分區有重複`);
-  assert.equal(union.length + res.excludedCount, TOTAL, `${label}: 五區 ＋ 排除 不等於 ${TOTAL}`);
+  assert.equal(union.length + res.excludedCount, TOTAL, `${label}: 六區 ＋ 排除 不等於 ${TOTAL}`);
+
+  // D37：理由的 domain 必須與變體區的 ID set **完全相等**（雙向），
+  // 且理由集合不得為空——空集合會被讀成「有變體但不知道為什麼」。
+  for (const v of res.variant) {
+    assert.ok(v.item && v.item.id, `${label}: 變體區元素缺少 item`);
+    assert.ok(Array.isArray(v.reasons) && v.reasons.length > 0, `${label}: 變體區 ${v.item.id} 理由為空`);
+    for (const r of v.reasons) {
+      assert.ok(['flip', 'canon'].includes(r), `${label}: 變體區 ${v.item.id} 出現未知理由 ${r}`);
+    }
+  }
 }
 
 function assertCase(res, key, label) {
