@@ -792,6 +792,28 @@ test('A16 ONLY_UNCERTAIN 雙向 —— 必須由真實 search() 產生，不得�
     'A16: 真正全空時必須回 EMPTY —— 只測正向的話「永遠不回 EMPTY」也會通過');
 });
 
+test('A16b ONLY_UNCERTAIN 必須真的依賴 variant —— 未提供區為 0 的隔離情境', () => {
+  // **這條是變異測試 F13-6 逼出來的。**
+  // A16 用查詢 S15，但那個查詢的未提供區有 2,085 筆（全資料集中兩欄皆無 token 的記錄），
+  // 所以 `uncertain = partial + unknown` 本來就 > 0 ——
+  // 把 variant 從 uncertain 拿掉，A16 依然全綠。它從頭到尾沒真的依賴 variant。
+  //
+  // 要隔離出「只有 variant 有值」，必須用全部記錄都有 token 的合成資料集。
+  const set = indexItems([
+    toItem(mkRow('Y-a', 'HS', '')),        // flip('SH') = 'HS' → 變體命中
+    toItem(mkRow('Y-b', 'QQQQ', '')),      // 完全不相干 → 排除
+  ]);
+  const c = { imprint: 'SH' };
+  const r = search(set, c);
+  assert.equal(r.mainCount, 0, 'A16b: 主區應為 0');
+  assert.equal(r.partial.length, 0, 'A16b: 部分符合區應為 0');
+  assert.equal(r.unknown.length, 0, 'A16b: **未提供區必須為 0**，否則本條又會被它撐住');
+  assert.equal(r.variant.length, 1, 'A16b: 只有變體區有值');
+  assert.ok(resultStates(r, c).includes(ResultState.ONLY_UNCERTAIN),
+    'A16b: uncertain 沒有納入 variant —— 畫面會顯示「找不到」，而下面列著一張卡');
+  assert.ok(!resultStates(r, c).includes(ResultState.EMPTY), 'A16b: 不得同時回 EMPTY');
+});
+
 test('A17 可達查詢閉包的規則指紋 —— 查詢域不是「真實 token」', () => {
   // v0.2 曾以 2,357 個真實 token 為母體，那是取樣偏誤：
   // `Y5P` 是合法輸入、可達 111 筆，卻不是任何記錄的 token。

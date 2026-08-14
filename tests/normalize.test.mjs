@@ -458,6 +458,23 @@ test('B22 變體只接受完全相等 —— 字首與包含都不算（含對�
   assert.equal(canonPredicate(['82'], q2), true, 'B22 對照組: canon 完全相等必須放行');
 });
 
+test('B22-1b 每條 predicate 必須覆蓋**全部**查詢 token —— every 不是 some', () => {
+  // **這條是變異測試 F13-5b 逼出來的。** 原本 B22 的三個 flip 案例全是單 token 查詢，
+  // 而單 token 之下 `every` 與 `some` 完全等價：把 every 改成 some，整組 B22 照樣全綠。
+  // 要分辨得出來，必須是「多 token、兩者都可倒讀、但只有一個命中」。
+  const q = ['SH', 'MM'];                  // flip → ['HS', 'WW']，兩者都在表內
+  assert.deepEqual(q.map(flip), ['HS', 'WW'], 'B22-1b 前提: 兩個 token 都可倒讀');
+  assert.equal(flipPredicate(['HS'], q), false, 'B22-1b: 只中一個 token 不得放行（every 不是 some）');
+  assert.equal(flipPredicate(['WW'], q), false, 'B22-1b: 只中另一個也不行');
+  assert.equal(flipPredicate(['HS', 'WW'], q), true, 'B22-1b 對照組: 全中才放行');
+
+  // canon 側同理
+  const q2 = ['B2', 'SL'];                 // canon → ['82', '51']
+  assert.deepEqual(q2.map(canon), ['82', '51'], 'B22-1b 前提: canon 值');
+  assert.equal(canonPredicate(['82'], q2), false, 'B22-1b: canon 側只中一個不得放行');
+  assert.equal(canonPredicate(['82', '51'], q2), true, 'B22-1b 對照組: canon 側全中才放行');
+});
+
 test('B22-2 兩條規則不得拼接 —— 這是 N15 的守門（變異 F13-10）', () => {
   // 真實 witness：記錄 衛署藥製字第034807號 的 token 是 [M, T, 130, HOPER]，
   // 查詢 'W L30' 之下 W 靠倒讀命中 M、L30 靠字形命中 130，
