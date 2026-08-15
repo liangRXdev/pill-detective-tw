@@ -1,6 +1,6 @@
-# 藥丸偵探 Pill Detective TW — 台灣藥品外觀搜尋　規劃文件 v1.10
+# 藥丸偵探 Pill Detective TW — 台灣藥品外觀搜尋　規劃文件 v1.11
 
-- 修訂時間：2026-08-13（最新 v1.10；v1.2 依 `plan-verdict-2.md`，v1.3–v1.10 為實作階段裁決。修訂紀錄見 §14）
+- 修訂時間：2026-08-15（最新 v1.11；v1.2 依 `plan-verdict-2.md`，v1.3–v1.11 為實作階段裁決。修訂紀錄見 §14）
 - repo：https://github.com/liangRXdev/pill-detective-tw （GitHub Pages 靜態站）
 - 資料源：衛生福利部食品藥物管理署 Open Data「藥品外觀資料集」（opendata infoId=42）
 - 姊妹專案：`TFDA-drug-id-quiz`（藥品辨識王，同一資料源，已上線）
@@ -577,7 +577,8 @@ meta: {
                                   // 與產物格式無關，格式微調不會造成假變更
   count: 6295,
   vocab: { color: [...], shape: [...], score_mark: [...] },   // 本次實際出現的值
-  images_bytes: 0
+  images_bytes: 91239644          // null＝未計；正整數＝已鏡像資產總量。
+                                  // **0 不是合法值**（D38，見該節）
 }
 
 items[]: {
@@ -844,6 +845,46 @@ CLAUDE.md / README.md / LICENSE / .gitignore / package.json
 
 ## 14. 修訂紀錄
 
+### v1.10 → v1.11（`images_bytes` 的 sentinel 拆解，2026-08-15）
+
+#### D38 `images_bytes`：0 不是合法值
+
+**怎麼發現的**：2026-08-15 首次手動觸發週更（在此之前 `update-data.yml` 從未執行過，
+只有 2026-08-12 那次一次性 `bootstrap-images`）。管線全綠、137 測試全過、資料照常發布，
+但 `appearance.json` 比前一版少 7 bytes——`content_hash` 與 6,295 筆全部相同，
+差異只在 `meta.images_bytes`：**91,239,644 → 0**，而 `images_complete` 仍是 `true`。
+
+**成因**：`fetch-images.py` 的 `if not todo: return 0` 早退在 `images_bytes` 重算與
+manifest 回寫**之前**。而「待處理 0 張」正是週更穩定後每一週的常態，不是例外路徑。
+
+**真正的缺陷不是數字錯，是 0 同時代表兩個相反狀態**：
+
+| `images_bytes: 0` 的意思 | 來源 |
+|---|---|
+| metadata-only 發布，圖片根本還沒上 | D23，C10c 正是斷言這個 |
+| 圖片 6,798 張全部就緒，只是收尾沒跑完 | 這次的 bug |
+
+C10c 因此是一條**弱驗收**：它斷言的值不再唯一對應它宣稱的狀態。
+這與「欄位出現次數 ≠ 記錄數」是同一類錯——**一個值被迫兼職兩種語意**。
+
+**決策（三條一起，缺一條就只剩約定在守）**：
+
+1. **語意**：`null`＝未計，正整數＝已鏡像資產總量，**0 不再是任何合法狀態**。
+   staging 初建與 metadata-only 發布都寫 `null`（原為 `0`）
+2. **`fetch-images` 待處理 0 張時不得早退**：空的 `todo` 讓下載段自然成為 no-op，收尾照跑
+3. **`--publish` 獨立守門**：`images_bytes` 非正整數即拒絕切換。
+   **雜湊齊全證明不了收尾跑完**——每張圖都有合法 sha256 的候選版本，
+   仍可能是 `fetch-images` 中途沒走完的產物。只修第 2 條的話，
+   下一個早退長出來時沒有任何東西擋得住
+
+**驗收**：C7c（驅動 `main()`，待處理 0 張仍重算且零 HTTP 請求）＋
+C10d（`--publish` 對 `null`／`0`／字串／小數／負數五種都拒絕，且不消耗候選版本、
+不留下半成品正式版；正整數才放行）。兩條各以變異實跑轉紅。
+
+**留下的教訓**：這個 bug 逃過 137 個測試與兩輪 Codex 覆審，
+因為它只在「排程真的跑起來、而且沒有圖片要抓」時才顯形——
+**管線寫完不等於管線驗過**。同理，`verify-images.yml`（季度）至今仍是 0 次執行。
+
 ### v1.9 → v1.10（資料更新時間頁尾 ＋ PWA A＋B，2026-08-13）
 
 兩件事，都由使用者裁決後動工。
@@ -1075,7 +1116,7 @@ fail-closed 資料更新與回歸測試**均未變動**。
 
 - 輸入仍必須是 canonical staging，且通過 schema、筆數、id 唯一性與圖片連結結構檢查
 - 輸出保留完整搜尋欄位與官方 `src`，但強制把每個 `sha256` 清為 `null`，不引用尚未發布的鏡像
-- `meta.images_complete=false`、`meta.images_bytes=0`
+- `meta.images_complete=false`、`meta.images_bytes=null`（v1.11：原為 `0`，見 D38）
 - staging 不被消耗，後續圖片首建仍可沿用原流程
 - 原 `--publish` 仍拒絕任何缺少合法 sha256 的圖片；全量完成後標示 `images_complete=true`
 

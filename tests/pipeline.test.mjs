@@ -380,7 +380,9 @@ test('C10c metadata-only 可先發布搜尋資料，但不放寬完整圖片守�
   assert.equal(r.code, 0, r.stderr);
   const published = JSON.parse(fs.readFileSync(ws.out, 'utf8'));
   assert.equal(published.meta.images_complete, false);
-  assert.equal(published.meta.images_bytes, 0);
+  // null＝未計，不是 0。0 曾經同時表示「圖片還沒上」與「圖片全就緒但沒重算」，
+  // 這條斷言因此測不出它宣稱的那件事（2026-08-15 週更把後者發布出去了）。
+  assert.equal(published.meta.images_bytes, null);
   assert.ok(published.items.flatMap((it) => it.imgs).every((g) => g.sha256 === null));
   assert.ok(published.items.flatMap((it) => it.imgs).every((g) => !('src_bytes' in g)));
   assert.ok(fs.existsSync(stagedPath), 'metadata-only 發布不得消耗完整圖片候選版本');
@@ -389,6 +391,58 @@ test('C10c metadata-only 可先發布搜尋資料，但不放寬完整圖片守�
   const full = run(['--out', ws.out, '--publish']);
   assert.notEqual(full.code, 0, '完整發布仍必須拒絕缺圖版本');
   assert.ok(before.equals(fs.readFileSync(ws.out)), '完整發布失敗不得改動 metadata-only 正式版');
+});
+
+/**
+ * C10d 是 2026-08-15 那次手動週更的回歸驗收：`fetch-images` 在待處理 0 張時早退，
+ * 跳過 `images_bytes` 重算，於是 `images_complete: true` 配著未計的 `images_bytes`
+ * 真的被發布到 production。
+ *
+ * **雜湊齊全證明不了收尾跑完**——每張圖都有合法 sha256 的候選版本，
+ * 仍可能是一個 fetch-images 中途沒走完的產物。所以守門要獨立擋一次，
+ * 不能靠「修好早退」這個約定；早退修好了，下一個早退還會再長出來。
+ */
+test('C10d --publish 拒絕 images_bytes 未計／為 0 的候選版本，且不消耗它', () => {
+  for (const bad of [null, 0, '91239644', 12.5, -1]) {
+    const ws = workspace();
+    const zip = writeZip(ws.dir, srcRows(5100));
+    assert.equal(run(['--source', zip, '--out', ws.out, '--vocab-lock', ws.lock]).code, 0);
+
+    // 圖片全部就緒（雜湊齊全）——唯一的缺陷是收尾沒跑完
+    const stagedPath = `${ws.out}.staging`;
+    const staged = JSON.parse(fs.readFileSync(stagedPath, 'utf8'));
+    for (const g of staged.items.flatMap((it) => it.imgs)) {
+      g.sha256 = 'a'.repeat(64);
+      g.src_bytes = 1234;
+    }
+    staged.meta.images_bytes = bad;
+    fs.writeFileSync(stagedPath, JSON.stringify(staged), 'utf8');
+    const beforeStaged = fs.readFileSync(stagedPath);
+
+    const r = run(['--out', ws.out, '--publish']);
+    assert.notEqual(r.code, 0, `images_bytes=${JSON.stringify(bad)} 應拒絕切換`);
+    assert.match(r.stderr, /images_bytes/);
+    assert.ok(!fs.existsSync(ws.out), '拒絕切換時不得產生正式版');
+    assert.ok(beforeStaged.equals(fs.readFileSync(stagedPath)),
+      '拒絕切換不得改動候選版本（images_complete 不可先寫進去）');
+  }
+
+  // 正整數才放行
+  const ws = workspace();
+  const zip = writeZip(ws.dir, srcRows(5100));
+  assert.equal(run(['--source', zip, '--out', ws.out, '--vocab-lock', ws.lock]).code, 0);
+  const stagedPath = `${ws.out}.staging`;
+  const staged = JSON.parse(fs.readFileSync(stagedPath, 'utf8'));
+  for (const g of staged.items.flatMap((it) => it.imgs)) {
+    g.sha256 = 'a'.repeat(64);
+    g.src_bytes = 1234;
+  }
+  staged.meta.images_bytes = 91239644;
+  fs.writeFileSync(stagedPath, JSON.stringify(staged), 'utf8');
+  assert.equal(run(['--out', ws.out, '--publish']).code, 0);
+  const published = JSON.parse(fs.readFileSync(ws.out, 'utf8'));
+  assert.equal(published.meta.images_complete, true);
+  assert.equal(published.meta.images_bytes, 91239644);
 });
 
 // ── C11 增量判定 ────────────────────────────────────────────────────

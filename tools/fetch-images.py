@@ -316,9 +316,12 @@ def main() -> int:
     for r in recovered:
         log(f"  ⚠ 例外清單中的圖片已恢復，需人工撤銷例外：{r}")
 
+    # **待處理 0 張時不得早退。** 早退會跳過下面的 `images_bytes` 重算與 manifest 回寫，
+    # 於是 staging 帶著 fetch-appearance 寫的「未計」值就被發布出去——
+    # 而「沒有圖片要抓」正是週更穩定後每一週的常態，不是例外情況。
+    # 空的 todo 讓下面整段自然變成 no-op（執行緒池零工作、results 空），收尾照跑。
     if not todo:
-        log("無待處理項目")
-        return 0
+        log("無待處理項目（仍重算資產總量並回寫 manifest）")
 
     IMG_DIR.mkdir(parents=True, exist_ok=True)
     results: dict[str, tuple[str, int]] = {}
