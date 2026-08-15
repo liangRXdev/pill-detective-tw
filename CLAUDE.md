@@ -1,6 +1,6 @@
 # CLAUDE.md — 藥丸偵探 Pill Detective TW
 
-規格在 `.ai-review/plan.md`（**v1.4，動任何東西前先讀 §5 的 D1.1／D3／D12／D14／D17／D18**）。
+規格在 `.ai-review/plan.md`（**v1.11，動任何東西前先讀 §5 的 D1.1／D3／D12／D14／D17／D18**）。
 兩輪 Codex 覆審報告與判定在同目錄，數字爭議先查 `plan-verdict.md` 的事實查核段。
 
 底下只記「從 code 看不出來、但改錯會出事」的部分。
@@ -165,6 +165,11 @@ grep -o "C[0-9][0-9]*" .ai-review/plan.md | sort -u -V | tail -5
 `imgs[].src_bytes` 是**原圖**的 Content-Length（給 D14 的 HEAD 掃描當基準）。
 兩者是同一次下載的產物，`carryHashes()` **必須一起沿用**——
 只沿用其中一個會讓 HEAD 掃描拿 `null` 去比對而全部誤判為「已變更」。
+
+`meta.images_bytes` 則是第三個、語意不同的欄位：**`null`＝未計，正整數＝已鏡像總量，
+`0` 不是合法值**（D38）。`fetch-images` 在待處理 0 張時**不得早退**——
+那是週更穩定後的常態路徑，早退會跳過重算，把「未計」當成就緒發布出去。
+`--publish` 對此獨立守門，因為**雜湊齊全證明不了收尾跑完**。
 
 季度檢查是 `--freshness`（HEAD 掃全量 ＋ 抽樣 100 張深驗，約 366 MB），
 **不是** `--verify-all`（22 GB，保留給人工全量稽核，不排程）。

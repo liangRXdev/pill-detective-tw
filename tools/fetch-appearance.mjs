@@ -284,7 +284,10 @@ export function metadataOnlyPayload(staged) {
 
   return {
     ...staged,
-    meta: { ...staged.meta, images_bytes: 0, images_complete: false },
+    // `images_bytes` 是 **null 而不是 0**：0 曾經同時代表「圖片還沒上」與
+    // 「圖片全部就緒但沒重算」兩個相反狀態，C10c 因此在對一個雙義值做斷言。
+    // null＝未計，正整數＝實算總量，0 不再是任何合法狀態（由 --publish 的守門擋著）。
+    meta: { ...staged.meta, images_bytes: null, images_complete: false },
     items,
   };
 }
@@ -344,6 +347,13 @@ async function main() {
     const staged = JSON.parse(fs.readFileSync(stagingPath, 'utf8'));
     const missing = staged.items.flatMap((it) => it.imgs).filter((g) => !isSha256(g.sha256));
     if (missing.length) die(`還有 ${missing.length} 張圖片未完成，不可切換（先跑 fetch-images）`);
+    // `images_complete=true` 配 `images_bytes` 未計，是 2026-08-15 那次週更真的發布出去的組合
+    // （fetch-images 在待處理 0 張時早退，跳過重算）。雜湊齊全證明的是每一張都處理過，
+    // 證明不了收尾跑完——所以這裡要獨立擋一次，否則修完早退還是只剩約定在守。
+    if (!Number.isInteger(staged.meta.images_bytes) || staged.meta.images_bytes <= 0) {
+      die(`meta.images_bytes 是 ${JSON.stringify(staged.meta.images_bytes)}，不是正整數；`
+        + 'fetch-images 的收尾未跑完，不可切換');
+    }
     staged.meta.images_complete = true;
     fs.writeFileSync(stagingPath, JSON.stringify(staged, null, 1) + '\n', 'utf8');
     fs.renameSync(stagingPath, outPath);
@@ -467,7 +477,8 @@ async function main() {
       content_hash: 'sha256:' + crypto.createHash('sha256').update(buf).digest('hex'),
       count: items.length,
       vocab: seen,
-      images_bytes: 0,
+      // 未計。fetch-images 收尾時實算回寫；發布守門要求它到那時必須是正整數。
+      images_bytes: null,
       ...(warnings.length ? { warnings } : {}),
     },
     items,

@@ -245,6 +245,46 @@ def main() -> int:
     check(sorted(p.name for p in (FI.ROOT / "data").glob("*")) == before,
           "D14: freshness 模式改動了 data/")
 
+    # ── C7c：待處理 0 張時仍須重算 images_bytes 並回寫 manifest ─────
+    #
+    # 2026-08-15 那次手動週更的回歸：`if not todo: return 0` 早退跳過收尾，
+    # staging 帶著 fetch-appearance 寫的「未計」值一路被發布到 production
+    # （meta 宣稱資產 0 bytes，同時 images_complete 為 true）。
+    # 「沒有圖片要抓」是週更穩定後每一週的常態，不是例外路徑。
+    #
+    # 這條只有驅動 main() 才驗得到——needs_fetch 與收尾之間那個 return 在
+    # 任何單一函式的測試裡都不存在。
+    with tempfile.TemporaryDirectory() as td:
+        ws = Path(td)
+        (ws / "data" / "img").mkdir(parents=True)
+        asset = FI.to_webp(png_bytes())
+        (ws / "data" / "img" / "probe-0.webp").write_bytes(asset)
+        manifest = ws / "data" / "appearance.json.staging"
+        manifest.write_text(json.dumps({
+            "meta": {"schema": 1, "count": 1, "images_bytes": None},
+            "items": [{"id": "X", "imgs": [{
+                "file": "img/probe-0.webp",
+                "src": f"{base}/ok-c7c",
+                "sha256": hashlib.sha256(asset).hexdigest(),
+                "src_bytes": 123,
+            }]}],
+        }, ensure_ascii=False), encoding="utf-8")
+
+        saved = (FI.ROOT, FI.IMG_DIR, sys.argv)
+        FI.ROOT, FI.IMG_DIR = ws, ws / "data" / "img"
+        sys.argv = ["fetch-images.py"]
+        HITS.clear()
+        try:
+            rc = FI.main()
+        finally:
+            FI.ROOT, FI.IMG_DIR, sys.argv = saved
+
+        written = json.loads(manifest.read_text(encoding="utf-8"))
+        got = written["meta"]["images_bytes"]
+        check(rc == 0, f"C7c: 待處理 0 張時回非零（{rc}）")
+        check(got == len(asset), f"C7c: images_bytes 未重算（{got!r}，應為 {len(asset)}）")
+        check(not HITS, f"C7c: 待處理 0 張卻仍發出 HTTP 請求（{HITS}）")
+
     # ── C15：分批切片必須穩定且互斥、涵蓋全集 ──────────────────────
     imgs = [{"file": f"img/{i:04d}-0.webp"} for i in range(97)]
 
