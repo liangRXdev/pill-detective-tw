@@ -1,0 +1,40 @@
+name: 測試
+
+# 137 個驗收在 2026-08-15 之前從未在 CI 跑過：`npm test` 只寫在 update-data.yml 裡，
+# 也就是只有週更當下才跑。PR #5／#6 合併時一次測試都沒跑。
+# 這支的用意就是把已經寫好的驗收接到每一次 push 與 PR 上。
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# 測試沒有「補跑舊 commit」的價值，後到者取消先前的——
+# 這與 update-data.yml 的 cancel-in-progress: false 方向相反是刻意的：
+# 那支取消會讓資料更新半途而廢，這支不會有副作用。
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: true
+
+# 一旦指定 permissions，**未列出的一律變成 none**（C18 守著這條紀律）。
+# 這支只讀 code，不寫任何東西。
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1   # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020  # v7
+        with:
+          node-version: '22'
+
+      # C7／C15 走 `uv run tests/fetch_images_probe.py`（真的用 Pillow 解碼、真的數請求次數）。
+      # 那組**缺 uv 是直接紅、不 skip**——所以這一步不可省，
+      # 否則整組圖片管線驗收會在 CI 上以失敗而非「跳過」的形式現形。
+      - uses: astral-sh/setup-uv@94527f2e458b27549849d47d273a16bec83a01e9  # v7
+
+      # 無 npm 相依（package.json 沒有 dependencies，測試跑 node --test），故不需 npm ci。
+      - name: 跑測試
+        run: npm test
