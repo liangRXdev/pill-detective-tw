@@ -1,176 +1,179 @@
-# 藥丸偵探 Pill Detective TW — 台灣藥品外觀搜尋
+# Pill Detective TW — Taiwan Drug Appearance Search (藥丸偵探)
+
+**English** | [繁體中文](README.zh-TW.md)
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Pill%20Detective%20TW-3D7A8A?style=for-the-badge&logo=github)](https://liangrxdev.github.io/pill-detective-tw/)
 
-依藥品**外觀特徵**（刻字、顏色、形狀、刻痕）從衛福部食藥署（TFDA）公開資料
-縮小候選藥品清單，供藥師與醫療人員**人工比對確認**。
+Narrows down candidate drugs by **appearance features** (imprint, color, shape, score line) using public data from the Taiwan Food and Drug Administration (TFDA), for pharmacists and healthcare staff to **confirm by manual comparison**. The interface is in Traditional Chinese.
 
-> 這是「外觀條件檢索 → 候選藥物 → 人工確認」，
-> **不是**「輸入照片 → 系統宣稱這就是某藥」。
-> 本站不使用任何 AI 推測藥品身份，也不提供相似度分數。
+> This is "appearance criteria search → candidate drugs → manual confirmation",
+> **not** "upload a photo → the system claims it is drug X".
+> The site uses no AI to guess drug identity and gives no similarity scores.
 
-## 這個工具最在意的事：不要漏
+## What this tool cares about most: don't miss
 
-使用者最可能受害的情境不是「多給了幾個候選」，而是
-**「以為清單裡沒有 → 認定這顆不是那個藥」，但真正的藥被系統靜默排除了**。
-因此設計往這個方向倒：
+The most likely way a user gets hurt is not "a few extra candidates" but
+**"it's not in the list → I conclude this pill isn't that drug", when the real drug was silently excluded by the system**.
+So the design leans in that direction:
 
-| 情形 | 一般作法 | 本站作法 |
+| Situation | Typical approach | This site |
 |---|---|---|
-| TFDA 沒填顏色（217 筆） | 勾「白色」時直接消失 | 進「資料未提供」區，並說明無法排除 |
-| TFDA 只記部分刻字（1,293 筆） | 輸入完整刻字時被排除 | 進「部分符合」區 |
-| 藥錠拿反了、把 `S` 看成 `5` | 回「找不到」 | 進「刻字可能看反或字形相近」區，並標示是哪一種 |
-| 主區 0 筆 | 顯示「找不到」 | 只有**每一筆都明確不符**時才說找不到 |
-| 資料檔載入失敗 | 顯示 0 筆結果 | 停用搜尋並明說「資料暫時無法載入」 |
+| TFDA didn't record the color (217 records) | Disappears when "white" is checked | Goes into a "data not provided" section explaining it can't be excluded |
+| TFDA recorded only part of the imprint (1,293 records) | Excluded when you type the full imprint | Goes into a "partial match" section |
+| Tablet held upside down, `S` read as `5` | Returns "not found" | Goes into an "imprint may be upside down or look-alike" section, labelled with which one |
+| 0 results in the main section | Shows "not found" | Only says not found when **every record clearly doesn't match** |
+| Data file fails to load | Shows 0 results | Disables search and says plainly "data temporarily unavailable" |
 
-刻意接受的漏檢只有兩處，都是為了避免清單長到在藥車前不可用：
+Only two misses are deliberately accepted, both to keep the list from getting too long to use at the medication cart:
 
-- **單字元查詢不啟用「包含」級**。輸入 `S` 而回傳印著 `EVEREST`、`YSP` 的藥，在藥車前不可用。
-- **變體區只接受「完全相等」**，且單字元不套字形轉換。理由見下節。
+- **Single-character queries don't enable the "contains" level.** Typing `S` and getting drugs imprinted `EVEREST` or `YSP` is unusable at the cart.
+- **The variant section only accepts exact equality**, and single characters get no look-alike conversion. See the next section for why.
 
-## 搜尋規則（deterministic，無評分）
+## Search Rules (deterministic, no scoring)
 
-刻字先切 token（大寫化、非英數視為分隔），**每個查詢 token 都必須命中**（不計順序），
-完整命中依精確度分為**三個互斥等級**；另外保留「部分符合」「資料未提供」「刻字可能看反或字形相近」
-三個無法排除區：
+The imprint is tokenized first (uppercased, non-alphanumerics treated as separators), and **every query token must match** (order-independent).
+Full matches are split by precision into **three mutually exclusive levels**; in addition there are three "cannot be excluded" sections: "partial match", "data not provided" and
+"imprint may be upside down or look-alike":
 
-| 區 | 意義 |
+| Section | Meaning |
 |---|---|
-| 完全符合 | 每段輸入都與某段刻字完全相同 |
-| 字首符合 | 每段輸入都是某段刻字的開頭 |
-| 包含 | 每段輸入都出現在刻字之中（單字元查詢不啟用此級） |
-| 部分符合 | 至少一段命中、但非全部——TFDA 只記錄了部分刻字 |
-| 資料未提供 | 該欄位 TFDA 未填，無法排除 |
-| 刻字可能看反或字形相近 | 原樣不符，但倒讀或字形壓平後完全相同 |
+| Exact match | Every input token is identical to an imprint token |
+| Prefix match | Every input token is the beginning of an imprint token |
+| Contains | Every input token appears within the imprint (not enabled for single-character queries) |
+| Partial match | At least one token matches but not all — TFDA recorded only part of the imprint |
+| Data not provided | TFDA left that field blank, so it can't be excluded |
+| Imprint may be upside down or look-alike | Doesn't match as-is, but matches exactly when read upside down or after glyph flattening |
 
-顏色與形狀可複選（組內 OR），各條件之間 AND。
-標註一／標註二**不標示為正面／背面**——TFDA 未定義兩欄的面向語意。
+Colors and shapes allow multiple selection (OR within a group), and criteria combine with AND.
+Marking 1 / marking 2 are **not labelled front / back** — TFDA doesn't define which face each field refers to.
 
-### 刻字看反與字形相近（變體區）
+### Upside-down and look-alike imprints (variant section)
 
-刻字**原樣比對不符**時，才額外試兩種確定性轉換。命中者一律進獨立的第五區，
-**不混進上面任何一區**——現有四區的成員逐筆不變。
+Two deterministic conversions are tried **only when the imprint doesn't match as-is**. Hits always go into a separate fifth section and
+**are never mixed into any of the sections above** — membership of the existing four sections is unchanged record by record.
 
-| 轉換 | 規則 |
+| Conversion | Rule |
 |---|---|
-| 180° 倒讀 | 固定 14 字元表：`0 1 8 H I N O S X Z` 自映射，`6↔9`、`M↔W`。任一字元不在表中即無變體 |
-| 字形相近 | 壓平成 5 個等價類：`0/O`、`1/I/L`、`5/S`、`2/Z`、`8/B` |
+| 180° rotation | A fixed 14-character table: `0 1 8 H I N O S X Z` map to themselves, `6↔9`, `M↔W`. Any character outside the table means no variant |
+| Look-alike glyphs | Flattened into 5 equivalence classes: `0/O`, `1/I/L`, `5/S`, `2/Z`, `8/B` |
 
-四條收緊規則，全部是為了讓這一區維持可用長度：
+Four tightening rules, all to keep this section a usable length:
 
-- **只接受完全相等**——變體不套字首級與包含級
-- **單字元不做字形轉換**（做了會讓查 `I` 回 801 筆、`5` 回 768 筆）
-- **不做組合變體**：不倒讀後再壓平，也不允許不同 token 各靠不同規則湊成一次全中
-- **不做編輯距離／模糊比對，不回傳分數或排名**
+- **Exact equality only** — variants don't get the prefix or contains levels
+- **No look-alike conversion for single characters** (otherwise `I` would return 801 records and `5` 768)
+- **No combined variants**: no rotation followed by flattening, and different tokens can't each use a different rule to add up to a full match
+- **No edit distance / fuzzy matching, no scores or rankings returned**
 
-每張卡自己標「倒讀」或「字形相近」，理由不掛在分區標題上——同一區裡兩張卡可能是不同原因進來的。
+Each card is labelled "upside down" or "look-alike" itself, rather than putting the reason in the section header — two cards in the same section may have got there for different reasons.
 
-規則是對稱的，所以**變體區可能比主區還大**：查 `SH` 主區 37 筆，倒讀成 `HS` 後變體區 42 筆。
-最壞情況是把廠商前綴看錯：查 `Y5P` 主區 0 筆、變體區 111 筆（`YSP` 永信本來就印在 111 個產品上）。
-這種情況不壓——壓下去等於讓最常見的誤讀反而查不到。改由測試盯著：
-`A17` 對完整可達查詢閉包（3,103 個查詢）跑指紋，規則一漂移就紅。
+The rules are symmetric, so **the variant section can be larger than the main one**: `SH` gives 37 in the main section and 42 in the variant section after rotating to `HS`.
+The worst case is misreading a manufacturer prefix: `Y5P` gives 0 in the main section and 111 in the variant section (`YSP`, Yung Shin, is printed on 111 products).
+This isn't suppressed — suppressing it would make the most common misreading unsearchable. Instead a test watches it:
+`A17` fingerprints the complete reachable query closure (3,103 queries) and goes red as soon as the rules drift.
 
-## 介面
+## Interface
 
-- **搜尋列 sticky、條件面板隨頁捲動**——吸頂的東西永遠矮於視窗，不遮蔽結果
-- **確定符合展開、低確定性收合**：部分符合、資料未提供與變體區以原生 `<details>` 呈現，
-  摘要保留分區名稱與筆數，首次展開才建立卡片（`M 40` 這類查詢的低確定性候選達 2,379 筆）
-- **變體區排在最後**：未提供區至少「這顆藥沒有和你的輸入牴觸」，
-  變體區則是「牴觸，但如果你看反了就不牴觸」——多疊一層假設，就排更後面
-- **卡片與詳細視窗顯示官方鏡像圖**（WebP，長邊 640），並可直連 TFDA 官方原圖
-- **詳細視窗提供「查看 TFDA 仿單」**（依許可證字號）
-- 無圖或載入失敗一律換 placeholder，不留破圖
-- **頁尾標示資料新鮮度**：見下方「資料更新時間」
+- **Sticky search bar, filter panel scrolls with the page** — whatever sticks to the top is always shorter than the viewport and never hides results
+- **Confident matches expanded, low-certainty ones collapsed**: partial match, data not provided and variant sections use native `<details>`;
+  the summary keeps the section name and count, and cards are only built on first expansion (queries like `M 40` have up to 2,379 low-certainty candidates)
+- **The variant section comes last**: the not-provided section at least means "this drug doesn't contradict your input",
+  while the variant section means "it contradicts, unless you read it upside down" — one more layer of assumption, so it goes further down
+- **Cards and the detail dialog show mirrored official images** (WebP, 640 px long edge), with a direct link to the TFDA original
+- **The detail dialog offers "View TFDA package insert"** (by license number)
+- Missing or failed images always show a placeholder, never a broken image
+- **The footer shows data freshness**: see "Data update dates" below
 
-## 離線與安裝（PWA）
+## Offline and Install (PWA)
 
-可安裝到手機主畫面，離線仍可搜尋——**藥車旁常常沒有穩定網路**。
+Installable to the phone home screen and searchable offline — **there often isn't a stable connection at the medication cart**.
 
-| | 離線可用 | 備註 |
+| | Available offline | Notes |
 |---|---|---|
-| 介面與搜尋邏輯 | ✅ | 約 118 KB（含 PWA 圖示 44 KB），安裝時預抓 |
-| 全部 6,295 筆搜尋資料 | ✅ | 3.7 MB，**首次載入時順帶存下**，不預抓 |
-| 藥品圖片 | 最近取得的 500 張 | 全量 87 MB，不做完整離線包。超過上限**依取得順序**淘汰（非 LRU） |
+| Interface and search logic | ✅ | About 118 KB (including 44 KB of PWA icons), prefetched on install |
+| All 6,295 search records | ✅ | 3.7 MB, **saved along the way on first load**, not prefetched |
+| Drug images | The 500 most recently fetched | 87 MB in total; no full offline pack. Over the limit, evicted **in fetch order** (not LRU) |
 
-兩個刻意的取捨：
+Two deliberate trade-offs:
 
-- **第一次造訪不具備離線能力**，要再載入一次。預抓 3.7 MB 會讓只是點進來看一眼的人先付這筆流量。
-- **離線時一定會講**。頁面頂端出現「目前無法連線，顯示的是先前存下的資料（來源版本 ⋯）」。
-  臨床情境下，一個看起來正常、其實是幾週前的畫面，比一個明確的錯誤畫面危險得多——
-  這也是為什麼快取**不會**在資料真的抓不到時偽裝成功，那種情況仍走「資料暫時無法載入」。
+- **The first visit is not offline-capable**; it needs one more load. Prefetching 3.7 MB would charge that traffic to people who only clicked in for a quick look.
+- **Offline is always announced**. The top of the page shows "no connection — showing previously saved data (source version …)".
+  Clinically, a screen that looks normal but is weeks old is far more dangerous than a clearly broken one —
+  which is also why the cache **never** pretends to succeed when data truly can't be fetched; that case still shows "data temporarily unavailable".
 
-## 資料
+## Data
 
 | | |
 |---|---|
-| 來源 | [TFDA Open Data 藥品外觀資料集](https://data.fda.gov.tw/opendata/exportDataList.do?method=openData&infoId=42)（infoId=42） |
-| 筆數 | 6,295 筆（**全量收錄，不做過濾**），快照 2026-08-10 |
-| 圖片 | 6,273 筆有官方外觀圖，共 6,798 張；其餘紀錄來源未提供可用圖片。轉為 WebP（長邊 640）共 87 MB。官方原圖中位 1.5 MB，單頁 20 張約 68 MB，外連在行動網路不可行 |
-| 圖片版本 | 檔名固定為 `sha1(id)-n.webp`，請求附 `?v=<sha256 前 8 碼>`——官方原地換圖時不會讀到瀏覽器舊快取 |
-| 更新 | GitHub Actions 每週一 04:17；**任一驗證失敗即整批不發布**，維持上一版。失敗會自動開 issue |
-| 更新狀態 | `data/status.json` 記錄最後成功檢查日，與 `appearance.json` **分開存**——後者必須維持位元組冪等（來源未變就不該產生 diff），把執行時間寫進去會直接破壞它 |
-| 新鮮度 | 每季 HEAD 掃全量比對原圖長度 ＋ 隨機抽 100 張深驗；偵測到官方換圖**不自動更新**，開 issue 待人工確認 |
+| Source | [TFDA Open Data drug appearance dataset](https://data.fda.gov.tw/opendata/exportDataList.do?method=openData&infoId=42) (infoId=42) |
+| Records | 6,295 (**everything included, no filtering**), snapshot 2026-08-10 |
+| Images | 6,273 records have official appearance images, 6,798 images in total; the rest have no usable image at the source. Converted to WebP (640 px long edge), 87 MB total. Official originals have a median of 1.5 MB; 20 per page would be about 68 MB, so hot-linking is not feasible on mobile networks |
+| Image versioning | File names are fixed as `sha1(id)-n.webp`, and requests carry `?v=<first 8 chars of sha256>` — so an in-place official image replacement never reads a stale browser cache |
+| Updates | GitHub Actions every Monday 04:17; **any validation failure means nothing is published** and the previous version stays. Failures automatically open an issue |
+| Update status | `data/status.json` records the last successful check date and is **stored separately** from `appearance.json` — the latter must stay byte-idempotent (no diff if the source hasn't changed), and writing the run time into it would break that |
+| Freshness | Quarterly HEAD scan of all originals comparing content length + deep check of 100 random images; detected official image replacements are **not updated automatically** but open an issue for manual confirmation |
 
-### 頁尾的兩個日期
+### The two dates in the footer
 
-它們不同義，所以分開顯示：
+They mean different things, so they are shown separately:
 
 > 資料版本：2026-08-10（TFDA 來源日期） · 最後檢查：2026-08-12 · 收錄：6,295 筆
 > 每週一自動檢查 TFDA 來源更新
+>
+> (Data version: 2026-08-10 (TFDA source date) · Last checked: 2026-08-12 · Records: 6,295 · TFDA source checked automatically every Monday)
 
-**只講「資料版本」的話，TFDA 三個月不更新就會讓這個站看起來像沒人維護。**
-分開之後，「檢查過但來源沒變」與「根本沒在跑」在畫面上分得開。
+**Showing only the "data version" would make the site look unmaintained whenever TFDA goes three months without an update.**
+Separating them distinguishes "checked but the source hasn't changed" from "not running at all".
 
-- 「最後檢查」**只在整條管線（守門／鏡像／驗證／測試／發布）全部通過後才推進**。
-  週更失敗時它停在上次成功的日期——那是正確行為，不是 bug
-- 超過 14 天（＝錯過兩次週更）未成功更新，該行轉為警示色並標出天數
-- 狀態檔讀不到或壞掉時只會少顯示，**絕不顯示一個猜出來的日期**
+- "Last checked" **only advances after the whole pipeline (gate / mirroring / validation / tests / publishing) passes**.
+  If the weekly update fails it stays at the last successful date — that is correct behavior, not a bug
+- If there has been no successful update for more than 14 days (= two missed weekly runs), that line switches to a warning color and shows the number of days
+- If the status file can't be read or is corrupt, less is shown — **a guessed date is never shown**
 
-## 隱私
+## Privacy
 
-無登入、無帳號、無 cookie、無 localStorage、無 analytics、無後端。搜尋與本地縮圖瀏覽不向第三方傳送使用者輸入；僅在使用者主動點擊「TFDA 官方原圖／仿單」時前往 TFDA 官方網站。連字型都不用 CDN。不索取姓名／病歷號／生日／處方內容。
+No login, no accounts, no cookies, no localStorage, no analytics, no backend. Search and local thumbnail browsing send no user input to third parties; only when the user actively clicks "TFDA original image / package insert" does the browser go to the official TFDA site. Not even fonts come from a CDN. No name / medical record number / birthday / prescription content is requested.
 
-離線功能會用到瀏覽器的 Cache Storage，**存的只有本站自己的檔案**（介面、搜尋資料、看過的圖片），
-不含任何搜尋輸入、查詢紀錄或使用者狀態，也不會送到任何地方。
-用瀏覽器的「清除網站資料」即可全部移除。
+The offline feature uses the browser's Cache Storage, **storing only this site's own files** (interface, search data, viewed images),
+never search input, query history or user state, and nothing is sent anywhere.
+Use the browser's "clear site data" to remove it all.
 
-## 開發
+## Development
 
 ```bash
-npm test                          # 137 項：搜尋語意／變體規則／正規化／管線 fail-closed／回歸 fixtures／靜態契約
-npm run build -- --source <zip>   # 建置 canonical（開發時用本機 zip 避免重複打 TFDA）
-uv run tools/fetch-images.py      # 鏡像圖片（需 uv + Pillow）
+npm test                          # 137 tests: search semantics / variant rules / normalization / pipeline fail-closed / regression fixtures / static contracts
+npm run build -- --source <zip>   # build canonical (use a local zip during development to avoid hitting TFDA repeatedly)
+uv run tools/fetch-images.py      # mirror images (needs uv + Pillow)
 npm run verify -- --source <zip> --in data/appearance.json.staging
-npm run publish:metadata          # 圖片尚未就緒時，先發布可搜尋資料
-npm run publish:data              # 資料就緒切換點（圖片未全部完成時會拒絕）
-node tools/write-status.mjs       # 寫 data/status.json（**必須在 publish 之後**）
+npm run publish:metadata          # publish searchable data first while images aren't ready
+npm run publish:data              # data-ready cutover (refuses if images aren't all done)
+node tools/write-status.mjs       # write data/status.json (**must run after publish**)
 
-uv run tools/fetch-images.py --in data/appearance.json --freshness   # 季度新鮮度檢查
+uv run tools/fetch-images.py --in data/appearance.json --freshness   # quarterly freshness check
 ```
 
-零依賴、無 build step、Node ≥ 22，GitHub Pages 靜態部署。Service Worker 手寫，不用 Workbox。
+Zero dependencies, no build step, Node ≥ 22, static deployment on GitHub Pages. The service worker is hand-written, not Workbox.
 
-規格在 `.ai-review/plan.md`（v1.10），變體區的規格增補在 `.ai-review/plan-imprint-variant.md`（v0.3）。
-同目錄另有各自的規格覆審與判定（`plan-review*.md`／`plan-verdict*.md`，變體區兩輪）、
-一輪程式碼覆審（`codex-review.md`），以及 `evidence/` 的人工驗收留檔。
-工程慣例見 `CLAUDE.md`。
+The spec is `.ai-review/plan.md` (v1.10); the variant-section addendum is `.ai-review/plan-imprint-variant.md` (v0.3).
+The same directory holds each spec review and verdict (`plan-review*.md` / `plan-verdict*.md`, two rounds for the variant section),
+one code review round (`codex-review.md`), and manual acceptance records under `evidence/`.
+Engineering conventions are in `CLAUDE.md`.
 
-回歸 fixtures 的預期值由 `tools/make-expected.mjs` **獨立第二實作**產生，全檔零 import `search.js`——
-同一份程式碼驗自己不算驗證。變體規則加上靜態斷言（C20）守著這條獨立性。
+Expected values for the regression fixtures are produced by `tools/make-expected.mjs`, an **independent second implementation** that imports nothing from `search.js` —
+the same code checking itself isn't verification. The variant rules add a static assertion (C20) guarding that independence.
 
-以下兩項**靜態測試驗不到**，改動後請重跑對應的人工留檔：
+The following two areas **can't be verified by static tests**; rerun the corresponding manual records after changing them:
 
-| 改動 | 重跑 |
+| Change | Rerun |
 |---|---|
-| `sw.js`（快取上限、部署後首次重載拿到哪一版、離線文案） | `.ai-review/evidence/e11-2026-08-13.md` 六項 |
-| 變體區的畫面（分區位置、逐卡理由標籤、收合摘要） | `.ai-review/evidence/e12-2026-08-14.md` |
+| `sw.js` (cache limit, which version the first reload after deploy gets, offline wording) | The six items in `.ai-review/evidence/e11-2026-08-13.md` |
+| Variant-section UI (section position, per-card reason labels, collapsed summary) | `.ai-review/evidence/e12-2026-08-14.md` |
 
-## 免責
+## Disclaimer
 
-本工具依 TFDA 公開藥品外觀資料提供候選結果，外觀相似不代表為同一藥品。
-實際藥品仍應依原包裝、藥袋、許可證資訊或由醫療專業人員確認。
-本工具為輔助辨識用途，非最終調劑核對系統。
+This tool provides candidate results based on TFDA public drug appearance data; similar appearance does not mean the same drug.
+Actual drugs should still be confirmed from the original packaging, drug bag, license information or by healthcare professionals.
+This tool is an identification aid, not a final dispensing verification system.
 
-## 授權
+## License
 
 MIT
