@@ -3,10 +3,10 @@
   "schema": 1,
   "source": "TFDA 藥品外觀資料集 (opendata 42)",
   "source_file": "42_5.json",
-  "source_version": "2026-10-12",
-  "source_rows": 6349,
-  "content_hash": "sha256:19e3b60877ed302e502c369672bbf92256c0ae4bfe33b215a615b51935df1b55",
-  "count": 6349,
+  "source_version": "2026-10-19",
+  "source_rows": 6360,
+  "content_hash": "sha256:6a06554e34dfee9e24c73809c54184542e2cbbf3c532f3cf808dd412785ad096",
+  "count": 6360,
   "vocab": {
    "color": [
     "棕",
@@ -44,7 +44,7 @@
     "直線"
    ]
   },
-  "images_bytes": 92158464,
+  "images_bytes": 92320648,
   "images_complete": true
  },
  "items": [
@@ -659,6 +659,175 @@
      "src": "https://mcp.fda.gov.tw/insert/shapeImg/35f67543-025d-4dc6-a513-e7784e50064d?c=o",
      "sha256": "d636c5a73d7b0a9fc7c7b59a1cd0e5197658364ddf7f21a63c16945178ad5072",
      "src_bytes": 5789570
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第015461號",
+   "zh": "\"中美\" 感冒速達膠囊",
+   "en": "COMMON SUTA CAPSULE \"C.M.\"",
+   "color": [
+    "棕",
+    "黃"
+   ],
+   "shape": [
+    "膠囊"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "22"
+   ],
+   "mark1": "CM CC06",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/5f92ab984118c1ca-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/6b54b159-0105-4368-98a1-115654911dd7?c=o",
+     "sha256": "6d7b6f98f5f29a38aa55bb582345ac5b190bd49e305efd945938dab561246292",
+     "src_bytes": 11877459
+    },
+    {
+     "file": "img/5f92ab984118c1ca-1.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/aa285af1-12d8-44e5-a07c-1abb65a30b16_img_1?c=o",
+     "sha256": "29f99291e38c86b6abb1283ac0c5c83e09d4159c481ff67fc2e74cc3724df927",
+     "src_bytes": 926394
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第015529號",
+   "zh": "\"達德士\"待克平錠",
+   "en": "DICYCLOMINE TABLETS \"D.T.S.\"",
+   "color": [
+    "粉"
+   ],
+   "shape": [
+    "圓形"
+   ],
+   "score_mark": [
+    "十字"
+   ],
+   "size": [
+    "8"
+   ],
+   "mark1": null,
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/ae079c2c782330b2-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/d42866e3-5b98-4869-bd16-d0fbb1a601c6?c=o",
+     "sha256": "b087326df544fd16887fdfe9a30e18a7c91eed14d9426f80753e26c2ccbfa703",
+     "src_bytes": 197097
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第015540號",
+   "zh": "\"井田\" 鼻康速錠",
+   "en": "NORSECON TABLETS \"CHINTENG\"",
+   "color": [
+    "黃"
+   ],
+   "shape": [
+    "圓形"
+   ],
+   "score_mark": [
+    "直線"
+   ],
+   "size": [
+    "8"
+   ],
+   "mark1": null,
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/c89e4932b971d737-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/d067da85-24bc-4279-b2cd-6d6106799bc6?c=o",
+     "sha256": "835a51d6d4d09996899128bef65d9893fd5284ce37e8090681e856d1a6b01aca",
+     "src_bytes": 238326
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第015543號",
+   "zh": "\"培力\" 培佳治錠",
+   "en": "PEICHIA TABLETS \"P.L.\"",
+   "color": [
+    "白"
+   ],
+   "shape": [
+    "圓形"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "13"
+   ],
+   "mark1": "Pei Li",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/220dfd7ba16fdbf8-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/f9def3b2-62fb-4875-acdb-2986c6fadf41?c=o",
+     "sha256": "521346f74e161533cf089807fb23f0ffa60f91574a623766e0dad7f4390398b8",
+     "src_bytes": 213051
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第015596號",
+   "zh": "益庇益庇錠５００毫克",
+   "en": "APAP TABLETS 500MG",
+   "color": [
+    "黃"
+   ],
+   "shape": [
+    "圓形"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "13"
+   ],
+   "mark1": "JCP",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/45bbf9597e76f375-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/ca4bf550-8487-45fe-a9f6-7921ad65c6fb?c=o",
+     "sha256": "816f11581791d68117898bc19e5ec67a4566815ec0ec2cf8c7ccd66db8c67636",
+     "src_bytes": 5770021
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第015622號",
+   "zh": "每鞭達挫錠",
+   "en": "MEBENDAZOLE TABLETS \"YUNG CHI\"",
+   "color": [
+    "橘"
+   ],
+   "shape": [
+    "圓形"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "12"
+   ],
+   "mark1": "YC",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/ee30ad7b56e460b5-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/cad6e334-6fee-47b8-9dbf-4fbc7722c989?c=o",
+     "sha256": "d6f78ed877a07b02d3fbdc561c81eb825896d024cad9240280d059929c795c8b",
+     "src_bytes": 418916
     }
    ]
   },
@@ -1710,33 +1879,6 @@
      "src": "https://mcp.fda.gov.tw/insert/shapeImg/306df6f5-c383-4bb7-bbf4-973d1a97d683?c=o",
      "sha256": "8c1403a0f653ac2f39ef9f985352ade54950bf50cb02dc842c85ff9ca7a1209e",
      "src_bytes": 4167203
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第016932號",
-   "zh": "〝信東〞秀得寧錠",
-   "en": "SEUDORIN TABLETS (PSEUDOEPHEDRINE HCL)",
-   "color": [
-    "粉"
-   ],
-   "shape": [
-    "圓形"
-   ],
-   "score_mark": [
-    "直線"
-   ],
-   "size": [
-    "7"
-   ],
-   "mark1": "ST 414",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/f7e3ff942ade62a2-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/89bec0c4-5e41-44b3-b6d6-024571506180?c=o",
-     "sha256": "9be156db8aab74aad1d96a084329dde763687664210b43213c6c646cdd5d0c07",
-     "src_bytes": 4307284
     }
    ]
   },
@@ -5223,61 +5365,80 @@
    ]
   },
   {
-   "id": "衛署藥製字第019857號",
-   "zh": "克風邪止疼止痛液",
-   "en": "ANTICOLD CONTROL-PAIN SOLUTION (ACETAMINOPHEN)",
+   "id": "衛署藥製字第047984號",
+   "zh": "糖利平錠50毫克",
+   "en": "Carlipin Tablets 50mg",
    "color": [
-    "棕"
+    "白"
    ],
    "shape": [
-    "液劑(包含糖漿用粉劑)"
+    "圓形"
    ],
    "score_mark": [
     "無"
    ],
-   "size": [],
-   "mark1": null,
+   "size": [
+    "7.4"
+   ],
+   "mark1": "YSP 6",
    "mark2": null,
    "imgs": [
     {
-     "file": "img/780446d20a130ae6-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/8163f639-dbef-4250-90d2-56d197bd1ce9?c=o",
-     "sha256": "3ee6744d3bfd3f29d9cf4200bfb7b6f920cbe16154b2599bc65916ac7e2e7b14",
-     "src_bytes": 5559936
+     "file": "img/251e82a8b8e8b87d-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/5dfc5f0f-758f-4954-8c41-0761c9626762?c=o",
+     "sha256": "20ebe97c8671270691592d3f9ea3d73cad7d9fbdb9cc5857a97bad730088fca5",
+     "src_bytes": 402886
     }
    ]
   },
   {
-   "id": "衛署藥製字第019864號",
-   "zh": "\"皇佳\" 安失疼錠",
-   "en": "ACEDOL TABLETS \"ROYAL\"",
+   "id": "衛署藥製字第047989號",
+   "zh": "思特寧膜衣錠3毫克",
+   "en": "SPITERIN F.C. Tablets 3mg (Risperidone)",
    "color": [
-    "白"
+    "黃"
    ],
    "shape": [
     "四邊形"
    ],
    "score_mark": [
-    "無"
+    "直線"
    ],
-   "size": [
-    "18"
-   ],
-   "mark1": "Royal",
-   "mark2": "A01",
+   "size": [],
+   "mark1": "SK",
+   "mark2": "3",
    "imgs": [
     {
-     "file": "img/74e30e9dd22a8d13-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/a766799b-207b-43d4-b3f3-bad1cc7c79e0?c=o",
-     "sha256": "abd253e9f8405cc649503bba77723eb1644349bdbfae93cfb3ec038093a42ce2",
-     "src_bytes": 4592017
+     "file": "img/37b6d82b30015117-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/22294077-57a8-4cb8-85da-1374b61a3eba?c=o",
+     "sha256": "c18b1e092a4d774df43bf3c0a9e14d52237249472f166907c0030787370b92f4",
+     "src_bytes": 682716
     }
    ]
   },
   {
-   "id": "衛署藥製字第019865號",
-   "zh": "莫暈得錠（敵芬尼/）",
-   "en": "MEMODIN TABLETS (DIPHENIDOL) \"ROYAL\"",
+   "id": "衛署藥製字第047990號",
+   "zh": "樂舒敏點眼液",
+   "en": "Rosumin Eye Drops",
+   "color": [],
+   "shape": [],
+   "score_mark": [],
+   "size": [],
+   "mark1": null,
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/54c720dcae6cd152-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/ca43ac96-bd44-4bf8-9208-edde26aa14cf?c=o",
+     "sha256": "8043d462d3113bce0f5cd37bd31fded52d8f323bce09aafe8421f6e3f30479f0",
+     "src_bytes": 1143469
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第047991號",
+   "zh": "悅消醣膜衣錠850毫克",
+   "en": "Anxofin F.C. Tablets 850mg",
    "color": [
     "白"
    ],
@@ -5288,50 +5449,23 @@
     "無"
    ],
    "size": [
-    "6.5"
+    "14"
    ],
-   "mark1": null,
+   "mark1": "AX 054",
    "mark2": null,
    "imgs": [
     {
-     "file": "img/a1de0c3095135b53-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/4200b89b-f555-4552-b012-fbba8c42de7a?c=o",
-     "sha256": "f6dde0188af36803fc87a9698b4f1c7914abfdfe5a28142865796b9386cd704a",
-     "src_bytes": 16567905
+     "file": "img/13708db26d25cd44-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/fdc9af2e-30ff-4db4-b807-c24b225e381c_img_1?c=o",
+     "sha256": "14ced3ba6df84ef6a8ef63895d2a7f74f77d2d4d8d35fb8eb4fd4f665643a81c",
+     "src_bytes": 5121107
     }
    ]
   },
   {
-   "id": "衛署藥製字第019875號",
-   "zh": "\"榮民\" 心康樂錠４０公絲（健心寧）",
-   "en": "CARDOLOL TABLETS 40MG (PROPRANOLOL) \"V.P.P.\"",
-   "color": [
-    "粉"
-   ],
-   "shape": [
-    "圓形"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "7.9"
-   ],
-   "mark1": "309",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/5b6de300ef9f34df-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/1ea1e7c0-cb1c-4ed5-a8a0-3df2b179cc3f?c=o",
-     "sha256": "f9379e20e807227e00001a0c054fc8331e697f96a63b58a582706dec17a54d09",
-     "src_bytes": 2109905
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第019877號",
-   "zh": "\"優生\"易復癆錠（醫肺妥）",
-   "en": "EPBUTOL TABLETS \"YU SHENG\" (ETHAMBUTOL)",
+   "id": "衛署藥製字第047993號",
+   "zh": "喜伏菌膜衣錠250毫克",
+   "en": "Ciflogen F.C. Tablets 250mg",
    "color": [
     "白"
    ],
@@ -5342,16 +5476,43 @@
     "直線"
    ],
    "size": [
-    "13"
+    "11"
    ],
-   "mark1": "YS EB",
+   "mark1": "SW 250",
    "mark2": null,
    "imgs": [
     {
-     "file": "img/75c63a640ff1aacf-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/b03871f4-8379-4aa5-afc8-3de3fb6d21cc?c=o",
-     "sha256": "40391ff154143664781ccf9def0f2440a5646ce2da67d7472f70776e0126994a",
-     "src_bytes": 39872333
+     "file": "img/7d2f43eb35cbb9f3-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/a2d3f8a1-f98f-4e8d-8984-e40f60ca7047?c=o",
+     "sha256": "68a9e5f37186ca3edda1de708a28dbb5ea31a7e7df27e8a0c94daaef9e9ad1e1",
+     "src_bytes": 718475
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第047998號",
+   "zh": "\"德聯\" 舒利通膜衣錠",
+   "en": "Suliton F.C. Tab.",
+   "color": [
+    "黃"
+   ],
+   "shape": [
+    "橢圓形"
+   ],
+   "score_mark": [
+    "直線"
+   ],
+   "size": [
+    "10"
+   ],
+   "mark1": "H S",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/2a1fc9e7f94df3f3-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/9e9983e1-1219-49c2-b5a2-7a04802377ac?c=o",
+     "sha256": "f52982ecb94555803c2093af2a57b977d2bf45d96ff6ead35ec073ed7ae99c89",
+     "src_bytes": 241468
     }
    ]
   },
@@ -9886,139 +10047,6 @@
      "src": "https://mcp.fda.gov.tw/insert/shapeImg/69b08c23-02bf-41a0-8c49-e2886d8fdfd7?c=o",
      "sha256": "e49275a0bdc7e8ca58ba3f7fa29d7a5fc1d6c190fe4ed82cccc81921737bc33e",
      "src_bytes": 657700
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第049089號",
-   "zh": "\"華興\" 安咳停錠",
-   "en": "Ancopin Tablets \"H.S.\"",
-   "color": [
-    "黃"
-   ],
-   "shape": [
-    "圓形"
-   ],
-   "score_mark": [
-    "直線"
-   ],
-   "size": [
-    "11"
-   ],
-   "mark1": null,
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/e06f596b5e84f6ca-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/2bfefe84-600d-483b-ac8d-e48eb3a1acf0_img_1?c=o",
-     "sha256": "1980d71849486ec284ffbb3ea0ee034544dab60fe48b52282370a30690485901",
-     "src_bytes": 42456
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第049091號",
-   "zh": "\"治痛單\" 葫蘆標無糖治痛單液",
-   "en": "\"C.T.D.\" HWU RO BIAO Chyr Tong Dan Sugar Free Solution",
-   "color": [
-    "棕"
-   ],
-   "shape": [
-    "液劑(包含糖漿用粉劑)"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [],
-   "mark1": null,
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/50b6d98176ad9dd2-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/1b278c19-3d44-432e-931d-244d28626ac4?c=o",
-     "sha256": "c887a64080ae4f35ffae9585d57c58a2f54b9b4c7f6a7463345fb20730c24285",
-     "src_bytes": 733549
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第049092號",
-   "zh": "適穩錠 15 毫克 (美洛西卡)",
-   "en": "LOXU TABLETS 15MG",
-   "color": [
-    "黃"
-   ],
-   "shape": [
-    "圓形"
-   ],
-   "score_mark": [
-    "直線"
-   ],
-   "size": [
-    "8"
-   ],
-   "mark1": "C 3",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/57c32273af1ff792-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/c2d16266-3284-46ba-afed-bbfdfa81f471_img_1?c=o",
-     "sha256": "910f1132e3f2e02fe3d2e7dfb4935103d8c6865d67a5035b3a230e6117aa1d4a",
-     "src_bytes": 56564
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第049097號",
-   "zh": "“鼎泰”意覓樂錠200毫克",
-   "en": "Amillian Tablets 200 mg 〝D.T.〞",
-   "color": [
-    "白"
-   ],
-   "shape": [
-    "圓形"
-   ],
-   "score_mark": [
-    "直線"
-   ],
-   "size": [
-    "12"
-   ],
-   "mark1": "Amillian 200",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/ca9ad33c63ec9cee-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/1257c3b9-11d1-41c3-82ff-97aa691c5bca?c=o",
-     "sha256": "4a164a3a54a0aab14d84f4aec70a0132428cf7d32df1efeaac22bcad04906e38",
-     "src_bytes": 539511
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第049099號",
-   "zh": "抵敏膜衣錠5毫克",
-   "en": "Desdin Film-coated Tablets 5mg",
-   "color": [
-    "藍"
-   ],
-   "shape": [
-    "圓形"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "7.0"
-   ],
-   "mark1": "GBL",
-   "mark2": "83",
-   "imgs": [
-    {
-     "file": "img/9c5f6dce11fe7c2a-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/ce51bfcd-087c-470d-bc1c-9fc56cba071c?c=o",
-     "sha256": "afb718daa237d84fe09ed3259d43636995137db1439f5b51f680d9585c217876",
-     "src_bytes": 9248017
     }
    ]
   },
@@ -14788,6 +14816,115 @@
    ]
   },
   {
+   "id": "衛署藥製字第022890號",
+   "zh": "\"華興\"邁立酵錠（來縮酵素）",
+   "en": "MILISHER TABLETS (LYSOZYME) \"H.S.\"",
+   "color": [
+    "白"
+   ],
+   "shape": [
+    "圓形"
+   ],
+   "score_mark": [
+    "直線"
+   ],
+   "size": [
+    "7"
+   ],
+   "mark1": "HS",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/25667a8b2f3ca5af-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/f037f836-fb9d-4cc7-bb90-ec58dd0b9788?c=o",
+     "sha256": "b89634c39a40f58273949264c311794617ad5a4b4edc784000111339d7da62ff",
+     "src_bytes": 330968
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第022903號",
+   "zh": "“優良”胃去病錠２００毫克（希每得定）",
+   "en": "GASTRODIN TABLETS 200MG (CIMETIDINE)",
+   "color": [
+    "綠"
+   ],
+   "shape": [
+    "圓形"
+   ],
+   "score_mark": [
+    "直線"
+   ],
+   "size": [
+    "9"
+   ],
+   "mark1": "U L",
+   "mark2": "024",
+   "imgs": [
+    {
+     "file": "img/cc34a3aab79f1129-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/2ae5e4c3-67b7-4b39-a884-22dffb57a3a0?c=o",
+     "sha256": "025fa78acfc3dddbdd4f30c233863138185404c4b7e51387d536b931ae70f831",
+     "src_bytes": 12155718
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第022908號",
+   "zh": "\"十全\"使排通錠（螺環固醇內酮）",
+   "en": "SPIRONOLACTONE TABLETS \"S.C.\"",
+   "color": [
+    "白"
+   ],
+   "shape": [
+    "圓形"
+   ],
+   "score_mark": [
+    "直線"
+   ],
+   "size": [
+    "8"
+   ],
+   "mark1": "SC 802",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/6589e603e70d12f1-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/3035256a-fced-410d-b1b6-c28ce0c3a2e7?c=o",
+     "sha256": "c2269d555bb11f00a0cda94609ed44639b36ea10ea0795cc34f596658c79db01",
+     "src_bytes": 97764
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第022964號",
+   "zh": "拿可欣膠囊100毫克(本補麻隆)",
+   "en": "NARCARICIN CAPSULES 100MG (BENZBROMARONE)",
+   "color": [
+    "藍",
+    "黃"
+   ],
+   "shape": [
+    "膠囊"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "18"
+   ],
+   "mark1": "Narcaricin 100MG",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/c430e3502ef7e278-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/c91c1a82-314e-423d-abdc-7c239bff1701?c=o",
+     "sha256": "76d35fdda0fffe1a166e1ca99aca59492e29f89b5e3024d612cf037d1867988f",
+     "src_bytes": 7158728
+    }
+   ]
+  },
+  {
    "id": "衛署藥製字第022971號",
    "zh": "\"瑞士\" 痛寧膠囊（待克菲那）",
    "en": "PAINSTOP CAPSULES\"SWISS\" (DICLOFENAC)",
@@ -19293,92 +19430,36 @@
    ]
   },
   {
-   "id": "衛署藥製字第025275號",
-   "zh": "鼻速通膠囊",
-   "en": "NORSETOA CAPSULES \"CHINTENG\"",
+   "id": "衛署藥製字第050016號",
+   "zh": "“新瑞”邁慮煩 膜衣錠 15 毫克",
+   "en": "Minivane F.C. Tablets 15mg“synray”",
    "color": [
-    "紅",
-    "白"
+    "黃"
    ],
    "shape": [
-    "膠囊"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "14"
-   ],
-   "mark1": "CTP R05",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/8f2b4f191a4d2562-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/3ef082fa-c0e0-4c4e-bac2-b85126761580?c=o",
-     "sha256": "4858585091a718e3de2c1f0b1667635ef38e2c0c40740f54f9ecdca3b0858f35",
-     "src_bytes": 3821286
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第025279號",
-   "zh": "佑速朗錠90毫克",
-   "en": "SUPERZYME TABLETS 90MG",
-   "color": [
-    "白"
-   ],
-   "shape": [
-    "四邊形"
+    "橢圓形"
    ],
    "score_mark": [
     "直線"
    ],
    "size": [
-    "12"
+    "12.5"
    ],
-   "mark1": null,
+   "mark1": "S W",
    "mark2": null,
    "imgs": [
     {
-     "file": "img/0c50c15b2cbbf311-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/183d7b58-7cbc-41a3-8e13-c40dcf936421?c=o",
-     "sha256": "c1e65c55ad3856f8895871cfbd559bd7de68f463518762749cfb9975afc18888",
-     "src_bytes": 7315518
+     "file": "img/a809e9d051afbdb8-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/ffa050e7-e5f1-492a-b072-aa6886325e3e?c=o",
+     "sha256": "3d802d49f7a9ec139aaacd6a49a25d04c3edcc42280ef1943791eaa1d7000054",
+     "src_bytes": 1081967
     }
    ]
   },
   {
-   "id": "衛署藥製字第025301號",
-   "zh": "\"永信\"旺舒膠囊（檸檬酸歐咳拉命）",
-   "en": "OXO CAPSULES (OXOLAMINE CITRATE) \"YUNG SHIN\"",
-   "color": [
-    "橘",
-    "橘"
-   ],
-   "shape": [
-    "膠囊"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "14.2"
-   ],
-   "mark1": "YSP OXC",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/49b55fe0d706fa26-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/820966be-19bc-4fa2-8171-e7427d76c07f?c=o",
-     "sha256": "d29ab3bd3ed538a8298b30ca4c55c2519af17b9de1c5b9115c32ba07298457b5",
-     "src_bytes": 1015411
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第025304號",
-   "zh": "\"大豐\"咳舒痰錠２０毫克",
-   "en": "COSTAN TABLETS 20MG  \"T.F.\"",
+   "id": "衛署藥製字第050027號",
+   "zh": "欣行健錠 100 毫克",
+   "en": "Pleya Tablets 100 mg",
    "color": [
     "白"
    ],
@@ -19386,19 +19467,73 @@
     "圓形"
    ],
    "score_mark": [
-    "無"
+    "直線"
    ],
    "size": [
-    "6.0"
+    "8.1"
    ],
-   "mark1": "TF",
+   "mark1": "YSP 199",
    "mark2": null,
    "imgs": [
     {
-     "file": "img/ab9603f6c24f6767-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/d8f93bb1-d0c5-4164-898f-d4a1264f963e?c=o",
-     "sha256": "0108b3466fbe8cfe9663a53c66d7935440980829c78d86ee1c9ad3e5b8516291",
-     "src_bytes": 10848737
+     "file": "img/89526c67963f67d3-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/df24ff07-8ef0-46f2-9bb9-05cdf222562f?c=o",
+     "sha256": "b9d8d27bc52cf7f28d41ccc3c3ec5c745d78d8c69ac8b06e9e0a59d90d59e545",
+     "src_bytes": 729930
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第050030號",
+   "zh": "\"黃氏\" 咳紓安錠",
+   "en": "Coughfree Tablets \"H.S.\"",
+   "color": [
+    "黃"
+   ],
+   "shape": [
+    "橢圓形"
+   ],
+   "score_mark": [
+    "直線"
+   ],
+   "size": [
+    "10"
+   ],
+   "mark1": "H S",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/4f2d77ff6eed13d8-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/07f50dc4-237c-4f58-a130-d8c1d44d0c11?c=o",
+     "sha256": "ebbf651cda925635b65eb512f86ff6bd03f236126d77a83afb7aee90f4ce6fa8",
+     "src_bytes": 4884511
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第050032號",
+   "zh": "\"十全\" 莫伏炎錠",
+   "en": "Mobufen Tablets",
+   "color": [
+    "白"
+   ],
+   "shape": [
+    "橢圓形"
+   ],
+   "score_mark": [
+    "直線"
+   ],
+   "size": [
+    "17.4"
+   ],
+   "mark1": "SC M7",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/e0aafcc65c740835-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/54fd5faf-c970-4200-a312-b5f55077f957?c=o",
+     "sha256": "76eea6d26eb42ff60909d961ae0b2706ab87a6d2dfe25ecf31ed0eb1ba706193",
+     "src_bytes": 175462
     }
    ]
   },
@@ -23463,33 +23598,6 @@
    ]
   },
   {
-   "id": "衛署藥製字第055534號",
-   "zh": "倍得舒持續性藥效膜衣錠 150 毫克",
-   "en": "Betetrim S.R. film-coated tablets 150mg",
-   "color": [
-    "紫"
-   ],
-   "shape": [
-    "圓形"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "11"
-   ],
-   "mark1": "B47",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/8daeb5534e7ff970-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/eae4d503-0cad-4e3a-8b89-3f7c200896e2?c=o",
-     "sha256": "7d21306657939a43b8cc45a02f9602af6086af50de2d6efb132adab083f28f1e",
-     "src_bytes": 4865090
-    }
-   ]
-  },
-  {
    "id": "衛署藥製字第055263號",
    "zh": "腦力勁內服溶液用顆粒劑 1200 毫克",
    "en": "Ceregent Granules for oral solution 1200mg",
@@ -23944,114 +24052,6 @@
      "src": "https://mcp.fda.gov.tw/insert/shapeImg/fd7892e2-9951-4148-a513-8e35ba9dc648?c=o",
      "sha256": "ae4b95c1dc80d3b3f8889fe4afebf568141222b9b544eac8ee0fedad882af925",
      "src_bytes": 2059710
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第055426號",
-   "zh": "“永勝”服敏優膜衣錠 5 毫克",
-   "en": "Minlo F.C. Tablets 5mg“EVEREST”",
-   "color": [
-    "白"
-   ],
-   "shape": [
-    "橢圓形"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "8"
-   ],
-   "mark1": null,
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/714fa2e228c774e4-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/f60c4ca2-ff1d-4669-abad-6eea815a066e?c=o",
-     "sha256": "eb7f1d37515b48f00642ec2ad46b9073dec4a0c75215c53adddb0e73b174ba9e",
-     "src_bytes": 1722546
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第055428號",
-   "zh": "保絡得膜衣錠 75 毫克",
-   "en": "Progrel F.C. Tablets 75 mg",
-   "color": [
-    "粉"
-   ],
-   "shape": [
-    "圓形"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "8.5"
-   ],
-   "mark1": "75",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/6003b4593145c579-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/a2372067-993c-498e-b607-cbebfc7afc3d?c=o",
-     "sha256": "bcfb8edf500626fe827931c50cb9a9a2f2ecf2e0ae39ab6bb03a5765a0eeb630",
-     "src_bytes": 9787270
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第055530號",
-   "zh": "佳能憶膜衣錠 8 毫克",
-   "en": "Gatamine F.C. Tablets 8mg",
-   "color": [
-    "粉"
-   ],
-   "shape": [
-    "圓形"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "7"
-   ],
-   "mark1": "SW",
-   "mark2": "8",
-   "imgs": [
-    {
-     "file": "img/e153b87a6231710b-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/72efe114-502b-4b16-a6e1-d2921fca1a46?c=o",
-     "sha256": "96f56e0aebea84cd3178edf84ba87a479be225af9a81f452a0b9c469b3b6c7de",
-     "src_bytes": 7056890
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第055531號",
-   "zh": "坦壓膜衣錠 50 毫克",
-   "en": "Tanza F.C. Tablets 50mg",
-   "color": [
-    "白"
-   ],
-   "shape": [
-    "橢圓形"
-   ],
-   "score_mark": [
-    "直線"
-   ],
-   "size": [
-    "10.3"
-   ],
-   "mark1": "C S",
-   "mark2": "03",
-   "imgs": [
-    {
-     "file": "img/a0880205cb5f15ac-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/d41fa748-5a82-47f0-a8b5-9e14d07be6a9?c=o",
-     "sha256": "e964373abadcf6065022820034715acf16c6f36e24254944e0ebeeea5c389d78",
-     "src_bytes": 2151660
     }
    ]
   },
@@ -28678,6 +28678,87 @@
    ]
   },
   {
+   "id": "衛署藥製字第027445號",
+   "zh": "“衛達”心滴舒糖衣錠５０毫克（待匹力達）",
+   "en": "SANDEL S.C. TABLETS 50MG \"WEIDAR\" (DIPYRIDAMOLE)",
+   "color": [
+    "橘"
+   ],
+   "shape": [
+    "圓形"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "7.0"
+   ],
+   "mark1": null,
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/412afc8df5bdcff0-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/1c1657e8-a465-4418-a5d4-a095f3d0ec2a?c=o",
+     "sha256": "b50a9980bc9f55efd0043e8bb99a923404057950d2d948450783be85089cf348",
+     "src_bytes": 10500339
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第027446號",
+   "zh": "\"衛達\"必莫痛錠３０公絲（尼夫平）",
+   "en": "BENOTON TABLETS 30MG \"WEIDAR\" (NEFOPAM)",
+   "color": [
+    "粉"
+   ],
+   "shape": [
+    "圓形"
+   ],
+   "score_mark": [
+    "直線"
+   ],
+   "size": [
+    "9.0"
+   ],
+   "mark1": null,
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/9b33ce2ac520b19e-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/04b690b5-737d-4d08-8424-7b95abf673f6?c=o",
+     "sha256": "fb3afdbdb680b7eba4b0ada17845561e3f60462b44559b9c5f12f5f25ac8bae2",
+     "src_bytes": 10325791
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第027448號",
+   "zh": "\"衛達\"賜樂泄錠",
+   "en": "SLOSAT TABLETS \"WEIDAR\"",
+   "color": [
+    "白"
+   ],
+   "shape": [
+    "橢圓形"
+   ],
+   "score_mark": [
+    "直線"
+   ],
+   "size": [
+    "10.4"
+   ],
+   "mark1": "W D",
+   "mark2": "SS",
+   "imgs": [
+    {
+     "file": "img/7a1ded5a216f3e44-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/1ddc5298-a33b-45d3-8eff-84d35bf7b5cb?c=o",
+     "sha256": "4d6dd7563306c77db087b4a596dc655c47afb2a34b2721f3b6f542ddb10170b9",
+     "src_bytes": 10307848
+    }
+   ]
+  },
+  {
    "id": "衛署藥製字第027450號",
    "zh": "\"衛達\"普骼舒錠２５０公絲（氯若沙宗）",
    "en": "PROLAX TABLETS 250MG \"WEIDAR\" (CHLORZOXAZONE)",
@@ -33193,9 +33274,36 @@
    ]
   },
   {
-   "id": "衛署藥製字第030416號",
-   "zh": "喉福喉錠",
-   "en": "HORF LOZENGES",
+   "id": "衛署藥製字第057226號",
+   "zh": "\"華興\"肌舒服錠",
+   "en": "Musine Tablets \"H.S.\"",
+   "color": [
+    "黃"
+   ],
+   "shape": [
+    "橢圓形"
+   ],
+   "score_mark": [
+    "直線"
+   ],
+   "size": [
+    "19"
+   ],
+   "mark1": "H S",
+   "mark2": "M",
+   "imgs": [
+    {
+     "file": "img/1aa72379cc259eb8-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/2df42ac0-caf1-4de9-9d95-880ab89c148d_img_1?c=o",
+     "sha256": "f107b986b7339b2b17e2e567c0185f6e3892c197e828b785ab87bc314157a472",
+     "src_bytes": 143381
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第057228號",
+   "zh": "巧復壓錠10毫克",
+   "en": "Azinium Tablets 10mg",
    "color": [
     "白"
    ],
@@ -33206,29 +33314,50 @@
     "直線"
    ],
    "size": [
-    "20"
+    "7"
+   ],
+   "mark1": "AMZ 10",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/ae59a6886da08908-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/34984d99-3d6c-4a8b-82b4-0ec3add63ab1_img_1?c=o",
+     "sha256": "e911847609195d5c3a0ef97566597286a7d1d2a007ee1d686c1510ec1c8b0786",
+     "src_bytes": 12770960
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第057231號",
+   "zh": "東健膜衣錠300毫克",
+   "en": "EPINE F.C. Tablets 300mg",
+   "color": [
+    "白"
+   ],
+   "shape": [
+    "橢圓形"
+   ],
+   "score_mark": [
+    "直線"
+   ],
+   "size": [
+    "17"
    ],
    "mark1": null,
    "mark2": null,
    "imgs": [
     {
-     "file": "img/9d80f129b3614ffd-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/1d338279-71a2-4806-82cb-9eb648457599_img_1?c=o",
-     "sha256": "8f6ee58401b37e302d2b651ab7d3f66e634d76acc806b400a4188c0460e9dfab",
-     "src_bytes": 117465
-    },
-    {
-     "file": "img/9d80f129b3614ffd-1.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/d3bac0ce-891d-41c0-8167-f2942b69a781?c=o",
-     "sha256": "c132279810652a2bbc043afc5beaf000f120200b6c7f0112d68afafbc236dbf3",
-     "src_bytes": 4476837
+     "file": "img/b45ce210c750852f-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/e7321e06-f387-4d6c-8823-9635e37f644b?c=o",
+     "sha256": "cb697579569c6748674f3c00eac9d38d6aeee114e8e6a0d54cfa49a324a6c710",
+     "src_bytes": 1167104
     }
    ]
   },
   {
-   "id": "衛署藥製字第030418號",
-   "zh": "普德錠80毫克",
-   "en": "BUBDEL TABLETS 80MG",
+   "id": "衛署藥製字第057234號",
+   "zh": "優穩壓膜衣錠20毫克",
+   "en": "Olsaa F.C. Tablets 20mg",
    "color": [
     "白"
    ],
@@ -33236,19 +33365,44 @@
     "圓形"
    ],
    "score_mark": [
-    "直線"
+    "無"
    ],
    "size": [
-    "10"
+    "8.6"
    ],
-   "mark1": "W",
+   "mark1": "CCP",
+   "mark2": "214",
+   "imgs": [
+    {
+     "file": "img/1d34892817acd4a8-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/4b28cafa-7c86-49cd-ac40-175f36ba9277?c=o",
+     "sha256": "fec49a91035f42ea334021f26eaed70d36fc54540d11dc27cf09f9146cfeb628",
+     "src_bytes": 4937530
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第057235號",
+   "zh": "\"十全\"柔心錠2.5毫克",
+   "en": "Roopril Tablets 2.5mg \"S.C.\"",
+   "color": [
+    "黃"
+   ],
+   "shape": [
+    "橢圓形"
+   ],
+   "score_mark": [
+    "直線"
+   ],
+   "size": [],
+   "mark1": "SC",
    "mark2": null,
    "imgs": [
     {
-     "file": "img/3073fcc57c1d6c6a-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/6198cf28-0660-42ca-96bc-de0de770880c?c=o",
-     "sha256": "67379d7e0189d1a921bbc5f2e84229453a2fb487f8fdb7fdee22212d77dbf452",
-     "src_bytes": 2766125
+     "file": "img/4e7d42a0f5d4df60-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/fc0216a9-7bbc-40e8-b76c-184e1396d2b4?c=o",
+     "sha256": "9c6175227402c5a214b02e837a96ca76694cf339e3c22ef26d1e76356fb43c8d",
+     "src_bytes": 110865
     }
    ]
   },
@@ -36703,34 +36857,6 @@
    ]
   },
   {
-   "id": "衛署藥輸字第010641號",
-   "zh": "維骨力膠囊",
-   "en": "VIARTRIL-S CAPSULES",
-   "color": [
-    "紅",
-    "白"
-   ],
-   "shape": [
-    "膠囊"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "20"
-   ],
-   "mark1": "ROTTA",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/16b1943484ef0d6a-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/aee2a01a-b186-44bd-b443-721a99df2d30?c=o",
-     "sha256": "20a357c551620a5391c6f6bdfead86175e372535ef2140f694aa7c6da7317af8",
-     "src_bytes": 1132323
-    }
-   ]
-  },
-  {
    "id": "衛署藥製字第057908號",
    "zh": "\"皇佳\"佳爾姿膠囊120毫克",
    "en": "Orlisgin capsule 120mg \"Royal\" (Orlistat)",
@@ -37854,85 +37980,6 @@
      "src": "https://mcp.fda.gov.tw/insert/shapeImg/0808367f-37f6-4fe5-9d98-ecdcfe657433?c=o",
      "sha256": "694cc2938ae6cc33255f70dd6933060e9dbf43e8757dbedab6f73ef7bb06eec6",
      "src_bytes": 1053840
-    }
-   ]
-  },
-  {
-   "id": "衛署藥輸字第009147號",
-   "zh": "移護寧５０毫克錠",
-   "en": "IMURAN AZATHIOPRINE TABLETS 50MG B.P.",
-   "color": [
-    "黃"
-   ],
-   "shape": [
-    "圓形"
-   ],
-   "score_mark": [
-    "直線"
-   ],
-   "size": [
-    "7.4"
-   ],
-   "mark1": "IM 5",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/7687259292258311-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/56b090ab-4c44-4583-9834-07f0891af6b6?c=o",
-     "sha256": "8191f91b11e1eb472f4083fd4e494eae1c554fb05893374fcf7c29bcfc37471e",
-     "src_bytes": 10743806
-    }
-   ]
-  },
-  {
-   "id": "衛署藥輸字第009313號",
-   "zh": "胃加芬液",
-   "en": "GASTROGRAFIN",
-   "color": [
-    "透明"
-   ],
-   "shape": [
-    "液劑(包含糖漿用粉劑)"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [],
-   "mark1": null,
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/0499d601e45493ad-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/624fe9c2-5b3c-41c9-bf07-7c5fcfdb8a05?c=o",
-     "sha256": "c0187d851734f58c833843adfd00afdc615a1380b3236a655547aa6d3631b004",
-     "src_bytes": 2573358
-    }
-   ]
-  },
-  {
-   "id": "衛署藥輸字第009796號",
-   "zh": "美道普錠200/50毫克",
-   "en": "MADOPAR 250 TABLETS \"ROCHE\"",
-   "color": [
-    "粉"
-   ],
-   "shape": [
-    "圓形"
-   ],
-   "score_mark": [
-    "十字"
-   ],
-   "size": [
-    "13"
-   ],
-   "mark1": "RO C HE",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/71a4805a428d8e51-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/adb604f1-6808-4254-96c5-89646091376c?c=o",
-     "sha256": "d1d6d6d0a55ec441ed90a1d1778083902f8110b44e9b49b0e9552a142c4b70ae",
-     "src_bytes": 16939877
     }
    ]
   },
@@ -42638,6 +42685,66 @@
    ]
   },
   {
+   "id": "衛署藥製字第030416號",
+   "zh": "喉福喉錠",
+   "en": "HORF LOZENGES",
+   "color": [
+    "白"
+   ],
+   "shape": [
+    "圓形"
+   ],
+   "score_mark": [
+    "直線"
+   ],
+   "size": [
+    "20"
+   ],
+   "mark1": null,
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/9d80f129b3614ffd-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/1d338279-71a2-4806-82cb-9eb648457599_img_1?c=o",
+     "sha256": "8f6ee58401b37e302d2b651ab7d3f66e634d76acc806b400a4188c0460e9dfab",
+     "src_bytes": 117465
+    },
+    {
+     "file": "img/9d80f129b3614ffd-1.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/d3bac0ce-891d-41c0-8167-f2942b69a781?c=o",
+     "sha256": "c132279810652a2bbc043afc5beaf000f120200b6c7f0112d68afafbc236dbf3",
+     "src_bytes": 4476837
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第030418號",
+   "zh": "普德錠80毫克",
+   "en": "BUBDEL TABLETS 80MG",
+   "color": [
+    "白"
+   ],
+   "shape": [
+    "圓形"
+   ],
+   "score_mark": [
+    "直線"
+   ],
+   "size": [
+    "10"
+   ],
+   "mark1": "W",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/3073fcc57c1d6c6a-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/6198cf28-0660-42ca-96bc-de0de770880c?c=o",
+     "sha256": "67379d7e0189d1a921bbc5f2e84229453a2fb487f8fdb7fdee22212d77dbf452",
+     "src_bytes": 2766125
+    }
+   ]
+  },
+  {
    "id": "衛署藥製字第030466號",
    "zh": "伊普膜衣錠４００毫克",
    "en": "IBUPROFEN FILM COATED TABLETS 400MG \"YUNG SHIN\"",
@@ -46929,42 +47036,41 @@
    ]
   },
   {
-   "id": "衛署藥製字第032137號",
-   "zh": "帝達黴素膠囊１５０公絲（克林達黴素）",
-   "en": "TIDACT CAPSULES 150MG (CLINDAMYCIN)",
+   "id": "衛署藥輸字第009147號",
+   "zh": "移護寧５０毫克錠",
+   "en": "IMURAN AZATHIOPRINE TABLETS 50MG B.P.",
    "color": [
-    "紫",
     "黃"
    ],
    "shape": [
-    "膠囊"
+    "圓形"
    ],
    "score_mark": [
-    "無"
+    "直線"
    ],
    "size": [
-    "19.2"
+    "7.4"
    ],
-   "mark1": "YSP",
+   "mark1": "IM 5",
    "mark2": null,
    "imgs": [
     {
-     "file": "img/a4fc8331a8c9be14-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/0b94f171-91f2-49cb-95e8-2367a8c1871d?c=o",
-     "sha256": "f5986f63bb645e66670d986d3bd941b9e9a88a0091bbb24211e297e2b59c3e24",
-     "src_bytes": 1487273
+     "file": "img/7687259292258311-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/56b090ab-4c44-4583-9834-07f0891af6b6?c=o",
+     "sha256": "8191f91b11e1eb472f4083fd4e494eae1c554fb05893374fcf7c29bcfc37471e",
+     "src_bytes": 10743806
     }
    ]
   },
   {
-   "id": "衛署藥製字第032244號",
-   "zh": "小兒熱之８０止咳顆粒",
-   "en": "CHILDREN'S ACETA 80 COUGH CONTROL GRANULES",
+   "id": "衛署藥輸字第009313號",
+   "zh": "胃加芬液",
+   "en": "GASTROGRAFIN",
    "color": [
-    "橘"
+    "透明"
    ],
    "shape": [
-    "顆粒劑、粉劑或散劑"
+    "液劑(包含糖漿用粉劑)"
    ],
    "score_mark": [
     "無"
@@ -46974,37 +47080,65 @@
    "mark2": null,
    "imgs": [
     {
-     "file": "img/2803e155a0924c94-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/591e9916-8b02-45d6-b573-2251750940f6?c=o",
-     "sha256": "0cfe55c4470b59d6432fc0b8cc1a19496a135ffdc4c295ead12abaecb003d72a",
-     "src_bytes": 1879511
+     "file": "img/0499d601e45493ad-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/624fe9c2-5b3c-41c9-bf07-7c5fcfdb8a05?c=o",
+     "sha256": "c0187d851734f58c833843adfd00afdc615a1380b3236a655547aa6d3631b004",
+     "src_bytes": 2573358
     }
    ]
   },
   {
-   "id": "衛署藥製字第032250號",
-   "zh": "舒保膜衣錠20毫克",
-   "en": "Supertidine F.C. Tablets 20mg",
+   "id": "衛署藥輸字第009796號",
+   "zh": "美道普錠200/50毫克",
+   "en": "MADOPAR 250 TABLETS \"ROCHE\"",
    "color": [
-    "白"
+    "粉"
    ],
    "shape": [
     "圓形"
    ],
    "score_mark": [
-    "無"
+    "十字"
    ],
    "size": [
-    "8"
+    "13"
    ],
-   "mark1": "FAMO 20",
+   "mark1": "RO C HE",
    "mark2": null,
    "imgs": [
     {
-     "file": "img/edca207acf4e0da3-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/284ba0e9-16b7-49af-a84d-06b5fb62b230?c=o",
-     "sha256": "5c11f559e282b8a7d69f1eb8f0105d34204f2ab2fcf4cb98248b846ff6b5a63b",
-     "src_bytes": 847304
+     "file": "img/71a4805a428d8e51-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/adb604f1-6808-4254-96c5-89646091376c?c=o",
+     "sha256": "d1d6d6d0a55ec441ed90a1d1778083902f8110b44e9b49b0e9552a142c4b70ae",
+     "src_bytes": 16939877
+    }
+   ]
+  },
+  {
+   "id": "衛署藥輸字第010641號",
+   "zh": "維骨力膠囊",
+   "en": "VIARTRIL-S CAPSULES",
+   "color": [
+    "紅",
+    "白"
+   ],
+   "shape": [
+    "膠囊"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "20"
+   ],
+   "mark1": "ROTTA",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/16b1943484ef0d6a-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/aee2a01a-b186-44bd-b443-721a99df2d30?c=o",
+     "sha256": "20a357c551620a5391c6f6bdfead86175e372535ef2140f694aa7c6da7317af8",
+     "src_bytes": 1132323
     }
    ]
   },
@@ -51529,87 +51663,6 @@
      "src": "https://mcp.fda.gov.tw/insert/shapeImg/65203ac3-fa89-4326-a314-1c1659fc0b07?c=o",
      "sha256": "077c7147eb4a1c8e667952616920cd6faa67d4d6595baa1f614b8eebc521da45",
      "src_bytes": 6259295
-    }
-   ]
-  },
-  {
-   "id": "衛署藥輸字第022769號",
-   "zh": "理思必妥膜衣錠３毫克",
-   "en": "Risperdal Film Coated Tablet 3mg",
-   "color": [
-    "黃"
-   ],
-   "shape": [
-    "橢圓形"
-   ],
-   "score_mark": [
-    "直線"
-   ],
-   "size": [
-    "14"
-   ],
-   "mark1": "Ris 3",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/47a17a5d5e0332e9-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/9a66d8dc-e25d-44af-9ec4-f7bd79ea3aa3?c=o",
-     "sha256": "ffd10cab6aa4d60e48adf7fd9075f262adcb0e10e025a871e8a59971321cf2de",
-     "src_bytes": 4839893
-    }
-   ]
-  },
-  {
-   "id": "衛署藥輸字第022778號",
-   "zh": "欣流膜衣錠10毫克",
-   "en": "SINGULAIR FILM COATED TABLET 10MG",
-   "color": [
-    "橘"
-   ],
-   "shape": [
-    "四邊形"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "7"
-   ],
-   "mark1": "MSD 117",
-   "mark2": "SINGULAIR",
-   "imgs": [
-    {
-     "file": "img/9218167d844b4013-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/df93540f-b38d-4301-afbb-816716a7c0d6?c=o",
-     "sha256": "95633fe8097dee6e52db643e60396f8e3520c8512889f345a2263d8e13068f24",
-     "src_bytes": 6585519
-    }
-   ]
-  },
-  {
-   "id": "衛署藥輸字第022779號",
-   "zh": "欣流咀嚼錠5毫克",
-   "en": "SINGULAIR CHEWABLE TABLET 5MG",
-   "color": [
-    "紫"
-   ],
-   "shape": [
-    "圓形"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "10"
-   ],
-   "mark1": "MSD 275",
-   "mark2": "SINGULAIR",
-   "imgs": [
-    {
-     "file": "img/4f2c692c7aa3c53b-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/a08844e2-0b88-4ce4-891b-24b593dd509e?c=o",
-     "sha256": "ee590c60df285a5e45c93fc177f372fefb589b955383a85a6027bac2c5b071ca",
-     "src_bytes": 6581130
     }
    ]
   },
@@ -56187,6 +56240,86 @@
    ]
   },
   {
+   "id": "衛署藥製字第032137號",
+   "zh": "帝達黴素膠囊１５０公絲（克林達黴素）",
+   "en": "TIDACT CAPSULES 150MG (CLINDAMYCIN)",
+   "color": [
+    "紫",
+    "黃"
+   ],
+   "shape": [
+    "膠囊"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "19.2"
+   ],
+   "mark1": "YSP",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/a4fc8331a8c9be14-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/0b94f171-91f2-49cb-95e8-2367a8c1871d?c=o",
+     "sha256": "f5986f63bb645e66670d986d3bd941b9e9a88a0091bbb24211e297e2b59c3e24",
+     "src_bytes": 1487273
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第032244號",
+   "zh": "小兒熱之８０止咳顆粒",
+   "en": "CHILDREN'S ACETA 80 COUGH CONTROL GRANULES",
+   "color": [
+    "橘"
+   ],
+   "shape": [
+    "顆粒劑、粉劑或散劑"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [],
+   "mark1": null,
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/2803e155a0924c94-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/591e9916-8b02-45d6-b573-2251750940f6?c=o",
+     "sha256": "0cfe55c4470b59d6432fc0b8cc1a19496a135ffdc4c295ead12abaecb003d72a",
+     "src_bytes": 1879511
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第032250號",
+   "zh": "舒保膜衣錠20毫克",
+   "en": "Supertidine F.C. Tablets 20mg",
+   "color": [
+    "白"
+   ],
+   "shape": [
+    "圓形"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "8"
+   ],
+   "mark1": "FAMO 20",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/edca207acf4e0da3-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/284ba0e9-16b7-49af-a84d-06b5fb62b230?c=o",
+     "sha256": "5c11f559e282b8a7d69f1eb8f0105d34204f2ab2fcf4cb98248b846ff6b5a63b",
+     "src_bytes": 847304
+    }
+   ]
+  },
+  {
    "id": "衛署藥製字第032261號",
    "zh": "\"黃氏\"樂痢平膠囊2毫克（樂必寧）",
    "en": "LOPER CAPSULES 2MG (LOPERAMIDE) \"H.S.\"",
@@ -60496,96 +60629,14 @@
    ]
   },
   {
-   "id": "衛署藥製字第033871號",
-   "zh": "\"羅得\"護肝膠囊150毫克（思利馬林）",
-   "en": "FORLIVER CAPSULES 150MG \"ROOT\" (SILYBIN)",
-   "color": [
-    "紅",
-    "橘"
-   ],
-   "shape": [
-    "膠囊"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "18"
-   ],
-   "mark1": null,
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/829db047bbecce4c-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/b9620a97-b2df-4920-81b0-89e0933ec1a3?c=o",
-     "sha256": "06e4c016b8c592f55a7c8cc5711473d13871b67fb98b62fa05fab43ee94905c5",
-     "src_bytes": 220757
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第033885號",
-   "zh": "優鈣錠５００毫克（碳酸鈣）",
-   "en": "U-CAL TABLETS 500MG (CALCIUM CARBONATE)",
+   "id": "衛署藥輸字第022769號",
+   "zh": "理思必妥膜衣錠３毫克",
+   "en": "Risperdal Film Coated Tablet 3mg",
    "color": [
     "黃"
    ],
    "shape": [
-    "圓形"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "12"
-   ],
-   "mark1": "COSAI",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/ffda1faa41f52551-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/8f9ce81c-481c-460c-9f18-a79cb82d51e4?c=o",
-     "sha256": "f079139fa747c5752d83a5b008f4529ddb792d337ece97f18fda6961fcb54b0d",
-     "src_bytes": 1536733
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第033894號",
-   "zh": "\"國嘉\"得佳錠0.75毫克(迪皮質醇)",
-   "en": "DECA TABLETS 0.75MG (DEXAMETHASONE)\"KOJAR\"",
-   "color": [
-    "粉"
-   ],
-   "shape": [
-    "圓形"
-   ],
-   "score_mark": [
-    "直線"
-   ],
-   "size": [
-    "7"
-   ],
-   "mark1": "K",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/399df05b2ff1d4b3-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/55693cbe-3eb7-4875-aa90-4d305f9c8c02?c=o",
-     "sha256": "9b11698046cb2ed104ce2c948c5242d646ca923f2cacb4a6fd58d83bf3e577be",
-     "src_bytes": 8046880
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第033895號",
-   "zh": "“國嘉”喜佳錠2毫克(吡啶)",
-   "en": "JA JA TABLETS 2MG (CETYLPYRIDINIUM CHLORIDE)\"KOJAR\"",
-   "color": [
-    "橘"
-   ],
-   "shape": [
-    "圓形"
+    "橢圓形"
    ],
    "score_mark": [
     "直線"
@@ -60593,14 +60644,68 @@
    "size": [
     "14"
    ],
-   "mark1": "KJ 011",
-   "mark2": "KOJAR KOJAR",
+   "mark1": "Ris 3",
+   "mark2": null,
    "imgs": [
     {
-     "file": "img/08ab35ad5dd70c88-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/163199bb-922d-4519-b747-be3f88eb534e?c=o",
-     "sha256": "6e1cb2b3517aa1dcf03e6df347cfe16f1ad87a7ecd695de490d1998a2376f61d",
-     "src_bytes": 6678480
+     "file": "img/47a17a5d5e0332e9-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/9a66d8dc-e25d-44af-9ec4-f7bd79ea3aa3?c=o",
+     "sha256": "ffd10cab6aa4d60e48adf7fd9075f262adcb0e10e025a871e8a59971321cf2de",
+     "src_bytes": 4839893
+    }
+   ]
+  },
+  {
+   "id": "衛署藥輸字第022778號",
+   "zh": "欣流膜衣錠10毫克",
+   "en": "SINGULAIR FILM COATED TABLET 10MG",
+   "color": [
+    "橘"
+   ],
+   "shape": [
+    "四邊形"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "7"
+   ],
+   "mark1": "MSD 117",
+   "mark2": "SINGULAIR",
+   "imgs": [
+    {
+     "file": "img/9218167d844b4013-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/df93540f-b38d-4301-afbb-816716a7c0d6?c=o",
+     "sha256": "95633fe8097dee6e52db643e60396f8e3520c8512889f345a2263d8e13068f24",
+     "src_bytes": 6585519
+    }
+   ]
+  },
+  {
+   "id": "衛署藥輸字第022779號",
+   "zh": "欣流咀嚼錠5毫克",
+   "en": "SINGULAIR CHEWABLE TABLET 5MG",
+   "color": [
+    "紫"
+   ],
+   "shape": [
+    "圓形"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "10"
+   ],
+   "mark1": "MSD 275",
+   "mark2": "SINGULAIR",
+   "imgs": [
+    {
+     "file": "img/4f2c692c7aa3c53b-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/a08844e2-0b88-4ce4-891b-24b593dd509e?c=o",
+     "sha256": "ee590c60df285a5e45c93fc177f372fefb589b955383a85a6027bac2c5b071ca",
+     "src_bytes": 6581130
     }
    ]
   },
@@ -61259,6 +61364,43 @@
      "src": "https://mcp.fda.gov.tw/insert/shapeImg/666b51cf-02de-457c-844c-72ef6af8cf63?c=o",
      "sha256": "92903beb9c146167d3cc331163e291dfe42fbd70001de7cb935ec6b7d0a7fc04",
      "src_bytes": 11583390
+    }
+   ]
+  },
+  {
+   "id": "衛署藥輸字第022924號",
+   "zh": "內舒拿水溶性鼻用噴液劑",
+   "en": "NASONEX AQUEOUS NASAL SPRAY",
+   "color": [],
+   "shape": [],
+   "score_mark": [],
+   "size": [],
+   "mark1": null,
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/702edccc690fd1ae-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/00797d23-da50-4251-b66e-7ba918eeab38?c=o",
+     "sha256": "e94bd828df0c2f8a1c6da2792e6a3485d7122255f3ea077d58fb602fb749befd",
+     "src_bytes": 8534980
+    },
+    {
+     "file": "img/702edccc690fd1ae-1.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/a80a6ea2-158c-44f0-a835-020162e38078?c=o",
+     "sha256": "5e9e369d7b653108d12773116200f30a6924d482881c4cf737e8d9d496c45eb3",
+     "src_bytes": 8477371
+    },
+    {
+     "file": "img/702edccc690fd1ae-2.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/ab8f17ea-c631-4a17-8641-c90f052bf8aa?c=o",
+     "sha256": "c56deb09d8cc2daf439abfa1a13310bc3c3c4e33a8632c3084fa91a9f249be62",
+     "src_bytes": 8522994
+    },
+    {
+     "file": "img/702edccc690fd1ae-3.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/be398e45-ad54-41a6-b691-7842c160f45e?c=o",
+     "sha256": "4c5e93c3ff02af6ee69f39e46e413f7feac8ff12fc8a63160ee78b7b5fe56d1f",
+     "src_bytes": 8353627
     }
    ]
   },
@@ -62399,33 +62541,6 @@
      "src": "https://mcp.fda.gov.tw/insert/shapeImg/1ef09603-c669-4992-ab8a-849ca1ff80cd?c=o",
      "sha256": "1c183f808d0f120d18577b0a1c632d0e0090eabfbf7f83772d24ce920e1b6815",
      "src_bytes": 8702834
-    }
-   ]
-  },
-  {
-   "id": "衛署藥輸字第023738號",
-   "zh": "睦體康３６０毫克腸衣錠",
-   "en": "MYFORTIC 360MG GASTRO-RESISTANT TABLETS",
-   "color": [
-    "粉"
-   ],
-   "shape": [
-    "橢圓形"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "15.6"
-   ],
-   "mark1": "CT",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/8a729e4696f7cac0-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/80c21518-ef71-422f-a2a2-09df64d2d979?c=o",
-     "sha256": "b78bf68b7aac9aab9fc5495106fa23d3a2a9d815b42919ade56109b6f1fff9a0",
-     "src_bytes": 2583121
     }
    ]
   },
@@ -63634,6 +63749,33 @@
      "src": "https://mcp.fda.gov.tw/insert/shapeImg/bd9b7452-6c33-4b36-b216-9e6afb447929?c=o",
      "sha256": "d688033d993b22a9f6e2f2e0d38a030149cf78dc50374dd8561d5ac3e7f60e6a",
      "src_bytes": 6461840
+    }
+   ]
+  },
+  {
+   "id": "衛署藥輸字第023738號",
+   "zh": "睦體康３６０毫克腸衣錠",
+   "en": "MYFORTIC 360MG GASTRO-RESISTANT TABLETS",
+   "color": [
+    "粉"
+   ],
+   "shape": [
+    "橢圓形"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "15.6"
+   ],
+   "mark1": "CT",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/8a729e4696f7cac0-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/80c21518-ef71-422f-a2a2-09df64d2d979?c=o",
+     "sha256": "b78bf68b7aac9aab9fc5495106fa23d3a2a9d815b42919ade56109b6f1fff9a0",
+     "src_bytes": 2583121
     }
    ]
   },
@@ -65293,143 +65435,6 @@
      "src": "https://mcp.fda.gov.tw/insert/shapeImg/bb477031-cff7-4fab-8dc9-cbbe8853a43a?c=o",
      "sha256": "e0c8e14b9920789ba6a0edee968b4f695bf304b5b4ff80428f39afe42403d81c",
      "src_bytes": 2627451
-    }
-   ]
-  },
-  {
-   "id": "衛署藥輸字第024405號",
-   "zh": "安保抗憂錠30毫克",
-   "en": "Apo-Paroxetine Tablets 30mg",
-   "color": [
-    "藍"
-   ],
-   "shape": [
-    "橢圓形"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "14"
-   ],
-   "mark1": "APO",
-   "mark2": "30",
-   "imgs": [
-    {
-     "file": "img/41b1f93b4793d1ed-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/23e937c1-ed55-4703-937f-333f3c2f8c5f_img_1?c=o",
-     "sha256": "f8aed61becfe1af111012afd38d1010fc2d3a435cb5802b7a18f37fd13390c22",
-     "src_bytes": 148673
-    },
-    {
-     "file": "img/41b1f93b4793d1ed-1.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/27daa556-83da-4c0e-bcf2-7d04423c9206?c=o",
-     "sha256": "a37ce37bcf8a4989ab09dca905061e4cea4314b25a04cc50b326c616f5328266",
-     "src_bytes": 8979719
-    }
-   ]
-  },
-  {
-   "id": "衛署藥輸字第024408號",
-   "zh": "安保喜樂膜衣錠20毫克",
-   "en": "Apo-Citalopram Tablets 20mg",
-   "color": [
-    "白"
-   ],
-   "shape": [
-    "橢圓形"
-   ],
-   "score_mark": [
-    "直線"
-   ],
-   "size": [
-    "8"
-   ],
-   "mark1": "APO",
-   "mark2": "2 0",
-   "imgs": [
-    {
-     "file": "img/2afa083b145b2640-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/0de7582a-f2c6-43fe-8e3c-2c8869c9fe93?c=o",
-     "sha256": "4c5697a4ffd19882b4b897b782905683e2cd8c75f63f118732421f763acc6aad",
-     "src_bytes": 7184247
-    }
-   ]
-  },
-  {
-   "id": "衛署藥輸字第024416號",
-   "zh": "威樂寧口炎凝膠",
-   "en": "Kamistad Gel",
-   "color": [],
-   "shape": [
-    "其他"
-   ],
-   "score_mark": [],
-   "size": [],
-   "mark1": null,
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/90b6887c9d5df30e-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/be965e8b-67e5-439e-b920-5915c8407da1?c=o",
-     "sha256": "25fd5a21012fd39e88dd1844df29a3f4601b364860b013bd58fe203ec4fbf47f",
-     "src_bytes": 2713366
-    }
-   ]
-  },
-  {
-   "id": "衛署藥輸字第024421號",
-   "zh": "暉致速悅持續性藥效膠囊37.5毫克",
-   "en": "Effexor XR 37.5mg Sustained-release Capsules",
-   "color": [
-    "灰",
-    "粉"
-   ],
-   "shape": [
-    "膠囊"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "15"
-   ],
-   "mark1": "W Effexor XR",
-   "mark2": "37 5",
-   "imgs": [
-    {
-     "file": "img/4ee93f9357636d9b-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/a960399e-1bd7-45cc-ab3b-5b8c3627b6a4?c=o",
-     "sha256": "c43324916da1e389feadca6f966db69f182610402faff5e9f34b3b44b54b66aa",
-     "src_bytes": 584643
-    }
-   ]
-  },
-  {
-   "id": "衛署藥輸字第024428號",
-   "zh": "衛克感─綜合感冒膠囊",
-   "en": "Grippostad C Capsules",
-   "color": [
-    "黃",
-    "白"
-   ],
-   "shape": [
-    "膠囊"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "20"
-   ],
-   "mark1": null,
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/84cc6405f30d92fc-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/7d54a667-ee08-4ae2-9062-7ed74ef9efcb?c=o",
-     "sha256": "c18115216d098c758bfd8a95c61ef4c3b7d15bfbde4d3e5e1948ec477e4ba7bb",
-     "src_bytes": 2155017
     }
    ]
   },
@@ -70002,6 +70007,115 @@
    ]
   },
   {
+   "id": "衛署藥製字第033871號",
+   "zh": "\"羅得\"護肝膠囊150毫克（思利馬林）",
+   "en": "FORLIVER CAPSULES 150MG \"ROOT\" (SILYBIN)",
+   "color": [
+    "紅",
+    "橘"
+   ],
+   "shape": [
+    "膠囊"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "18"
+   ],
+   "mark1": null,
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/829db047bbecce4c-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/b9620a97-b2df-4920-81b0-89e0933ec1a3?c=o",
+     "sha256": "06e4c016b8c592f55a7c8cc5711473d13871b67fb98b62fa05fab43ee94905c5",
+     "src_bytes": 220757
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第033885號",
+   "zh": "優鈣錠５００毫克（碳酸鈣）",
+   "en": "U-CAL TABLETS 500MG (CALCIUM CARBONATE)",
+   "color": [
+    "黃"
+   ],
+   "shape": [
+    "圓形"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "12"
+   ],
+   "mark1": "COSAI",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/ffda1faa41f52551-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/8f9ce81c-481c-460c-9f18-a79cb82d51e4?c=o",
+     "sha256": "f079139fa747c5752d83a5b008f4529ddb792d337ece97f18fda6961fcb54b0d",
+     "src_bytes": 1536733
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第033894號",
+   "zh": "\"國嘉\"得佳錠0.75毫克(迪皮質醇)",
+   "en": "DECA TABLETS 0.75MG (DEXAMETHASONE)\"KOJAR\"",
+   "color": [
+    "粉"
+   ],
+   "shape": [
+    "圓形"
+   ],
+   "score_mark": [
+    "直線"
+   ],
+   "size": [
+    "7"
+   ],
+   "mark1": "K",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/399df05b2ff1d4b3-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/55693cbe-3eb7-4875-aa90-4d305f9c8c02?c=o",
+     "sha256": "9b11698046cb2ed104ce2c948c5242d646ca923f2cacb4a6fd58d83bf3e577be",
+     "src_bytes": 8046880
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第033895號",
+   "zh": "“國嘉”喜佳錠2毫克(吡啶)",
+   "en": "JA JA TABLETS 2MG (CETYLPYRIDINIUM CHLORIDE)\"KOJAR\"",
+   "color": [
+    "橘"
+   ],
+   "shape": [
+    "圓形"
+   ],
+   "score_mark": [
+    "直線"
+   ],
+   "size": [
+    "14"
+   ],
+   "mark1": "KJ 011",
+   "mark2": "KOJAR KOJAR",
+   "imgs": [
+    {
+     "file": "img/08ab35ad5dd70c88-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/163199bb-922d-4519-b747-be3f88eb534e?c=o",
+     "sha256": "6e1cb2b3517aa1dcf03e6df347cfe16f1ad87a7ecd695de490d1998a2376f61d",
+     "src_bytes": 6678480
+    }
+   ]
+  },
+  {
    "id": "衛署藥製字第033896號",
    "zh": "“十全”舒胃達錠１０毫克",
    "en": "SUWEIDA TABLETS 10MG (DOMPERIDONE)\"S.C.\"",
@@ -74381,38 +74495,44 @@
    ]
   },
   {
-   "id": "衛署藥製字第036008號",
-   "zh": "美定隆糖衣錠６０公絲（溴化吡啶斯狄明）",
-   "en": "MESTINON S.C. TABLETS 60MG (PYRIDOSTIGMINE BROMIDE)",
+   "id": "衛署藥輸字第024405號",
+   "zh": "安保抗憂錠30毫克",
+   "en": "Apo-Paroxetine Tablets 30mg",
    "color": [
-    "橘"
+    "藍"
    ],
    "shape": [
-    "圓形"
+    "橢圓形"
    ],
    "score_mark": [
     "無"
    ],
    "size": [
-    "10"
+    "14"
    ],
-   "mark1": null,
-   "mark2": null,
+   "mark1": "APO",
+   "mark2": "30",
    "imgs": [
     {
-     "file": "img/b4182d9d7a27f95e-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/e4e69d6b-f838-4b8c-8b2d-ab682730de95?c=o",
-     "sha256": "a03754d437654e5a999f3f2690553165b045994b059eddc211065d28163b7249",
-     "src_bytes": 731736
+     "file": "img/41b1f93b4793d1ed-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/23e937c1-ed55-4703-937f-333f3c2f8c5f_img_1?c=o",
+     "sha256": "f8aed61becfe1af111012afd38d1010fc2d3a435cb5802b7a18f37fd13390c22",
+     "src_bytes": 148673
+    },
+    {
+     "file": "img/41b1f93b4793d1ed-1.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/27daa556-83da-4c0e-bcf2-7d04423c9206?c=o",
+     "sha256": "a37ce37bcf8a4989ab09dca905061e4cea4314b25a04cc50b326c616f5328266",
+     "src_bytes": 8979719
     }
    ]
   },
   {
-   "id": "衛署藥製字第036069號",
-   "zh": "“皇佳”莫炎腸衣錠５０毫克（待克菲那）",
-   "en": "MOREN E.F.C. TABLET 50MG (DICLOFENAC SODIUM) \"ROYAL\"",
+   "id": "衛署藥輸字第024408號",
+   "zh": "安保喜樂膜衣錠20毫克",
+   "en": "Apo-Citalopram Tablets 20mg",
    "color": [
-    "橘"
+    "白"
    ],
    "shape": [
     "橢圓形"
@@ -74421,22 +74541,93 @@
     "直線"
    ],
    "size": [
-    "11"
+    "8"
+   ],
+   "mark1": "APO",
+   "mark2": "2 0",
+   "imgs": [
+    {
+     "file": "img/2afa083b145b2640-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/0de7582a-f2c6-43fe-8e3c-2c8869c9fe93?c=o",
+     "sha256": "4c5697a4ffd19882b4b897b782905683e2cd8c75f63f118732421f763acc6aad",
+     "src_bytes": 7184247
+    }
+   ]
+  },
+  {
+   "id": "衛署藥輸字第024416號",
+   "zh": "威樂寧口炎凝膠",
+   "en": "Kamistad Gel",
+   "color": [],
+   "shape": [
+    "其他"
+   ],
+   "score_mark": [],
+   "size": [],
+   "mark1": null,
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/90b6887c9d5df30e-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/be965e8b-67e5-439e-b920-5915c8407da1?c=o",
+     "sha256": "25fd5a21012fd39e88dd1844df29a3f4601b364860b013bd58fe203ec4fbf47f",
+     "src_bytes": 2713366
+    }
+   ]
+  },
+  {
+   "id": "衛署藥輸字第024421號",
+   "zh": "暉致速悅持續性藥效膠囊37.5毫克",
+   "en": "Effexor XR 37.5mg Sustained-release Capsules",
+   "color": [
+    "灰",
+    "粉"
+   ],
+   "shape": [
+    "膠囊"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "15"
+   ],
+   "mark1": "W Effexor XR",
+   "mark2": "37 5",
+   "imgs": [
+    {
+     "file": "img/4ee93f9357636d9b-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/a960399e-1bd7-45cc-ab3b-5b8c3627b6a4?c=o",
+     "sha256": "c43324916da1e389feadca6f966db69f182610402faff5e9f34b3b44b54b66aa",
+     "src_bytes": 584643
+    }
+   ]
+  },
+  {
+   "id": "衛署藥輸字第024428號",
+   "zh": "衛克感─綜合感冒膠囊",
+   "en": "Grippostad C Capsules",
+   "color": [
+    "黃",
+    "白"
+   ],
+   "shape": [
+    "膠囊"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "20"
    ],
    "mark1": null,
    "mark2": null,
    "imgs": [
     {
-     "file": "img/acbd704577dfa4e3-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/0abe87fa-e3a1-45d2-b910-3bb803715538_img_1?c=o",
-     "sha256": "3682150a441d64917b05945a3349dc1de6f0f81c3c94811b920fc8816e0d63a2",
-     "src_bytes": 174146
-    },
-    {
-     "file": "img/acbd704577dfa4e3-1.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/8274707f-2761-415c-9190-bd705f1071a3?c=o",
-     "sha256": "0e80612249b6cbbe9593da0abd50cda5a5a01fca0a3f68c6e903df92e0707b3e",
-     "src_bytes": 17378238
+     "file": "img/84cc6405f30d92fc-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/7d54a667-ee08-4ae2-9062-7ed74ef9efcb?c=o",
+     "sha256": "c18115216d098c758bfd8a95c61ef4c3b7d15bfbde4d3e5e1948ec477e4ba7bb",
+     "src_bytes": 2155017
     }
    ]
   },
@@ -78913,142 +79104,6 @@
    ]
   },
   {
-   "id": "衛署藥輸字第025419號",
-   "zh": "力安穩 膜衣錠 5/160/12.5毫克",
-   "en": "Exforge HCT Film Coated Tablets 5/160/12.5 mg",
-   "color": [
-    "白"
-   ],
-   "shape": [
-    "橢圓形"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "13.4"
-   ],
-   "mark1": "NVR",
-   "mark2": "VCL",
-   "imgs": [
-    {
-     "file": "img/ba553b29e1cc668e-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/187a899e-c8ff-44dd-ba44-b18f2cfd399d?c=o",
-     "sha256": "8f071538c81d50259a69e01dc0d0728b0f1bbe4814831f8b20d9ba6cdc1d4bcf",
-     "src_bytes": 5300562
-    }
-   ]
-  },
-  {
-   "id": "衛署藥輸字第025421號",
-   "zh": "力安穩 膜衣錠 10/160/25毫克",
-   "en": "Exforge HCT Film Coated Tablets 10/160/25 mg",
-   "color": [
-    "黃"
-   ],
-   "shape": [
-    "橢圓形"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "13.4"
-   ],
-   "mark1": "NVR",
-   "mark2": "VHL",
-   "imgs": [
-    {
-     "file": "img/2571bbeb8c3171ce-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/0904d65b-2a00-4ac2-90fe-cf0a6bcd4627?c=o",
-     "sha256": "f0ddb2e4313f496254b2e521a0bfcbe77fa891adf4f88b7bf11b2cfdc8fb3f38",
-     "src_bytes": 3499454
-    }
-   ]
-  },
-  {
-   "id": "衛署藥輸字第025423號",
-   "zh": "多適達膠囊0.5mg/0.4mg",
-   "en": "Duodart Capsules",
-   "color": [
-    "橘",
-    "棕"
-   ],
-   "shape": [
-    "膠囊"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "23"
-   ],
-   "mark1": "GS 7CZ",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/356a46b32cd8102f-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/829598c4-6ae0-483c-b0aa-31bce2ad1c61?c=o",
-     "sha256": "cae633135f60ac41953f73bd5e8a9770d2ebecb71adccdd05002a9f684a0e3a8",
-     "src_bytes": 2058870
-    }
-   ]
-  },
-  {
-   "id": "衛署藥輸字第025427號",
-   "zh": "福避痛膜衣錠80毫克",
-   "en": "Feburic 80 mg Film Coated Tablets",
-   "color": [
-    "黃"
-   ],
-   "shape": [
-    "四邊形"
-   ],
-   "score_mark": [
-    "直線"
-   ],
-   "size": [
-    "18"
-   ],
-   "mark1": "80",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/6e3683a7f21dc896-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/fa72b061-d376-4757-bd0f-8ecab17c0ab2?c=o",
-     "sha256": "7d3f111845a8abecc3560c3f359c5a245c0e6c4acfbe324e587456724bd58482",
-     "src_bytes": 2748434
-    }
-   ]
-  },
-  {
-   "id": "衛署藥輸字第025431號",
-   "zh": "合利他命 強效錠",
-   "en": "ALINAMIN EX PLUS",
-   "color": [
-    "黃"
-   ],
-   "shape": [
-    "圓形"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "9.2"
-   ],
-   "mark1": "ALINAMIN201",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/e67d11ac78d68c16-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/55974998-4b11-40b2-af3d-38d6a8e7a143?c=o",
-     "sha256": "0ef4b19fc0d7f8e66f59c3002fb9a7ac4a487508ae68250c609ce916109fa0d2",
-     "src_bytes": 7785449
-    }
-   ]
-  },
-  {
    "id": "衛部藥製字第061464號",
    "zh": "\"約克\"骨得力加強型口服溶液用粉劑",
    "en": "Gooduly powder for oral solution \"Y.K.\"",
@@ -83463,6 +83518,66 @@
    ]
   },
   {
+   "id": "衛署藥製字第036008號",
+   "zh": "美定隆糖衣錠６０公絲（溴化吡啶斯狄明）",
+   "en": "MESTINON S.C. TABLETS 60MG (PYRIDOSTIGMINE BROMIDE)",
+   "color": [
+    "橘"
+   ],
+   "shape": [
+    "圓形"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "10"
+   ],
+   "mark1": null,
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/b4182d9d7a27f95e-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/e4e69d6b-f838-4b8c-8b2d-ab682730de95?c=o",
+     "sha256": "a03754d437654e5a999f3f2690553165b045994b059eddc211065d28163b7249",
+     "src_bytes": 731736
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第036069號",
+   "zh": "“皇佳”莫炎腸衣錠５０毫克（待克菲那）",
+   "en": "MOREN E.F.C. TABLET 50MG (DICLOFENAC SODIUM) \"ROYAL\"",
+   "color": [
+    "橘"
+   ],
+   "shape": [
+    "橢圓形"
+   ],
+   "score_mark": [
+    "直線"
+   ],
+   "size": [
+    "11"
+   ],
+   "mark1": null,
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/acbd704577dfa4e3-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/0abe87fa-e3a1-45d2-b910-3bb803715538_img_1?c=o",
+     "sha256": "3682150a441d64917b05945a3349dc1de6f0f81c3c94811b920fc8816e0d63a2",
+     "src_bytes": 174146
+    },
+    {
+     "file": "img/acbd704577dfa4e3-1.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/8274707f-2761-415c-9190-bd705f1071a3?c=o",
+     "sha256": "0e80612249b6cbbe9593da0abd50cda5a5a01fca0a3f68c6e903df92e0707b3e",
+     "src_bytes": 17378238
+    }
+   ]
+  },
+  {
    "id": "衛署藥製字第036072號",
    "zh": "\"安星\"克得黴素膠囊300毫克(克林達黴素)",
    "en": "CLEDOMYCIN CAPSULES 300MG \"ASTAR\" (CLINDAMYCIN)",
@@ -84583,6 +84698,33 @@
    ]
   },
   {
+   "id": "衛署藥製字第036480號",
+   "zh": "\"嘉林\" 安胃寧錠５００毫克",
+   "en": "ANWENIN TABLETS 500MG \"C.L.\"",
+   "color": [
+    "白"
+   ],
+   "shape": [
+    "圓形"
+   ],
+   "score_mark": [
+    "直線"
+   ],
+   "size": [
+    "13"
+   ],
+   "mark1": null,
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/e1ad0793785cb79d-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/41e2b791-d6c7-4886-b89c-d2e04371cde7?c=o",
+     "sha256": "69189edaf0d72af7c56c0130a7007ebde261697111b01e80e2bcf3f25e901d0b",
+     "src_bytes": 4124148
+    }
+   ]
+  },
+  {
    "id": "衛署藥製字第036483號",
    "zh": "\"華興\"清脂膠囊300公絲（健菲布脂）",
    "en": "CLEAROL CAPSULES 300MG (GEMFIBROZIL) \"H.S\"",
@@ -85003,6 +85145,33 @@
      "src": "https://mcp.fda.gov.tw/insert/shapeImg/2dab2fa0-519f-4d79-ade1-e80bc4f3aa6f?c=o",
      "sha256": "b27f35e6340b1234d682d885f55a8c6ad342fdb2344ff578ee1d77454f526325",
      "src_bytes": 1316785
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第037352號",
+   "zh": "\"國嘉\"和寧錠0.5毫克（哈泊度）",
+   "en": "HOPAN TABLETS 0.5MG (HALOPERIDOL) \"KOJAR\"",
+   "color": [
+    "藍"
+   ],
+   "shape": [
+    "四邊形"
+   ],
+   "score_mark": [
+    "直線"
+   ],
+   "size": [
+    "7"
+   ],
+   "mark1": "KOJAR",
+   "mark2": "KJ 019",
+   "imgs": [
+    {
+     "file": "img/da4cd8ba035c62b2-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/70ecd09a-e363-46e9-8148-8ba83fcc2aa0?c=o",
+     "sha256": "d18436af185bdfcfa6ed53571efdb72a65bbab893b364aee54df648a1b113209",
+     "src_bytes": 6309612
     }
    ]
   },
@@ -86118,33 +86287,6 @@
    ]
   },
   {
-   "id": "衛署藥製字第037352號",
-   "zh": "\"國嘉\"和寧錠0.5毫克（哈泊度）",
-   "en": "HOPAN TABLETS 0.5MG (HALOPERIDOL) \"KOJAR\"",
-   "color": [
-    "藍"
-   ],
-   "shape": [
-    "四邊形"
-   ],
-   "score_mark": [
-    "直線"
-   ],
-   "size": [
-    "7"
-   ],
-   "mark1": "KOJAR",
-   "mark2": "KJ 019",
-   "imgs": [
-    {
-     "file": "img/da4cd8ba035c62b2-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/70ecd09a-e363-46e9-8148-8ba83fcc2aa0?c=o",
-     "sha256": "d18436af185bdfcfa6ed53571efdb72a65bbab893b364aee54df648a1b113209",
-     "src_bytes": 6309612
-    }
-   ]
-  },
-  {
    "id": "衛署藥製字第037355號",
    "zh": "\"永吉\" 待克菲那腸溶糖衣錠50毫克",
    "en": "DICLOFENAC E.S.C. TABLETS 50MG \"YUNG CHI\"",
@@ -87191,6 +87333,33 @@
    ]
   },
   {
+   "id": "衛署藥製字第038018號",
+   "zh": "腹釋寧腸溶糖衣錠60毫克",
+   "en": "PHAZIN ENTERIC S.C. TABLETS 60 MG",
+   "color": [
+    "紅"
+   ],
+   "shape": [
+    "圓形"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "6"
+   ],
+   "mark1": null,
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/f1a77b662dc39f02-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/a55ada41-b42c-4a51-bbe5-ee6fc8067d21?c=o",
+     "sha256": "75712f71cadbd0c09f6aa494f33ef08249118f38b3f6fdbf1c4d7a2c9958c9b9",
+     "src_bytes": 41030
+    }
+   ]
+  },
+  {
    "id": "衛署藥製字第037697號",
    "zh": "\"中美\"便通樂膜衣錠(番瀉葉苷)",
    "en": "THROUGH F.C. TABLETS \"C.M.\"(SENNOSIDES)",
@@ -87736,38 +87905,120 @@
    ]
   },
   {
-   "id": "衛署藥製字第038018號",
-   "zh": "腹釋寧腸溶糖衣錠60毫克",
-   "en": "PHAZIN ENTERIC S.C. TABLETS 60 MG",
+   "id": "衛署藥輸字第025419號",
+   "zh": "力安穩 膜衣錠 5/160/12.5毫克",
+   "en": "Exforge HCT Film Coated Tablets 5/160/12.5 mg",
    "color": [
-    "紅"
+    "白"
    ],
    "shape": [
-    "圓形"
+    "橢圓形"
    ],
    "score_mark": [
     "無"
    ],
    "size": [
-    "6"
+    "13.4"
    ],
-   "mark1": null,
-   "mark2": null,
+   "mark1": "NVR",
+   "mark2": "VCL",
    "imgs": [
     {
-     "file": "img/f1a77b662dc39f02-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/a55ada41-b42c-4a51-bbe5-ee6fc8067d21?c=o",
-     "sha256": "75712f71cadbd0c09f6aa494f33ef08249118f38b3f6fdbf1c4d7a2c9958c9b9",
-     "src_bytes": 41030
+     "file": "img/ba553b29e1cc668e-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/187a899e-c8ff-44dd-ba44-b18f2cfd399d?c=o",
+     "sha256": "8f071538c81d50259a69e01dc0d0728b0f1bbe4814831f8b20d9ba6cdc1d4bcf",
+     "src_bytes": 5300562
     }
    ]
   },
   {
-   "id": "衛署藥製字第038019號",
-   "zh": "非炎徐放膜衣錠１００毫克（待克菲那）",
-   "en": "VOREN SR FILM COATED TABLETS 100MG (DICLOFENAC)",
+   "id": "衛署藥輸字第025421號",
+   "zh": "力安穩 膜衣錠 10/160/25毫克",
+   "en": "Exforge HCT Film Coated Tablets 10/160/25 mg",
    "color": [
-    "橘"
+    "黃"
+   ],
+   "shape": [
+    "橢圓形"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "13.4"
+   ],
+   "mark1": "NVR",
+   "mark2": "VHL",
+   "imgs": [
+    {
+     "file": "img/2571bbeb8c3171ce-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/0904d65b-2a00-4ac2-90fe-cf0a6bcd4627?c=o",
+     "sha256": "f0ddb2e4313f496254b2e521a0bfcbe77fa891adf4f88b7bf11b2cfdc8fb3f38",
+     "src_bytes": 3499454
+    }
+   ]
+  },
+  {
+   "id": "衛署藥輸字第025423號",
+   "zh": "多適達膠囊0.5mg/0.4mg",
+   "en": "Duodart Capsules",
+   "color": [
+    "橘",
+    "棕"
+   ],
+   "shape": [
+    "膠囊"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "23"
+   ],
+   "mark1": "GS 7CZ",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/356a46b32cd8102f-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/829598c4-6ae0-483c-b0aa-31bce2ad1c61?c=o",
+     "sha256": "cae633135f60ac41953f73bd5e8a9770d2ebecb71adccdd05002a9f684a0e3a8",
+     "src_bytes": 2058870
+    }
+   ]
+  },
+  {
+   "id": "衛署藥輸字第025427號",
+   "zh": "福避痛膜衣錠80毫克",
+   "en": "Feburic 80 mg Film Coated Tablets",
+   "color": [
+    "黃"
+   ],
+   "shape": [
+    "四邊形"
+   ],
+   "score_mark": [
+    "直線"
+   ],
+   "size": [
+    "18"
+   ],
+   "mark1": "80",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/6e3683a7f21dc896-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/fa72b061-d376-4757-bd0f-8ecab17c0ab2?c=o",
+     "sha256": "7d3f111845a8abecc3560c3f359c5a245c0e6c4acfbe324e587456724bd58482",
+     "src_bytes": 2748434
+    }
+   ]
+  },
+  {
+   "id": "衛署藥輸字第025431號",
+   "zh": "合利他命 強效錠",
+   "en": "ALINAMIN EX PLUS",
+   "color": [
+    "黃"
    ],
    "shape": [
     "圓形"
@@ -87778,69 +88029,14 @@
    "size": [
     "9.2"
    ],
-   "mark1": null,
+   "mark1": "ALINAMIN201",
    "mark2": null,
    "imgs": [
     {
-     "file": "img/1b15391bb38d1e14-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/67a5d830-6dcf-437a-96ed-c92c4947f43f?c=o",
-     "sha256": "76480c5dcc0d70a02e1e0566f7d99acfd7914c09f1c4c883c9bf562b009558e1",
-     "src_bytes": 579289
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第038023號",
-   "zh": "\"大豐\"治尿酸痛錠100毫克(異嘌呤醇)",
-   "en": "UROPRIL TABLETS 100MG (ALLOPURINOL) \"T.F.\"",
-   "color": [
-    "白"
-   ],
-   "shape": [
-    "圓形"
-   ],
-   "score_mark": [
-    "直線"
-   ],
-   "size": [
-    "9"
-   ],
-   "mark1": "TF UP",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/9a58929bbf045196-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/ba2ead5d-9cf2-4d63-a706-c38e0fc6c009?c=o",
-     "sha256": "4bf1892a4162742009634469fddab438ac6ee37d2b6ed2569aae13b60af39e0c",
-     "src_bytes": 9223522
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第038030號",
-   "zh": "\"永勝\"保肝膠囊１５０公絲（思利馬林）",
-   "en": "PROCAM CAPSULES 150MG (SILYMARIN) \"EVEREST\"",
-   "color": [
-    "棕",
-    "透明"
-   ],
-   "shape": [
-    "膠囊"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "21"
-   ],
-   "mark1": "PROCAM",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/04fba02d1c9044a9-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/55681d66-5b13-48fb-ac74-fbc338d3e6e9?c=o",
-     "sha256": "390628a7a308861743f898337e61a5c705d7b8a00242fbb7668887dfae723857",
-     "src_bytes": 1779618
+     "file": "img/e67d11ac78d68c16-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/55974998-4b11-40b2-af3d-38d6a8e7a143?c=o",
+     "sha256": "0ef4b19fc0d7f8e66f59c3002fb9a7ac4a487508ae68250c609ce916109fa0d2",
+     "src_bytes": 7785449
     }
    ]
   },
@@ -91648,6 +91844,34 @@
    ]
   },
   {
+   "id": "衛部藥製字第062418號",
+   "zh": "＂約克＂滅磷膜衣錠800毫克",
+   "en": "Seveless F.C. Tablet 800 mg \"Y.K.\"",
+   "color": [
+    "白",
+    "白"
+   ],
+   "shape": [
+    "橢圓形"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "20"
+   ],
+   "mark1": null,
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/6b218ee218041db1-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/465e453b-ecf9-40a4-af18-a17006d26013?c=o",
+     "sha256": "72007f45980983ea7982963538c81a5eefd9a7fc9cd0ae9001f3dfc867301425",
+     "src_bytes": 706483
+    }
+   ]
+  },
+  {
    "id": "衛部藥製字第R00042號",
    "zh": "欣[氟-18]氟化鈉注射劑",
    "en": "Syn [F-18]Sodium Fluoride Injection",
@@ -94733,12 +94957,66 @@
    ]
   },
   {
-   "id": "衛部藥輸字第026604號",
-   "zh": "胃易舒膠囊40毫克",
-   "en": "Stadnex 40 CAP",
+   "id": "衛署藥製字第038019號",
+   "zh": "非炎徐放膜衣錠１００毫克（待克菲那）",
+   "en": "VOREN SR FILM COATED TABLETS 100MG (DICLOFENAC)",
    "color": [
-    "紫",
-    "紫"
+    "橘"
+   ],
+   "shape": [
+    "圓形"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "9.2"
+   ],
+   "mark1": null,
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/1b15391bb38d1e14-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/67a5d830-6dcf-437a-96ed-c92c4947f43f?c=o",
+     "sha256": "76480c5dcc0d70a02e1e0566f7d99acfd7914c09f1c4c883c9bf562b009558e1",
+     "src_bytes": 579289
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第038023號",
+   "zh": "\"大豐\"治尿酸痛錠100毫克(異嘌呤醇)",
+   "en": "UROPRIL TABLETS 100MG (ALLOPURINOL) \"T.F.\"",
+   "color": [
+    "白"
+   ],
+   "shape": [
+    "圓形"
+   ],
+   "score_mark": [
+    "直線"
+   ],
+   "size": [
+    "9"
+   ],
+   "mark1": "TF UP",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/9a58929bbf045196-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/ba2ead5d-9cf2-4d63-a706-c38e0fc6c009?c=o",
+     "sha256": "4bf1892a4162742009634469fddab438ac6ee37d2b6ed2569aae13b60af39e0c",
+     "src_bytes": 9223522
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第038030號",
+   "zh": "\"永勝\"保肝膠囊１５０公絲（思利馬林）",
+   "en": "PROCAM CAPSULES 150MG (SILYMARIN) \"EVEREST\"",
+   "color": [
+    "棕",
+    "透明"
    ],
    "shape": [
     "膠囊"
@@ -94747,16 +95025,16 @@
     "無"
    ],
    "size": [
-    "17"
+    "21"
    ],
-   "mark1": "40",
+   "mark1": "PROCAM",
    "mark2": null,
    "imgs": [
     {
-     "file": "img/774f1c8fb2dc10ef-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/27142570-ac1e-4397-b15a-f9fffcd709a3?c=o",
-     "sha256": "6b0fa19b9ee0c6f80cc2101dd1aaaa0a4c768922687e7f54da17c5929cf4b56c",
-     "src_bytes": 8964619
+     "file": "img/04fba02d1c9044a9-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/55681d66-5b13-48fb-ac74-fbc338d3e6e9?c=o",
+     "sha256": "390628a7a308861743f898337e61a5c705d7b8a00242fbb7668887dfae723857",
+     "src_bytes": 1779618
     }
    ]
   },
@@ -99111,64 +99389,12 @@
    ]
   },
   {
-   "id": "衛署藥製字第039625號",
-   "zh": "富得美膠囊２０毫克（匹若卡）",
-   "en": "FELDEMIN CAPSULES 20MG (PIROXICAM) \"EVEREST\"",
+   "id": "衛部藥輸字第026604號",
+   "zh": "胃易舒膠囊40毫克",
+   "en": "Stadnex 40 CAP",
    "color": [
-    "綠"
-   ],
-   "shape": [
-    "膠囊"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [],
-   "mark1": null,
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/69af9681e026049d-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/a1bfc30b-b492-4001-9432-043ead39f5d2?c=o",
-     "sha256": "bab2a9291beb1c3256bca68247c09fc9e2e99ec1e800e6165ec5e96928fa5346",
-     "src_bytes": 1268112
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第039651號",
-   "zh": "\"鎰浩\" 可立錠2毫克",
-   "en": "KOLININ TABLETS 2MG",
-   "color": [
-    "黃"
-   ],
-   "shape": [
-    "圓形"
-   ],
-   "score_mark": [
-    "直線"
-   ],
-   "size": [
-    "7"
-   ],
-   "mark1": "YH LR",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/5689ab0985eae90b-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/4fcd152f-423c-4032-b936-21cde7280f17?c=o",
-     "sha256": "8b39d88709bed23036883ffd5df77962c27dfd78c36a4041b44ea88ee6c9b26d",
-     "src_bytes": 774794
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第039658號",
-   "zh": "\"約克\"骨樂舒膠囊250毫克",
-   "en": "GLUCO CAPSULES 250MG \"Y.K.\"",
-   "color": [
-    "紅",
-    "白"
+    "紫",
+    "紫"
    ],
    "shape": [
     "膠囊"
@@ -99177,70 +99403,16 @@
     "無"
    ],
    "size": [
-    "19"
+    "17"
    ],
-   "mark1": null,
+   "mark1": "40",
    "mark2": null,
    "imgs": [
     {
-     "file": "img/3d3ee6ffa2524bd1-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/df1a7938-6c62-448b-8279-aa2a12466a88?c=o",
-     "sha256": "4be153fa031c03c0782ff112fd10c21f0216c2f9126f44b420a3ff8ee5eab551",
-     "src_bytes": 6844091
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第039661號",
-   "zh": "\"陽生\" 諾司卡賓錠２０毫克",
-   "en": "NOSCAPINE TABLET 20MG \"Y.S.\"",
-   "color": [
-    "白"
-   ],
-   "shape": [
-    "六邊形"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "8"
-   ],
-   "mark1": "TYS",
-   "mark2": "643",
-   "imgs": [
-    {
-     "file": "img/b33f8bde4394e921-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/d890694f-fe80-4ca5-aa2c-7a396a8aa53b?c=o",
-     "sha256": "a898ee953021d3d320a304269d2df52260076ba16edc25549502898de3c614cf",
-     "src_bytes": 932750
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第039662號",
-   "zh": "\"國嘉\"可朗膜衣錠２００毫克（異布洛芬）",
-   "en": "KELANG F.C. TABLETS 200MG ( IBUPROFEN ) \"KOJAR\"",
-   "color": [
-    "橘"
-   ],
-   "shape": [
-    "圓形"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "10"
-   ],
-   "mark1": null,
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/706182719ae051cf-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/1dc07c08-99c5-4553-9389-065d3a0131c1?c=o",
-     "sha256": "084f1398e8b0e948679b7ec4e701dc7893a3c7d8117bd522797236127625f81f",
-     "src_bytes": 7455237
+     "file": "img/774f1c8fb2dc10ef-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/27142570-ac1e-4397-b15a-f9fffcd709a3?c=o",
+     "sha256": "6b0fa19b9ee0c6f80cc2101dd1aaaa0a4c768922687e7f54da17c5929cf4b56c",
+     "src_bytes": 8964619
     }
    ]
   },
@@ -103833,29 +104005,136 @@
    ]
   },
   {
-   "id": "衛部藥輸字第027642號",
-   "zh": "捷癌寧膜衣錠100毫克",
-   "en": "VERZENIO film-coated tablet 100mg",
+   "id": "衛署藥製字第039625號",
+   "zh": "富得美膠囊２０毫克（匹若卡）",
+   "en": "FELDEMIN CAPSULES 20MG (PIROXICAM) \"EVEREST\"",
    "color": [
+    "綠"
+   ],
+   "shape": [
+    "膠囊"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [],
+   "mark1": null,
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/69af9681e026049d-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/a1bfc30b-b492-4001-9432-043ead39f5d2?c=o",
+     "sha256": "bab2a9291beb1c3256bca68247c09fc9e2e99ec1e800e6165ec5e96928fa5346",
+     "src_bytes": 1268112
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第039651號",
+   "zh": "\"鎰浩\" 可立錠2毫克",
+   "en": "KOLININ TABLETS 2MG",
+   "color": [
+    "黃"
+   ],
+   "shape": [
+    "圓形"
+   ],
+   "score_mark": [
+    "直線"
+   ],
+   "size": [
+    "7"
+   ],
+   "mark1": "YH LR",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/5689ab0985eae90b-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/4fcd152f-423c-4032-b936-21cde7280f17?c=o",
+     "sha256": "8b39d88709bed23036883ffd5df77962c27dfd78c36a4041b44ea88ee6c9b26d",
+     "src_bytes": 774794
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第039658號",
+   "zh": "\"約克\"骨樂舒膠囊250毫克",
+   "en": "GLUCO CAPSULES 250MG \"Y.K.\"",
+   "color": [
+    "紅",
     "白"
    ],
    "shape": [
-    "橢圓形"
+    "膠囊"
    ],
    "score_mark": [
     "無"
    ],
    "size": [
-    "13"
+    "19"
    ],
-   "mark1": "Lilly",
-   "mark2": "100",
+   "mark1": null,
+   "mark2": null,
    "imgs": [
     {
-     "file": "img/26e8fcbbe92edaf6-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/9bdfe5f4-50d5-4bb5-a5f2-07f41a4d7248?c=o",
-     "sha256": "80c1b34f21f9fca9d7fb30d4b0c7369a01129b49749e3db70f2935a6b1a2114d",
-     "src_bytes": 985459
+     "file": "img/3d3ee6ffa2524bd1-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/df1a7938-6c62-448b-8279-aa2a12466a88?c=o",
+     "sha256": "4be153fa031c03c0782ff112fd10c21f0216c2f9126f44b420a3ff8ee5eab551",
+     "src_bytes": 6844091
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第039661號",
+   "zh": "\"陽生\" 諾司卡賓錠２０毫克",
+   "en": "NOSCAPINE TABLET 20MG \"Y.S.\"",
+   "color": [
+    "白"
+   ],
+   "shape": [
+    "六邊形"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "8"
+   ],
+   "mark1": "TYS",
+   "mark2": "643",
+   "imgs": [
+    {
+     "file": "img/b33f8bde4394e921-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/d890694f-fe80-4ca5-aa2c-7a396a8aa53b?c=o",
+     "sha256": "a898ee953021d3d320a304269d2df52260076ba16edc25549502898de3c614cf",
+     "src_bytes": 932750
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第039662號",
+   "zh": "\"國嘉\"可朗膜衣錠２００毫克（異布洛芬）",
+   "en": "KELANG F.C. TABLETS 200MG ( IBUPROFEN ) \"KOJAR\"",
+   "color": [
+    "橘"
+   ],
+   "shape": [
+    "圓形"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "10"
+   ],
+   "mark1": null,
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/706182719ae051cf-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/1dc07c08-99c5-4553-9389-065d3a0131c1?c=o",
+     "sha256": "084f1398e8b0e948679b7ec4e701dc7893a3c7d8117bd522797236127625f81f",
+     "src_bytes": 7455237
     }
    ]
   },
@@ -105360,6 +105639,33 @@
    ]
   },
   {
+   "id": "衛署藥製字第040361號",
+   "zh": "\"長安\"亞細達錠５００毫克（乙醯胺酚）",
+   "en": "ACETAMINOPHEN TABLETS 500MG \"C.A.\"",
+   "color": [
+    "黃"
+   ],
+   "shape": [
+    "橢圓形"
+   ],
+   "score_mark": [
+    "直線"
+   ],
+   "size": [
+    "17"
+   ],
+   "mark1": null,
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/461205b0d0a9f802-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/de536353-cae3-4799-9eac-1121da3d2e9a?c=o",
+     "sha256": "72036755f952d106f5127d3644fee5738954d737b5f95c51c1975f89afe8d291",
+     "src_bytes": 12637800
+    }
+   ]
+  },
+  {
    "id": "衛署藥製字第040163號",
    "zh": "\"威勝\"鳳梨酵素腸溶膜衣錠５０毫克",
    "en": "HOMELAIN ENTERIC F.C. TABLETS 50MG \"W.S.\"",
@@ -105892,33 +106198,6 @@
      "src": "https://mcp.fda.gov.tw/insert/shapeImg/00cf5af4-062e-4592-b683-7ce3ad481ed1?c=o",
      "sha256": "efd45f039fcce729209b230bace2f4cb74f81271672812a571f3f9987d71c142",
      "src_bytes": 4844814
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第040361號",
-   "zh": "\"長安\"亞細達錠５００毫克（乙醯胺酚）",
-   "en": "ACETAMINOPHEN TABLETS 500MG \"C.A.\"",
-   "color": [
-    "黃"
-   ],
-   "shape": [
-    "橢圓形"
-   ],
-   "score_mark": [
-    "直線"
-   ],
-   "size": [
-    "17"
-   ],
-   "mark1": null,
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/461205b0d0a9f802-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/de536353-cae3-4799-9eac-1121da3d2e9a?c=o",
-     "sha256": "72036755f952d106f5127d3644fee5738954d737b5f95c51c1975f89afe8d291",
-     "src_bytes": 12637800
     }
    ]
   },
@@ -107503,6 +107782,34 @@
    ]
   },
   {
+   "id": "衛署藥製字第041244號",
+   "zh": "\"長安\"比喜肝膠囊１５０毫克（思利馬林）",
+   "en": "B C LIVER CAPSULES 150MG \"C.A.\" (SILYMARIN)",
+   "color": [
+    "棕",
+    "棕"
+   ],
+   "shape": [
+    "膠囊"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "21"
+   ],
+   "mark1": null,
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/7b5360ec1a098282-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/fdc7a147-17b3-4a17-b41d-a551076c0b8e?c=o",
+     "sha256": "c21057209884c228a8958a264f3fedc0647175011e65fe62ed6359e2da7eea45",
+     "src_bytes": 11298188
+    }
+   ]
+  },
+  {
    "id": "衛署藥製字第041025號",
    "zh": "\"國嘉\"德利治癒膠囊250毫克（硝基甲嘧唑乙醇）",
    "en": "TOLIZOLE CAPSULES 250MG \"KOJAR\"(METRONIDAZOLE)",
@@ -108051,140 +108358,29 @@
    ]
   },
   {
-   "id": "衛署藥製字第041244號",
-   "zh": "\"長安\"比喜肝膠囊１５０毫克（思利馬林）",
-   "en": "B C LIVER CAPSULES 150MG \"C.A.\" (SILYMARIN)",
-   "color": [
-    "棕",
-    "棕"
-   ],
-   "shape": [
-    "膠囊"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "21"
-   ],
-   "mark1": null,
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/7b5360ec1a098282-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/fdc7a147-17b3-4a17-b41d-a551076c0b8e?c=o",
-     "sha256": "c21057209884c228a8958a264f3fedc0647175011e65fe62ed6359e2da7eea45",
-     "src_bytes": 11298188
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第041247號",
-   "zh": "\"信東\"卡賓錠２００毫克(卡巴氮平)",
-   "en": "CARPINE TABLETS 200MG (CARBAMAZEPINE)",
+   "id": "衛部藥輸字第027642號",
+   "zh": "捷癌寧膜衣錠100毫克",
+   "en": "VERZENIO film-coated tablet 100mg",
    "color": [
     "白"
    ],
    "shape": [
-    "圓形"
-   ],
-   "score_mark": [
-    "直線"
-   ],
-   "size": [
-    "9"
-   ],
-   "mark1": "ST 212",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/85079c9a70020aa8-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/8a5f449f-56ab-4e69-8a3c-26a06df49a8a?c=o",
-     "sha256": "6b0bd91351e86e05fe383f4064dfa9ebfb9d7cd4b20fb771608989ecf0e1dcd2",
-     "src_bytes": 4634413
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第041250號",
-   "zh": "\"壽元\"固骨膠囊250毫克（硫酸固可砂明）",
-   "en": "GLUC CAPSULES 250MG \"S.Y.\"(GLUCOSAMINE SULTATE)",
-   "color": [
-    "紅",
-    "白"
-   ],
-   "shape": [
-    "膠囊"
+    "橢圓形"
    ],
    "score_mark": [
     "無"
    ],
    "size": [
-    "17.8"
+    "13"
    ],
-   "mark1": null,
-   "mark2": null,
+   "mark1": "Lilly",
+   "mark2": "100",
    "imgs": [
     {
-     "file": "img/0402af0c00fc78eb-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/01a171e9-15be-44ea-bddf-8db3d305c831?c=o",
-     "sha256": "a8fe2f56e4e696bddb49c4240196ac2de3c849e08eda339dec1b362928e59240",
-     "src_bytes": 8487528
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第041253號",
-   "zh": "〝嘉信〞增骨力膠囊２５０毫克(硫酸固可沙明）",
-   "en": "ARTRIL-S CAPSULES 250MG \"CHIA SHIN\"(GLUCOSAMINE SULFATE)",
-   "color": [
-    "紅",
-    "白"
-   ],
-   "shape": [
-    "膠囊"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "19.0"
-   ],
-   "mark1": "CSP 362",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/ece168e8ac6e49e6-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/e2b75df9-f752-453f-8346-be5fb3f8e436?c=o",
-     "sha256": "293acb8ebeb34ba6df41e46ac1203706886d6e4a6bac61680029f82a0e1f16de",
-     "src_bytes": 4647995
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第041264號",
-   "zh": "\"國嘉\" 揚汝諾爾錠２毫克（亞疏連）",
-   "en": "AZUNOL TABLETS 2MG \"KOJAR\"",
-   "color": [
-    "紫"
-   ],
-   "shape": [
-    "圓形"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "7"
-   ],
-   "mark1": "K",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/3847670f784a27b6-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/345a6fde-12b7-4977-8a9c-8d42cfbdce9d?c=o",
-     "sha256": "6fcdfee476ece9f523d334e82d11071a19b19ec919f8c24fa79332fbb35dc398",
-     "src_bytes": 224440
+     "file": "img/26e8fcbbe92edaf6-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/9bdfe5f4-50d5-4bb5-a5f2-07f41a4d7248?c=o",
+     "sha256": "80c1b34f21f9fca9d7fb30d4b0c7369a01129b49749e3db70f2935a6b1a2114d",
+     "src_bytes": 985459
     }
    ]
   },
@@ -112873,39 +113069,135 @@
    ]
   },
   {
-   "id": "衛部藥輸字第028474號",
-   "zh": "倍拉維150毫克/100毫克膜衣錠",
-   "en": "Paxlovid 150 mg/100mg Film-coated Tablets",
+   "id": "衛部藥輸字第028630號",
+   "zh": "宜脂亭錠10毫克",
+   "en": "EZITIN (Ezetimibe Tablets 10 mg)",
    "color": [
-    "粉",
     "白"
    ],
    "shape": [
-    "橢圓形",
-    "四邊形"
+    "橢圓形"
+   ],
+   "score_mark": [],
+   "size": [],
+   "mark1": null,
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/522ffd3f9b24fb28-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/f70d0dba-97d7-44a0-b98f-23088964f7d7?c=o",
+     "sha256": "7ab0cbf3823398e0f47e9a92bed0be9978d4b761648cb23c1380198dca334b07",
+     "src_bytes": 478677
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第041247號",
+   "zh": "\"信東\"卡賓錠２００毫克(卡巴氮平)",
+   "en": "CARPINE TABLETS 200MG (CARBAMAZEPINE)",
+   "color": [
+    "白"
+   ],
+   "shape": [
+    "圓形"
    ],
    "score_mark": [
-    "無",
+    "直線"
+   ],
+   "size": [
+    "9"
+   ],
+   "mark1": "ST 212",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/85079c9a70020aa8-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/8a5f449f-56ab-4e69-8a3c-26a06df49a8a?c=o",
+     "sha256": "6b0bd91351e86e05fe383f4064dfa9ebfb9d7cd4b20fb771608989ecf0e1dcd2",
+     "src_bytes": 4634413
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第041250號",
+   "zh": "\"壽元\"固骨膠囊250毫克（硫酸固可砂明）",
+   "en": "GLUC CAPSULES 250MG \"S.Y.\"(GLUCOSAMINE SULTATE)",
+   "color": [
+    "紅",
+    "白"
+   ],
+   "shape": [
+    "膠囊"
+   ],
+   "score_mark": [
     "無"
    ],
    "size": [
-    "18",
-    "17"
+    "17.8"
    ],
-   "mark1": "PFE;;;H",
-   "mark2": "3CL;;;R9",
+   "mark1": null,
+   "mark2": null,
    "imgs": [
     {
-     "file": "img/5beef71e81723324-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/06750dac-59cc-4698-84e9-ef0328d2e167?c=o",
-     "sha256": "56b59feca269a94d6f18cae8d12ff1c0bd36fc1b30b6941d63e66c105e2c90f4",
-     "src_bytes": 6736710
-    },
+     "file": "img/0402af0c00fc78eb-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/01a171e9-15be-44ea-bddf-8db3d305c831?c=o",
+     "sha256": "a8fe2f56e4e696bddb49c4240196ac2de3c849e08eda339dec1b362928e59240",
+     "src_bytes": 8487528
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第041253號",
+   "zh": "〝嘉信〞增骨力膠囊２５０毫克(硫酸固可沙明）",
+   "en": "ARTRIL-S CAPSULES 250MG \"CHIA SHIN\"(GLUCOSAMINE SULFATE)",
+   "color": [
+    "紅",
+    "白"
+   ],
+   "shape": [
+    "膠囊"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "19.0"
+   ],
+   "mark1": "CSP 362",
+   "mark2": null,
+   "imgs": [
     {
-     "file": "img/5beef71e81723324-1.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/3c0ac57d-2bbf-499b-9639-2952c1d99c60?c=o",
-     "sha256": "ec286521384e548b328850655336d29d3a883a5b913a4c4b4bee7ca3d27a193d",
-     "src_bytes": 923363
+     "file": "img/ece168e8ac6e49e6-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/e2b75df9-f752-453f-8346-be5fb3f8e436?c=o",
+     "sha256": "293acb8ebeb34ba6df41e46ac1203706886d6e4a6bac61680029f82a0e1f16de",
+     "src_bytes": 4647995
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第041264號",
+   "zh": "\"國嘉\" 揚汝諾爾錠２毫克（亞疏連）",
+   "en": "AZUNOL TABLETS 2MG \"KOJAR\"",
+   "color": [
+    "紫"
+   ],
+   "shape": [
+    "圓形"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "7"
+   ],
+   "mark1": "K",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/3847670f784a27b6-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/345a6fde-12b7-4977-8a9c-8d42cfbdce9d?c=o",
+     "sha256": "6fcdfee476ece9f523d334e82d11071a19b19ec919f8c24fa79332fbb35dc398",
+     "src_bytes": 224440
     }
    ]
   },
@@ -117135,190 +117427,39 @@
    ]
   },
   {
-   "id": "衛署藥製字第042686號",
-   "zh": "景安寧錠0.5毫克（三氮二氮平）",
-   "en": "KINAX TABLETS 0.5MG (ALPRAZOLAM)",
+   "id": "衛部藥輸字第028474號",
+   "zh": "倍拉維150毫克/100毫克膜衣錠",
+   "en": "Paxlovid 150 mg/100mg Film-coated Tablets",
    "color": [
-    "粉"
+    "粉",
+    "白"
    ],
    "shape": [
-    "橢圓形"
-   ],
-   "score_mark": [
-    "直線"
-   ],
-   "size": [
-    "8.6"
-   ],
-   "mark1": "S K",
-   "mark2": "201",
-   "imgs": [
-    {
-     "file": "img/fd24211b20d15761-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/25a42c69-1d53-4039-9126-09581370203c?c=o",
-     "sha256": "e4d7402dd09a1f86af1b7ec724b10378c6598f82795b3923a2cdbbdd7db86ad9",
-     "src_bytes": 40245
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第042687號",
-   "zh": "愛舒可羅持續性膜衣錠６０毫克",
-   "en": "REGROW SUSTAINED RELEASE F.C. TABLET 60MG",
-   "color": [
-    "粉"
-   ],
-   "shape": [
+    "橢圓形",
     "四邊形"
    ],
    "score_mark": [
-    "直線"
-   ],
-   "size": [
-    "15"
-   ],
-   "mark1": null,
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/25d8de8df5f15f2a-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/01536dd2-80e8-4a5b-8038-ee93e4244b71?c=o",
-     "sha256": "e9cdeb0c7c2d3d4ee3aa4f17bfc6e201d67d8d01b5d648271105306b866221f6",
-     "src_bytes": 840151
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第042695號",
-   "zh": "\"長安\"加強型綜合感冒膠囊",
-   "en": "Complex Cold Capsule EX PLUS \"C.A\"",
-   "color": [
-    "藍",
-    "白"
-   ],
-   "shape": [
-    "膠囊"
-   ],
-   "score_mark": [
+    "無",
     "無"
    ],
    "size": [
-    "21"
+    "18",
+    "17"
    ],
-   "mark1": null,
-   "mark2": null,
+   "mark1": "PFE;;;H",
+   "mark2": "3CL;;;R9",
    "imgs": [
     {
-     "file": "img/ba5b7e5c3242424e-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/b3dacc76-35fa-450c-8642-56348b337b56?c=o",
-     "sha256": "87da8a4fa73831c24d4545fa81cff4b23308cbb58a56e46f6b7dd29a025e3510",
-     "src_bytes": 9164904
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第042704號",
-   "zh": "諾怡錠５毫克（安脈狄平）",
-   "en": "NOBAR TABLETS 5MG  (AMLODIPINE BESYLATE)",
-   "color": [
-    "白"
-   ],
-   "shape": [
-    "八邊形"
-   ],
-   "score_mark": [
-    "直線"
-   ],
-   "size": [
-    "8.6"
-   ],
-   "mark1": "NBR 5",
-   "mark2": "SY",
-   "imgs": [
+     "file": "img/5beef71e81723324-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/06750dac-59cc-4698-84e9-ef0328d2e167?c=o",
+     "sha256": "56b59feca269a94d6f18cae8d12ff1c0bd36fc1b30b6941d63e66c105e2c90f4",
+     "src_bytes": 6736710
+    },
     {
-     "file": "img/7936ebc916cc0e88-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/30ec49fc-dcae-41d3-aca4-7194a9a06dfa?c=o",
-     "sha256": "f464391f8135f1b17e6f8df8bb1e9b9dc5fefb328c8f96f37ec64d7a03e5128b",
-     "src_bytes": 27326
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第042709號",
-   "zh": "\"溫士頓\" 舒爽美口含錠",
-   "en": "SOZGONE TROCHES \"WINSTON\"",
-   "color": [
-    "綠"
-   ],
-   "shape": [
-    "圓形"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "18"
-   ],
-   "mark1": "winston",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/b63665031b1546e6-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/46cc5a5c-cc0a-48c7-98d4-66175cfc0fcd?c=o",
-     "sha256": "39b999353642c318453b88dc878a04e84e6bf5e1109b6d98446ec913f65af4fc",
-     "src_bytes": 3598916
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第042722號",
-   "zh": "鈣佳磷錠６６７公絲（醋酸鈣）〝溫士頓〞",
-   "en": "CALGALIN TABLETS 667MG (CALCIUM ACETATE) \"WINSTON\"",
-   "color": [
-    "白"
-   ],
-   "shape": [
-    "四邊形"
-   ],
-   "score_mark": [
-    "直線"
-   ],
-   "size": [
-    "19"
-   ],
-   "mark1": "T 79",
-   "mark2": "MDF",
-   "imgs": [
-    {
-     "file": "img/9e0036aa9c93a3b0-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/23b01f25-74ab-466a-b853-e5790ac8b473?c=o",
-     "sha256": "a0c8cb3b04794fd2179766ed184c865e3b3195e3208ef76f9d555712b7d15927",
-     "src_bytes": 2333525
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第042727號",
-   "zh": "診嗽糖漿",
-   "en": "JUNSO SYRUP",
-   "color": [
-    "棕"
-   ],
-   "shape": [
-    "液劑(包含糖漿用粉劑)"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [],
-   "mark1": null,
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/7f5bcf7ce3b7415b-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/5df246bc-dca1-4308-bc9e-c5c34d55adee_img_1?c=o",
-     "sha256": "7ab0fab011bfccfbf1cb98ab2a8486cc2ded23eb91dfd53e44464e6e0ae22497",
-     "src_bytes": 161406
+     "file": "img/5beef71e81723324-1.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/3c0ac57d-2bbf-499b-9639-2952c1d99c60?c=o",
+     "sha256": "ec286521384e548b328850655336d29d3a883a5b913a4c4b4bee7ca3d27a193d",
+     "src_bytes": 923363
     }
    ]
   },
@@ -118387,29 +118528,6 @@
      "src": "https://mcp.fda.gov.tw/insert/shapeImg/e752d508-ab10-45d2-b56e-6822226a823f?c=o",
      "sha256": "e141115bb867184e79c9c1c64030160319725c1304bf736aa3ec3061f2e46733",
      "src_bytes": 3510750
-    }
-   ]
-  },
-  {
-   "id": "衛部藥輸字第028630號",
-   "zh": "宜脂亭錠10毫克",
-   "en": "EZITIN (Ezetimibe Tablets 10 mg)",
-   "color": [
-    "白"
-   ],
-   "shape": [
-    "橢圓形"
-   ],
-   "score_mark": [],
-   "size": [],
-   "mark1": null,
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/522ffd3f9b24fb28-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/f70d0dba-97d7-44a0-b98f-23088964f7d7?c=o",
-     "sha256": "7ab0cbf3823398e0f47e9a92bed0be9978d4b761648cb23c1380198dca334b07",
-     "src_bytes": 478677
     }
    ]
   },
@@ -121729,9 +121847,9 @@
    ]
   },
   {
-   "id": "衛部藥輸字第028943號",
-   "zh": "適胰順美錠50/500毫克",
-   "en": "Sitagliptin /Metformin Sandoz Film Coated Tablets 50/500mg",
+   "id": "衛署藥製字第042686號",
+   "zh": "景安寧錠0.5毫克（三氮二氮平）",
+   "en": "KINAX TABLETS 0.5MG (ALPRAZOLAM)",
    "color": [
     "粉"
    ],
@@ -121739,17 +121857,180 @@
     "橢圓形"
    ],
    "score_mark": [
-    "無"
+    "直線"
    ],
-   "size": [],
-   "mark1": "SM01",
+   "size": [
+    "8.6"
+   ],
+   "mark1": "S K",
+   "mark2": "201",
+   "imgs": [
+    {
+     "file": "img/fd24211b20d15761-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/25a42c69-1d53-4039-9126-09581370203c?c=o",
+     "sha256": "e4d7402dd09a1f86af1b7ec724b10378c6598f82795b3923a2cdbbdd7db86ad9",
+     "src_bytes": 40245
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第042687號",
+   "zh": "愛舒可羅持續性膜衣錠６０毫克",
+   "en": "REGROW SUSTAINED RELEASE F.C. TABLET 60MG",
+   "color": [
+    "粉"
+   ],
+   "shape": [
+    "四邊形"
+   ],
+   "score_mark": [
+    "直線"
+   ],
+   "size": [
+    "15"
+   ],
+   "mark1": null,
    "mark2": null,
    "imgs": [
     {
-     "file": "img/1d1ab1b3ec3073a4-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/c630eaf8-14bd-409d-8c0d-047ee3ecb3f6?c=o",
-     "sha256": "c6218b1c571a715cf0de66248fe8c82c81be99bd572b9d89ff7cbad160d3d985",
-     "src_bytes": 304386
+     "file": "img/25d8de8df5f15f2a-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/01536dd2-80e8-4a5b-8038-ee93e4244b71?c=o",
+     "sha256": "e9cdeb0c7c2d3d4ee3aa4f17bfc6e201d67d8d01b5d648271105306b866221f6",
+     "src_bytes": 840151
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第042695號",
+   "zh": "\"長安\"加強型綜合感冒膠囊",
+   "en": "Complex Cold Capsule EX PLUS \"C.A\"",
+   "color": [
+    "藍",
+    "白"
+   ],
+   "shape": [
+    "膠囊"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "21"
+   ],
+   "mark1": null,
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/ba5b7e5c3242424e-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/b3dacc76-35fa-450c-8642-56348b337b56?c=o",
+     "sha256": "87da8a4fa73831c24d4545fa81cff4b23308cbb58a56e46f6b7dd29a025e3510",
+     "src_bytes": 9164904
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第042704號",
+   "zh": "諾怡錠５毫克（安脈狄平）",
+   "en": "NOBAR TABLETS 5MG  (AMLODIPINE BESYLATE)",
+   "color": [
+    "白"
+   ],
+   "shape": [
+    "八邊形"
+   ],
+   "score_mark": [
+    "直線"
+   ],
+   "size": [
+    "8.6"
+   ],
+   "mark1": "NBR 5",
+   "mark2": "SY",
+   "imgs": [
+    {
+     "file": "img/7936ebc916cc0e88-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/30ec49fc-dcae-41d3-aca4-7194a9a06dfa?c=o",
+     "sha256": "f464391f8135f1b17e6f8df8bb1e9b9dc5fefb328c8f96f37ec64d7a03e5128b",
+     "src_bytes": 27326
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第042709號",
+   "zh": "\"溫士頓\" 舒爽美口含錠",
+   "en": "SOZGONE TROCHES \"WINSTON\"",
+   "color": [
+    "綠"
+   ],
+   "shape": [
+    "圓形"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "18"
+   ],
+   "mark1": "winston",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/b63665031b1546e6-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/46cc5a5c-cc0a-48c7-98d4-66175cfc0fcd?c=o",
+     "sha256": "39b999353642c318453b88dc878a04e84e6bf5e1109b6d98446ec913f65af4fc",
+     "src_bytes": 3598916
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第042722號",
+   "zh": "鈣佳磷錠６６７公絲（醋酸鈣）〝溫士頓〞",
+   "en": "CALGALIN TABLETS 667MG (CALCIUM ACETATE) \"WINSTON\"",
+   "color": [
+    "白"
+   ],
+   "shape": [
+    "四邊形"
+   ],
+   "score_mark": [
+    "直線"
+   ],
+   "size": [
+    "19"
+   ],
+   "mark1": "T 79",
+   "mark2": "MDF",
+   "imgs": [
+    {
+     "file": "img/9e0036aa9c93a3b0-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/23b01f25-74ab-466a-b853-e5790ac8b473?c=o",
+     "sha256": "a0c8cb3b04794fd2179766ed184c865e3b3195e3208ef76f9d555712b7d15927",
+     "src_bytes": 2333525
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第042727號",
+   "zh": "診嗽糖漿",
+   "en": "JUNSO SYRUP",
+   "color": [
+    "棕"
+   ],
+   "shape": [
+    "液劑(包含糖漿用粉劑)"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [],
+   "mark1": null,
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/7f5bcf7ce3b7415b-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/5df246bc-dca1-4308-bc9e-c5c34d55adee_img_1?c=o",
+     "sha256": "7ab0fab011bfccfbf1cb98ab2a8486cc2ded23eb91dfd53e44464e6e0ae22497",
+     "src_bytes": 161406
     }
    ]
   },
@@ -126093,246 +126374,27 @@
    ]
   },
   {
-   "id": "衛署藥製字第043937號",
-   "zh": "\"大豐\" 免憂膠囊２０公絲（富魯歐西汀）",
-   "en": "FONZAC CAPSULES 20MG (FLUOXETINE) \"T.F.\"",
+   "id": "衛部藥輸字第028943號",
+   "zh": "適胰順美錠50/500毫克",
+   "en": "Sitagliptin /Metformin Sandoz Film Coated Tablets 50/500mg",
    "color": [
-    "綠",
-    "白"
+    "粉"
    ],
    "shape": [
-    "膠囊"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "16"
-   ],
-   "mark1": "TAFONG",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/eb6f9b38c0199f05-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/5669d775-57ee-4ea2-bc05-8d359fafff49?c=o",
-     "sha256": "f1bfa2f221b4c4139eda0c4819dfe7776e639f17c06d8a52620aa972f6fa9f22",
-     "src_bytes": 6797596
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第043939號",
-   "zh": "美利錠",
-   "en": "MEP TABLET",
-   "color": [
-    "白"
-   ],
-   "shape": [
-    "圓形"
-   ],
-   "score_mark": [
-    "十字"
-   ],
-   "size": [
-    "8"
-   ],
-   "mark1": null,
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/2b7ada6cc629f3bd-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/d428d98b-d00a-4151-ae29-88c43fecfedd?c=o",
-     "sha256": "8d7bebe77c1f987c9d0cc4fc796fc409b34a6feabddd080da007f58d3900ecd8",
-     "src_bytes": 10404765
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第043941號",
-   "zh": "血必克膠囊２５０公絲（妥內散酸）〝溫士頓〞",
-   "en": "SPICA CAPSULES 250MG (TRANEXAMIC ACID) \"WINSTON\"",
-   "color": [
-    "橘",
-    "黃"
-   ],
-   "shape": [
-    "膠囊"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "18"
-   ],
-   "mark1": "winston 31103",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/88d8119ae7d3d03c-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/1f2479cb-6d38-4e2f-899a-10d178796822?c=o",
-     "sha256": "d21215d580ff7a1f23d41e098b5a60861c3d0ab12b7f5f5f1fd7399da8f776b9",
-     "src_bytes": 3533488
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第043943號",
-   "zh": "〝信東〞益撲喘吸入液0.25毫克/毫升",
-   "en": "IPRATRAN INHALATION SOLUTION 0.25MG/ML (IPRATROPIUM BROMIDE)",
-   "color": [
-    "透明"
-   ],
-   "shape": [
-    "液劑(包含糖漿用粉劑)"
+    "橢圓形"
    ],
    "score_mark": [
     "無"
    ],
    "size": [],
-   "mark1": null,
+   "mark1": "SM01",
    "mark2": null,
    "imgs": [
     {
-     "file": "img/e1f05dd21ed60173-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/54ee3e5a-8145-476b-8f62-a76c790db0d2?c=o",
-     "sha256": "efe3d5701ce6d9370dabeca6623cb3cbd913ff616c7b1793726e50ebe7bab330",
-     "src_bytes": 1527998
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第043948號",
-   "zh": "\"信隆\"伊普膜衣錠４００毫克",
-   "en": "IBUPROFEN F.C. TABLET \"S.L.\"",
-   "color": [
-    "橘"
-   ],
-   "shape": [
-    "圓形"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "13.0"
-   ],
-   "mark1": null,
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/cd71384592ba9a53-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/d5e7890c-19dc-4d95-948e-58a88159fb95?c=o",
-     "sha256": "71dc6884befe2a331a812c84d696ce4f14e1ecfe9146dbb184f3c1be52555ea5",
-     "src_bytes": 3643126
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第043949號",
-   "zh": "穩睡膠囊",
-   "en": "VENSI CAPSULES",
-   "color": [
-    "紅",
-    "黃"
-   ],
-   "shape": [
-    "膠囊"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "18"
-   ],
-   "mark1": "CTP",
-   "mark2": "O01",
-   "imgs": [
-    {
-     "file": "img/4a546cf579a060e6-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/648c9672-e684-4724-992c-2a91523e1324_img_1?c=o",
-     "sha256": "a5efb05ba0ffd1d01725ded5e16fb757e7108df6c7110d64f76edff457266f95",
-     "src_bytes": 1052975
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第043950號",
-   "zh": "田納滋錠５毫克",
-   "en": "TANATRIL TABLETS 5MG",
-   "color": [
-    "白"
-   ],
-   "shape": [
-    "圓形"
-   ],
-   "score_mark": [
-    "直線"
-   ],
-   "size": [
-    "6"
-   ],
-   "mark1": "TT 135",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/528a9343f103265d-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/a3ac76f3-a24c-43d2-9371-b47548456936?c=o",
-     "sha256": "27f7d20d7411c48eb10ad8e0223e84eeea5c1b0830dcdb11ca870269f8d0a7a1",
-     "src_bytes": 1131707
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第043951號",
-   "zh": "田納滋錠１０毫克",
-   "en": "TANATRIL TABLETS 10MG",
-   "color": [
-    "白"
-   ],
-   "shape": [
-    "圓形"
-   ],
-   "score_mark": [
-    "直線"
-   ],
-   "size": [
-    "6"
-   ],
-   "mark1": "TT 136",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/e2b13f69aeed1420-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/2e4219c0-cf05-4eb2-b05f-513c8aedbffa?c=o",
-     "sha256": "b5ca66bb3948350589529720e1110ab8686c22933801e7e58f28896838ea29b9",
-     "src_bytes": 828175
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第043953號",
-   "zh": "“天下”可醫喉錠",
-   "en": "Ten Sharp Ke Yi Hou Tablets",
-   "color": [
-    "黃"
-   ],
-   "shape": [
-    "圓形"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "16"
-   ],
-   "mark1": "CTP",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/f720eb2890d3f059-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/4bde988d-732e-4492-9f34-6d7ad49d319a?c=o",
-     "sha256": "9d65309d447bed6eb19174a2b32efc9f481fe76c5dc048434de0bfffed865a14",
-     "src_bytes": 208876
+     "file": "img/1d1ab1b3ec3073a4-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/c630eaf8-14bd-409d-8c0d-047ee3ecb3f6?c=o",
+     "sha256": "c6218b1c571a715cf0de66248fe8c82c81be99bd572b9d89ff7cbad160d3d985",
+     "src_bytes": 304386
     }
    ]
   },
@@ -129560,60 +129622,6 @@
    ]
   },
   {
-   "id": "衛署藥製字第001713號",
-   "zh": "\"回春堂\"複方酵素錠",
-   "en": "ENZYME TABLETS \"H.C.T.\"",
-   "color": [
-    "白"
-   ],
-   "shape": [
-    "圓形"
-   ],
-   "score_mark": [
-    "直線"
-   ],
-   "size": [
-    "7"
-   ],
-   "mark1": "HC TG04",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/1b8b23a18d923e8d-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/f9e7f917-1e55-4c0a-b219-7df5470af9fb?c=o",
-     "sha256": "0c8f11a2e431ceda79ae10a2429966502cc09349b25a88fe061efe304ff99133",
-     "src_bytes": 1471618
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第001741號",
-   "zh": "安賜百樂鈣錠",
-   "en": "ASPARA-CA TABLETS",
-   "color": [
-    "白"
-   ],
-   "shape": [
-    "圓形"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "9"
-   ],
-   "mark1": "TT 103",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/9e78f9460e3e6dda-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/d3e86a88-4f47-45ae-bfca-31743cc5e667?c=o",
-     "sha256": "0ed8fe80d46cf7a77277f289d24cee1278ae3d39c2f9daf638488e3b46ec091e",
-     "src_bytes": 810939
-    }
-   ]
-  },
-  {
    "id": "衛署藥製字第000188號",
    "zh": "舒益喉炎口含片",
    "en": "SUYI SORE THROAT TROCHES",
@@ -130196,6 +130204,60 @@
      "src": "https://mcp.fda.gov.tw/insert/shapeImg/7072cedb-7a98-4c87-ab4c-b2c04d0eccf3?c=o",
      "sha256": "cefa5856f79ce1bfe3a93430dfe497cea3ca585e2bdbf396f4a5f925fcbaa004",
      "src_bytes": 2201156
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第001713號",
+   "zh": "\"回春堂\"複方酵素錠",
+   "en": "ENZYME TABLETS \"H.C.T.\"",
+   "color": [
+    "白"
+   ],
+   "shape": [
+    "圓形"
+   ],
+   "score_mark": [
+    "直線"
+   ],
+   "size": [
+    "7"
+   ],
+   "mark1": "HC TG04",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/1b8b23a18d923e8d-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/f9e7f917-1e55-4c0a-b219-7df5470af9fb?c=o",
+     "sha256": "0c8f11a2e431ceda79ae10a2429966502cc09349b25a88fe061efe304ff99133",
+     "src_bytes": 1471618
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第001741號",
+   "zh": "安賜百樂鈣錠",
+   "en": "ASPARA-CA TABLETS",
+   "color": [
+    "白"
+   ],
+   "shape": [
+    "圓形"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "9"
+   ],
+   "mark1": "TT 103",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/9e78f9460e3e6dda-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/d3e86a88-4f47-45ae-bfca-31743cc5e667?c=o",
+     "sha256": "0ed8fe80d46cf7a77277f289d24cee1278ae3d39c2f9daf638488e3b46ec091e",
+     "src_bytes": 810939
     }
    ]
   },
@@ -130788,11 +130850,119 @@
    ]
   },
   {
-   "id": "衛署藥製字第002963號",
-   "zh": "\"昇銘\"葡萄糖鈣丁片錠",
-   "en": "\"ZM\"CALCIUM GLUCONATED TABLETS",
+   "id": "衛署藥製字第043937號",
+   "zh": "\"大豐\" 免憂膠囊２０公絲（富魯歐西汀）",
+   "en": "FONZAC CAPSULES 20MG (FLUOXETINE) \"T.F.\"",
+   "color": [
+    "綠",
+    "白"
+   ],
+   "shape": [
+    "膠囊"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "16"
+   ],
+   "mark1": "TAFONG",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/eb6f9b38c0199f05-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/5669d775-57ee-4ea2-bc05-8d359fafff49?c=o",
+     "sha256": "f1bfa2f221b4c4139eda0c4819dfe7776e639f17c06d8a52620aa972f6fa9f22",
+     "src_bytes": 6797596
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第043939號",
+   "zh": "美利錠",
+   "en": "MEP TABLET",
    "color": [
     "白"
+   ],
+   "shape": [
+    "圓形"
+   ],
+   "score_mark": [
+    "十字"
+   ],
+   "size": [
+    "8"
+   ],
+   "mark1": null,
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/2b7ada6cc629f3bd-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/d428d98b-d00a-4151-ae29-88c43fecfedd?c=o",
+     "sha256": "8d7bebe77c1f987c9d0cc4fc796fc409b34a6feabddd080da007f58d3900ecd8",
+     "src_bytes": 10404765
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第043941號",
+   "zh": "血必克膠囊２５０公絲（妥內散酸）〝溫士頓〞",
+   "en": "SPICA CAPSULES 250MG (TRANEXAMIC ACID) \"WINSTON\"",
+   "color": [
+    "橘",
+    "黃"
+   ],
+   "shape": [
+    "膠囊"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "18"
+   ],
+   "mark1": "winston 31103",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/88d8119ae7d3d03c-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/1f2479cb-6d38-4e2f-899a-10d178796822?c=o",
+     "sha256": "d21215d580ff7a1f23d41e098b5a60861c3d0ab12b7f5f5f1fd7399da8f776b9",
+     "src_bytes": 3533488
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第043943號",
+   "zh": "〝信東〞益撲喘吸入液0.25毫克/毫升",
+   "en": "IPRATRAN INHALATION SOLUTION 0.25MG/ML (IPRATROPIUM BROMIDE)",
+   "color": [
+    "透明"
+   ],
+   "shape": [
+    "液劑(包含糖漿用粉劑)"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [],
+   "mark1": null,
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/e1f05dd21ed60173-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/54ee3e5a-8145-476b-8f62-a76c790db0d2?c=o",
+     "sha256": "efe3d5701ce6d9370dabeca6623cb3cbd913ff616c7b1793726e50ebe7bab330",
+     "src_bytes": 1527998
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第043948號",
+   "zh": "\"信隆\"伊普膜衣錠４００毫克",
+   "en": "IBUPROFEN F.C. TABLET \"S.L.\"",
+   "color": [
+    "橘"
    ],
    "shape": [
     "圓形"
@@ -130801,25 +130971,53 @@
     "無"
    ],
    "size": [
-    "16.0"
+    "13.0"
    ],
-   "mark1": "ZM",
+   "mark1": null,
    "mark2": null,
    "imgs": [
     {
-     "file": "img/1f13b51bb8cf7238-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/1618d3c7-2bc4-4202-998d-a4d8bd80ae98?c=o",
-     "sha256": "4f827bbd4d542c305dab807331319b849649c105a65d9cc6a3060a27ef27d79f",
-     "src_bytes": 727326
+     "file": "img/cd71384592ba9a53-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/d5e7890c-19dc-4d95-948e-58a88159fb95?c=o",
+     "sha256": "71dc6884befe2a331a812c84d696ce4f14e1ecfe9146dbb184f3c1be52555ea5",
+     "src_bytes": 3643126
     }
    ]
   },
   {
-   "id": "衛署藥製字第003019號",
-   "zh": "胃之盟錠",
-   "en": "WEITUMON TABLETS",
+   "id": "衛署藥製字第043949號",
+   "zh": "穩睡膠囊",
+   "en": "VENSI CAPSULES",
    "color": [
-    "綠"
+    "紅",
+    "黃"
+   ],
+   "shape": [
+    "膠囊"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "18"
+   ],
+   "mark1": "CTP",
+   "mark2": "O01",
+   "imgs": [
+    {
+     "file": "img/4a546cf579a060e6-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/648c9672-e684-4724-992c-2a91523e1324_img_1?c=o",
+     "sha256": "a5efb05ba0ffd1d01725ded5e16fb757e7108df6c7110d64f76edff457266f95",
+     "src_bytes": 1052975
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第043950號",
+   "zh": "田納滋錠５毫克",
+   "en": "TANATRIL TABLETS 5MG",
+   "color": [
+    "白"
    ],
    "shape": [
     "圓形"
@@ -130828,16 +131026,70 @@
     "直線"
    ],
    "size": [
-    "13"
+    "6"
    ],
-   "mark1": "W",
+   "mark1": "TT 135",
    "mark2": null,
    "imgs": [
     {
-     "file": "img/01b7f00b965a3f7c-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/600c9d55-bdb5-4d0a-8307-01660a3ecfb1?c=o",
-     "sha256": "05ca610f53a865b92fc2f6b5f8f9c9d7e75a0484e1b2f1de2cfea051c3894483",
-     "src_bytes": 1715305
+     "file": "img/528a9343f103265d-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/a3ac76f3-a24c-43d2-9371-b47548456936?c=o",
+     "sha256": "27f7d20d7411c48eb10ad8e0223e84eeea5c1b0830dcdb11ca870269f8d0a7a1",
+     "src_bytes": 1131707
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第043951號",
+   "zh": "田納滋錠１０毫克",
+   "en": "TANATRIL TABLETS 10MG",
+   "color": [
+    "白"
+   ],
+   "shape": [
+    "圓形"
+   ],
+   "score_mark": [
+    "直線"
+   ],
+   "size": [
+    "6"
+   ],
+   "mark1": "TT 136",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/e2b13f69aeed1420-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/2e4219c0-cf05-4eb2-b05f-513c8aedbffa?c=o",
+     "sha256": "b5ca66bb3948350589529720e1110ab8686c22933801e7e58f28896838ea29b9",
+     "src_bytes": 828175
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第043953號",
+   "zh": "“天下”可醫喉錠",
+   "en": "Ten Sharp Ke Yi Hou Tablets",
+   "color": [
+    "黃"
+   ],
+   "shape": [
+    "圓形"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "16"
+   ],
+   "mark1": "CTP",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/f720eb2890d3f059-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/4bde988d-732e-4492-9f34-6d7ad49d319a?c=o",
+     "sha256": "9d65309d447bed6eb19174a2b32efc9f481fe76c5dc048434de0bfffed865a14",
+     "src_bytes": 208876
     }
    ]
   },
@@ -135308,97 +135560,9 @@
    ]
   },
   {
-   "id": "衛署藥製字第045181號",
-   "zh": "欣娜錠",
-   "en": "SYNNA TABLETS",
-   "color": [
-    "白",
-    "藍"
-   ],
-   "shape": [
-    "圓形"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "7"
-   ],
-   "mark1": "SYN 201",
-   "mark2": "SYN 202",
-   "imgs": [
-    {
-     "file": "img/1baaef9e1031b6b8-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/8b487baf-02a5-4699-a93c-af7a89177caf?c=o",
-     "sha256": "c4fa1eb34253d52413f5302054f3419b1b087d33093819d45b75e33a8644a96d",
-     "src_bytes": 32149
-    },
-    {
-     "file": "img/1baaef9e1031b6b8-1.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/c585359b-c884-40a3-93df-b9c001fdd0f6?c=o",
-     "sha256": "14845e1f20ad16cd1d6d58b76f28f893dec51495cd87dfbb0a61f7fe99440fd5",
-     "src_bytes": 35196
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第045187號",
-   "zh": "壓聞好錠",
-   "en": "YAWAHO TABLETS",
-   "color": [
-    "白"
-   ],
-   "shape": [
-    "八邊形"
-   ],
-   "score_mark": [
-    "直線"
-   ],
-   "size": [
-    "9"
-   ],
-   "mark1": "CT 410",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/6a26b17eb84435c2-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/81fc27c9-f825-40b8-8662-06b67618fd82?c=o",
-     "sha256": "1a559900443460cf9fa11f33bf010c70170c0ca48cea60855c5a6296cfc6d40f",
-     "src_bytes": 245405
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第045201號",
-   "zh": "賽普膜衣錠500毫克",
-   "en": "Ciproflo F.C. Tablet 500mg",
-   "color": [
-    "白"
-   ],
-   "shape": [
-    "橢圓形"
-   ],
-   "score_mark": [
-    "直線"
-   ],
-   "size": [
-    "17.8"
-   ],
-   "mark1": null,
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/8febedfbc274f348-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/415c227b-417d-4259-8e87-c52d29b32f4c?c=o",
-     "sha256": "71efa8900c1eb21aa156a85d002470715bc3ddeca04ed8bc79b27ce44a37d563",
-     "src_bytes": 5981774
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第045247號",
-   "zh": "肚比康糖衣錠１００毫克",
-   "en": "DOBECON SUGAR COATED TABLETS 100MG \"YUNG SHIN\"",
+   "id": "衛署藥製字第002963號",
+   "zh": "\"昇銘\"葡萄糖鈣丁片錠",
+   "en": "\"ZM\"CALCIUM GLUCONATED TABLETS",
    "color": [
     "白"
    ],
@@ -135409,105 +135573,43 @@
     "無"
    ],
    "size": [
-    "10.5"
+    "16.0"
    ],
-   "mark1": "YSP 43",
+   "mark1": "ZM",
    "mark2": null,
    "imgs": [
     {
-     "file": "img/71b81458499dec0d-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/7a4e0996-4f8d-4ed5-bd45-48d5bc98cb51?c=o",
-     "sha256": "504d4683547965f86c39a11f8a74a7975d54f7d1ff6871ad8b18201e0359f930",
-     "src_bytes": 964782
+     "file": "img/1f13b51bb8cf7238-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/1618d3c7-2bc4-4202-998d-a4d8bd80ae98?c=o",
+     "sha256": "4f827bbd4d542c305dab807331319b849649c105a65d9cc6a3060a27ef27d79f",
+     "src_bytes": 727326
     }
    ]
   },
   {
-   "id": "衛署藥製字第045248號",
-   "zh": "止嗽寧膠囊",
-   "en": "Suconin Capsules",
+   "id": "衛署藥製字第003019號",
+   "zh": "胃之盟錠",
+   "en": "WEITUMON TABLETS",
    "color": [
-    "白",
-    "白"
-   ],
-   "shape": [
-    "膠囊"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "8"
-   ],
-   "mark1": "TK81",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/34b7418d1fd2a4eb-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/6a85a358-2530-4621-9e63-fcec9277b366?c=o",
-     "sha256": "1a16eb2b7454f237822559e313fab406da8603190fab44c7bcc933f89c1dc437",
-     "src_bytes": 164238
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第045250號",
-   "zh": "加胃先腸溶膠囊20毫克 (奧美拉唑)",
-   "en": "OMP E.C. CAPSULES 20MG (OMPRAZOLE)",
-   "color": [
-    "綠",
     "綠"
    ],
    "shape": [
-    "膠囊"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "14.5"
-   ],
-   "mark1": null,
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/52c54ab3db262c2b-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/534510dc-4c4e-48de-b0c1-f52324e17b0a?c=o",
-     "sha256": "4ea4bbf1847da773ac6583d3eeea9f4b90198886725b06e4160b7171aae7e705",
-     "src_bytes": 4795597
-    },
-    {
-     "file": "img/52c54ab3db262c2b-1.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/5bbc08bc-fca1-4a97-bd93-4e91f674ae17_img_1?c=o",
-     "sha256": "cc0bdce14864134ae01a8f21d10dc82a9d68b0fa6c4e4fd9d05a138535ff3efe",
-     "src_bytes": 902454
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第045254號",
-   "zh": "欣保錠5公絲",
-   "en": "SYNBOT TABLETS 5MG",
-   "color": [
-    "白"
-   ],
-   "shape": [
-    "四邊形"
+    "圓形"
    ],
    "score_mark": [
     "直線"
    ],
    "size": [
-    "8.3"
+    "13"
    ],
-   "mark1": "SYNBOT",
+   "mark1": "W",
    "mark2": null,
    "imgs": [
     {
-     "file": "img/210570d8ac90f61b-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/e1334afc-89b5-4325-ab42-efa291ffa426?c=o",
-     "sha256": "e0a3b2c6464b076d7d58699ab4deaaac36be7902ad0016c8c6524337218043a4",
-     "src_bytes": 30540
+     "file": "img/01b7f00b965a3f7c-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/600c9d55-bdb5-4d0a-8307-01660a3ecfb1?c=o",
+     "sha256": "05ca610f53a865b92fc2f6b5f8f9c9d7e75a0484e1b2f1de2cfea051c3894483",
+     "src_bytes": 1715305
     }
    ]
   },
@@ -139195,6 +139297,34 @@
    ]
   },
   {
+   "id": "衛署藥製字第009453號",
+   "zh": "\"永信\"適汎黴素膠囊",
+   "en": "CEPHANMYCIN CAPSULES \"YUNG SHIN\"",
+   "color": [
+    "綠",
+    "白"
+   ],
+   "shape": [
+    "膠囊"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "17.7"
+   ],
+   "mark1": "YSP CCC",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/bbd49fb677967fb9-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/c438b105-a276-47fb-9ab2-28b5acebe08b?c=o",
+     "sha256": "00b02423306be603193185cfdcff1971407507fd5821f7433a65915eade055f2",
+     "src_bytes": 1454695
+    }
+   ]
+  },
+  {
    "id": "衛署藥製字第008953號",
    "zh": "\"中美\"喜喉淨口含錠",
    "en": "CEKOCHIN LOZENGES \"C.M.\"",
@@ -139790,34 +139920,6 @@
      "src": "https://mcp.fda.gov.tw/insert/shapeImg/3f550bb7-db4b-4bae-ab0a-a43dbc92d097?c=o",
      "sha256": "ea39faee304829a8dc3fe622a2ac9eb0d9a211bd68ee964dce494e97bb9d7203",
      "src_bytes": 39072459
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第009453號",
-   "zh": "\"永信\"適汎黴素膠囊",
-   "en": "CEPHANMYCIN CAPSULES \"YUNG SHIN\"",
-   "color": [
-    "綠",
-    "白"
-   ],
-   "shape": [
-    "膠囊"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "17.7"
-   ],
-   "mark1": "YSP CCC",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/bbd49fb677967fb9-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/c438b105-a276-47fb-9ab2-28b5acebe08b?c=o",
-     "sha256": "00b02423306be603193185cfdcff1971407507fd5821f7433a65915eade055f2",
-     "src_bytes": 1454695
     }
    ]
   },
@@ -140442,36 +140544,70 @@
    ]
   },
   {
-   "id": "衛署藥製字第010229號",
-   "zh": "\"順華\" 甲美樂錠",
-   "en": "THIMAZOL TABLETS \"SHUN HWA\"",
+   "id": "衛署藥製字第045181號",
+   "zh": "欣娜錠",
+   "en": "SYNNA TABLETS",
    "color": [
-    "白"
+    "白",
+    "藍"
    ],
    "shape": [
     "圓形"
    ],
    "score_mark": [
-    "直線"
+    "無"
    ],
    "size": [
     "7"
    ],
-   "mark1": "TC",
-   "mark2": null,
+   "mark1": "SYN 201",
+   "mark2": "SYN 202",
    "imgs": [
     {
-     "file": "img/4f52ca50a3401fd7-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/1e3a0d60-062e-4764-9c3f-403b2755ccec?c=o",
-     "sha256": "20f7140ce2876f09f8dc14c5b1c73026aae5d2ce097d7768b8978a56b3107a7e",
-     "src_bytes": 205727
+     "file": "img/1baaef9e1031b6b8-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/8b487baf-02a5-4699-a93c-af7a89177caf?c=o",
+     "sha256": "c4fa1eb34253d52413f5302054f3419b1b087d33093819d45b75e33a8644a96d",
+     "src_bytes": 32149
+    },
+    {
+     "file": "img/1baaef9e1031b6b8-1.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/c585359b-c884-40a3-93df-b9c001fdd0f6?c=o",
+     "sha256": "14845e1f20ad16cd1d6d58b76f28f893dec51495cd87dfbb0a61f7fe99440fd5",
+     "src_bytes": 35196
     }
    ]
   },
   {
-   "id": "衛署藥製字第010248號",
-   "zh": "\"井田\"可其而錠",
-   "en": "COOCHIL TABLETS \"CHINTENG\"",
+   "id": "衛署藥製字第045187號",
+   "zh": "壓聞好錠",
+   "en": "YAWAHO TABLETS",
+   "color": [
+    "白"
+   ],
+   "shape": [
+    "八邊形"
+   ],
+   "score_mark": [
+    "直線"
+   ],
+   "size": [
+    "9"
+   ],
+   "mark1": "CT 410",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/6a26b17eb84435c2-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/81fc27c9-f825-40b8-8662-06b67618fd82?c=o",
+     "sha256": "1a559900443460cf9fa11f33bf010c70170c0ca48cea60855c5a6296cfc6d40f",
+     "src_bytes": 245405
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第045201號",
+   "zh": "賽普膜衣錠500毫克",
+   "en": "Ciproflo F.C. Tablet 500mg",
    "color": [
     "白"
    ],
@@ -140482,23 +140618,23 @@
     "直線"
    ],
    "size": [
-    "8"
+    "17.8"
    ],
    "mark1": null,
    "mark2": null,
    "imgs": [
     {
-     "file": "img/1488040f004ae0b4-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/7be40622-52bb-4836-a9b9-15084aded58d?c=o",
-     "sha256": "d6b634e94704d14cf4c8e3a51c5f2da8836be1bc8aacbccbf80a0817c36ee9fe",
-     "src_bytes": 2542977
+     "file": "img/8febedfbc274f348-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/415c227b-417d-4259-8e87-c52d29b32f4c?c=o",
+     "sha256": "71efa8900c1eb21aa156a85d002470715bc3ddeca04ed8bc79b27ce44a37d563",
+     "src_bytes": 5981774
     }
    ]
   },
   {
-   "id": "衛署藥製字第010249號",
-   "zh": "彼維能錠",
-   "en": "PIWEILIN TABLETS \"CHINTENG\"",
+   "id": "衛署藥製字第045247號",
+   "zh": "肚比康糖衣錠１００毫克",
+   "en": "DOBECON SUGAR COATED TABLETS 100MG \"YUNG SHIN\"",
    "color": [
     "白"
    ],
@@ -140506,19 +140642,108 @@
     "圓形"
    ],
    "score_mark": [
-    "直線"
+    "無"
+   ],
+   "size": [
+    "10.5"
+   ],
+   "mark1": "YSP 43",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/71b81458499dec0d-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/7a4e0996-4f8d-4ed5-bd45-48d5bc98cb51?c=o",
+     "sha256": "504d4683547965f86c39a11f8a74a7975d54f7d1ff6871ad8b18201e0359f930",
+     "src_bytes": 964782
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第045248號",
+   "zh": "止嗽寧膠囊",
+   "en": "Suconin Capsules",
+   "color": [
+    "白",
+    "白"
+   ],
+   "shape": [
+    "膠囊"
+   ],
+   "score_mark": [
+    "無"
    ],
    "size": [
     "8"
    ],
-   "mark1": "CJ",
+   "mark1": "TK81",
    "mark2": null,
    "imgs": [
     {
-     "file": "img/ff8fd6f0c430be13-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/db0c0315-965c-446c-9d48-f9328acaf58d_img_1?c=o",
-     "sha256": "493b64aeef855a5fc73f5f5db0a8a68abf615c558a9c4afd80add2df196986d4",
-     "src_bytes": 739179
+     "file": "img/34b7418d1fd2a4eb-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/6a85a358-2530-4621-9e63-fcec9277b366?c=o",
+     "sha256": "1a16eb2b7454f237822559e313fab406da8603190fab44c7bcc933f89c1dc437",
+     "src_bytes": 164238
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第045250號",
+   "zh": "加胃先腸溶膠囊20毫克 (奧美拉唑)",
+   "en": "OMP E.C. CAPSULES 20MG (OMPRAZOLE)",
+   "color": [
+    "綠",
+    "綠"
+   ],
+   "shape": [
+    "膠囊"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "14.5"
+   ],
+   "mark1": null,
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/52c54ab3db262c2b-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/534510dc-4c4e-48de-b0c1-f52324e17b0a?c=o",
+     "sha256": "4ea4bbf1847da773ac6583d3eeea9f4b90198886725b06e4160b7171aae7e705",
+     "src_bytes": 4795597
+    },
+    {
+     "file": "img/52c54ab3db262c2b-1.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/5bbc08bc-fca1-4a97-bd93-4e91f674ae17_img_1?c=o",
+     "sha256": "cc0bdce14864134ae01a8f21d10dc82a9d68b0fa6c4e4fd9d05a138535ff3efe",
+     "src_bytes": 902454
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第045254號",
+   "zh": "欣保錠5公絲",
+   "en": "SYNBOT TABLETS 5MG",
+   "color": [
+    "白"
+   ],
+   "shape": [
+    "四邊形"
+   ],
+   "score_mark": [
+    "直線"
+   ],
+   "size": [
+    "8.3"
+   ],
+   "mark1": "SYNBOT",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/210570d8ac90f61b-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/e1334afc-89b5-4325-ab42-efa291ffa426?c=o",
+     "sha256": "e0a3b2c6464b076d7d58699ab4deaaac36be7902ad0016c8c6524337218043a4",
+     "src_bytes": 30540
     }
    ]
   },
@@ -145066,117 +145291,36 @@
    ]
   },
   {
-   "id": "衛署藥製字第046658號",
-   "zh": "速糖淨持續性藥效錠30公絲",
-   "en": "KLUDONE MR TABLETS 30MG",
+   "id": "衛署藥製字第010229號",
+   "zh": "\"順華\" 甲美樂錠",
+   "en": "THIMAZOL TABLETS \"SHUN HWA\"",
    "color": [
     "白"
-   ],
-   "shape": [
-    "橢圓形"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "10"
-   ],
-   "mark1": "PM012",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/61bdcbc111e2ba44-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/35265b1d-b5a8-4602-9b9a-0a62500a38e1_img_1?c=o",
-     "sha256": "5b5dab6f8340273c040700fe28bcc988babcf759e9f883824c3287fdde6dd187",
-     "src_bytes": 554050
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第046659號",
-   "zh": "撫緒妥糖衣錠",
-   "en": "FUXIDOL S.C. TABLETS",
-   "color": [
-    "橘"
    ],
    "shape": [
     "圓形"
    ],
    "score_mark": [
-    "無"
+    "直線"
    ],
    "size": [
-    "9"
+    "7"
    ],
-   "mark1": null,
+   "mark1": "TC",
    "mark2": null,
    "imgs": [
     {
-     "file": "img/fc1a663b49d854d2-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/4a099c15-e83d-445c-9b7a-bc2541b43dad_img_1?c=o",
-     "sha256": "896fc925940c92269bbfe7e78f3482de042782dd34d5be0bc782956a8370f6f7",
-     "src_bytes": 480255
+     "file": "img/4f52ca50a3401fd7-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/1e3a0d60-062e-4764-9c3f-403b2755ccec?c=o",
+     "sha256": "20f7140ce2876f09f8dc14c5b1c73026aae5d2ce097d7768b8978a56b3107a7e",
+     "src_bytes": 205727
     }
    ]
   },
   {
-   "id": "衛署藥製字第046678號",
-   "zh": "\"汎生\" 安骨利膠囊250毫克",
-   "en": "ANCOLY CAPSULES 250MG \"PANBIOTIC",
-   "color": [
-    "紅",
-    "白"
-   ],
-   "shape": [
-    "膠囊"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "20"
-   ],
-   "mark1": "Glc",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/dab2ce55421c4dd3-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/d6ed4b09-22ed-4f1f-ba70-31f6fae65d17?c=o",
-     "sha256": "8236f094bf5387afef9e7e7d0324709feb4074aff240458aaf4ca5ad3a47d3f3",
-     "src_bytes": 1331558
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第046679號",
-   "zh": "力骨朗膠囊",
-   "en": "Gluwalker Capsules",
-   "color": [
-    "紅",
-    "白"
-   ],
-   "shape": [
-    "膠囊"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [],
-   "mark1": "Yo Come",
-   "mark2": "GSCa",
-   "imgs": [
-    {
-     "file": "img/3882ef24009bb3e7-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/e884e704-9ff5-4039-b298-ed52b05ffdea?c=o",
-     "sha256": "d2e93b6a73bfa20c5197e3b03a2d5c2d26c8e9854f1a10859d2c53794fb9f4f2",
-     "src_bytes": 1548143
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第046681號",
-   "zh": "欣坦膜衣錠1200毫克",
-   "en": "SYNTAM F.C. TABLETS 1200MG",
+   "id": "衛署藥製字第010248號",
+   "zh": "\"井田\"可其而錠",
+   "en": "COOCHIL TABLETS \"CHINTENG\"",
    "color": [
     "白"
    ],
@@ -145187,43 +145331,43 @@
     "直線"
    ],
    "size": [
-    "18.0"
+    "8"
    ],
-   "mark1": "S Y",
+   "mark1": null,
    "mark2": null,
    "imgs": [
     {
-     "file": "img/7725514f5933436e-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/0ba2ca18-24c4-4536-ae27-a4ffac9ed358?c=o",
-     "sha256": "35911e629556b3b125e9ade0af15945dcc3633fcddff291e6afefaacd1f2eba2",
-     "src_bytes": 8316611
+     "file": "img/1488040f004ae0b4-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/7be40622-52bb-4836-a9b9-15084aded58d?c=o",
+     "sha256": "d6b634e94704d14cf4c8e3a51c5f2da8836be1bc8aacbccbf80a0817c36ee9fe",
+     "src_bytes": 2542977
     }
    ]
   },
   {
-   "id": "衛署藥製字第046682號",
-   "zh": "\"強生\"肌舒錠",
-   "en": "MUSLEX TABLETS",
+   "id": "衛署藥製字第010249號",
+   "zh": "彼維能錠",
+   "en": "PIWEILIN TABLETS \"CHINTENG\"",
    "color": [
-    "橘"
+    "白"
    ],
    "shape": [
     "圓形"
    ],
    "score_mark": [
-    "無"
+    "直線"
    ],
    "size": [
-    "13"
+    "8"
    ],
-   "mark1": "JCP",
+   "mark1": "CJ",
    "mark2": null,
    "imgs": [
     {
-     "file": "img/34fc6c4569c0188d-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/3154ffcb-5204-4429-8eef-c92d21d69263?c=o",
-     "sha256": "3f580d91ca7cd489b7a2623e22133a89582148f83d8ede4fc746b8395560e199",
-     "src_bytes": 7406551
+     "file": "img/ff8fd6f0c430be13-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/db0c0315-965c-446c-9d48-f9328acaf58d_img_1?c=o",
+     "sha256": "493b64aeef855a5fc73f5f5db0a8a68abf615c558a9c4afd80add2df196986d4",
+     "src_bytes": 739179
     }
    ]
   },
@@ -149883,72 +150027,11 @@
    ]
   },
   {
-   "id": "衛署藥製字第015461號",
-   "zh": "\"中美\" 感冒速達膠囊",
-   "en": "COMMON SUTA CAPSULE \"C.M.\"",
-   "color": [
-    "棕",
-    "黃"
-   ],
-   "shape": [
-    "膠囊"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "22"
-   ],
-   "mark1": "CM CC06",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/5f92ab984118c1ca-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/6b54b159-0105-4368-98a1-115654911dd7?c=o",
-     "sha256": "6d7b6f98f5f29a38aa55bb582345ac5b190bd49e305efd945938dab561246292",
-     "src_bytes": 11877459
-    },
-    {
-     "file": "img/5f92ab984118c1ca-1.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/aa285af1-12d8-44e5-a07c-1abb65a30b16_img_1?c=o",
-     "sha256": "29f99291e38c86b6abb1283ac0c5c83e09d4159c481ff67fc2e74cc3724df927",
-     "src_bytes": 926394
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第015529號",
-   "zh": "\"達德士\"待克平錠",
-   "en": "DICYCLOMINE TABLETS \"D.T.S.\"",
+   "id": "衛署藥製字第016932號",
+   "zh": "〝信東〞秀得寧錠",
+   "en": "SEUDORIN TABLETS (PSEUDOEPHEDRINE HCL)",
    "color": [
     "粉"
-   ],
-   "shape": [
-    "圓形"
-   ],
-   "score_mark": [
-    "十字"
-   ],
-   "size": [
-    "8"
-   ],
-   "mark1": null,
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/ae079c2c782330b2-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/d42866e3-5b98-4869-bd16-d0fbb1a601c6?c=o",
-     "sha256": "b087326df544fd16887fdfe9a30e18a7c91eed14d9426f80753e26c2ccbfa703",
-     "src_bytes": 197097
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第015540號",
-   "zh": "\"井田\" 鼻康速錠",
-   "en": "NORSECON TABLETS \"CHINTENG\"",
-   "color": [
-    "黃"
    ],
    "shape": [
     "圓形"
@@ -149957,25 +150040,52 @@
     "直線"
    ],
    "size": [
-    "8"
+    "7"
    ],
-   "mark1": null,
+   "mark1": "ST 414",
    "mark2": null,
    "imgs": [
     {
-     "file": "img/c89e4932b971d737-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/d067da85-24bc-4279-b2cd-6d6106799bc6?c=o",
-     "sha256": "835a51d6d4d09996899128bef65d9893fd5284ce37e8090681e856d1a6b01aca",
-     "src_bytes": 238326
+     "file": "img/f7e3ff942ade62a2-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/89bec0c4-5e41-44b3-b6d6-024571506180?c=o",
+     "sha256": "9be156db8aab74aad1d96a084329dde763687664210b43213c6c646cdd5d0c07",
+     "src_bytes": 4307284
     }
    ]
   },
   {
-   "id": "衛署藥製字第015543號",
-   "zh": "\"培力\" 培佳治錠",
-   "en": "PEICHIA TABLETS \"P.L.\"",
+   "id": "衛署藥製字第046658號",
+   "zh": "速糖淨持續性藥效錠30公絲",
+   "en": "KLUDONE MR TABLETS 30MG",
    "color": [
     "白"
+   ],
+   "shape": [
+    "橢圓形"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "10"
+   ],
+   "mark1": "PM012",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/61bdcbc111e2ba44-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/35265b1d-b5a8-4602-9b9a-0a62500a38e1_img_1?c=o",
+     "sha256": "5b5dab6f8340273c040700fe28bcc988babcf759e9f883824c3287fdde6dd187",
+     "src_bytes": 554050
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第046659號",
+   "zh": "撫緒妥糖衣錠",
+   "en": "FUXIDOL S.C. TABLETS",
+   "color": [
+    "橘"
    ],
    "shape": [
     "圓形"
@@ -149984,25 +150094,106 @@
     "無"
    ],
    "size": [
-    "13"
+    "9"
    ],
-   "mark1": "Pei Li",
+   "mark1": null,
    "mark2": null,
    "imgs": [
     {
-     "file": "img/220dfd7ba16fdbf8-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/f9def3b2-62fb-4875-acdb-2986c6fadf41?c=o",
-     "sha256": "521346f74e161533cf089807fb23f0ffa60f91574a623766e0dad7f4390398b8",
-     "src_bytes": 213051
+     "file": "img/fc1a663b49d854d2-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/4a099c15-e83d-445c-9b7a-bc2541b43dad_img_1?c=o",
+     "sha256": "896fc925940c92269bbfe7e78f3482de042782dd34d5be0bc782956a8370f6f7",
+     "src_bytes": 480255
     }
    ]
   },
   {
-   "id": "衛署藥製字第015596號",
-   "zh": "益庇益庇錠５００毫克",
-   "en": "APAP TABLETS 500MG",
+   "id": "衛署藥製字第046678號",
+   "zh": "\"汎生\" 安骨利膠囊250毫克",
+   "en": "ANCOLY CAPSULES 250MG \"PANBIOTIC",
    "color": [
-    "黃"
+    "紅",
+    "白"
+   ],
+   "shape": [
+    "膠囊"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "20"
+   ],
+   "mark1": "Glc",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/dab2ce55421c4dd3-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/d6ed4b09-22ed-4f1f-ba70-31f6fae65d17?c=o",
+     "sha256": "8236f094bf5387afef9e7e7d0324709feb4074aff240458aaf4ca5ad3a47d3f3",
+     "src_bytes": 1331558
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第046679號",
+   "zh": "力骨朗膠囊",
+   "en": "Gluwalker Capsules",
+   "color": [
+    "紅",
+    "白"
+   ],
+   "shape": [
+    "膠囊"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [],
+   "mark1": "Yo Come",
+   "mark2": "GSCa",
+   "imgs": [
+    {
+     "file": "img/3882ef24009bb3e7-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/e884e704-9ff5-4039-b298-ed52b05ffdea?c=o",
+     "sha256": "d2e93b6a73bfa20c5197e3b03a2d5c2d26c8e9854f1a10859d2c53794fb9f4f2",
+     "src_bytes": 1548143
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第046681號",
+   "zh": "欣坦膜衣錠1200毫克",
+   "en": "SYNTAM F.C. TABLETS 1200MG",
+   "color": [
+    "白"
+   ],
+   "shape": [
+    "橢圓形"
+   ],
+   "score_mark": [
+    "直線"
+   ],
+   "size": [
+    "18.0"
+   ],
+   "mark1": "S Y",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/7725514f5933436e-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/0ba2ca18-24c4-4536-ae27-a4ffac9ed358?c=o",
+     "sha256": "35911e629556b3b125e9ade0af15945dcc3633fcddff291e6afefaacd1f2eba2",
+     "src_bytes": 8316611
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第046682號",
+   "zh": "\"強生\"肌舒錠",
+   "en": "MUSLEX TABLETS",
+   "color": [
+    "橘"
    ],
    "shape": [
     "圓形"
@@ -150017,37 +150208,10 @@
    "mark2": null,
    "imgs": [
     {
-     "file": "img/45bbf9597e76f375-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/ca4bf550-8487-45fe-a9f6-7921ad65c6fb?c=o",
-     "sha256": "816f11581791d68117898bc19e5ec67a4566815ec0ec2cf8c7ccd66db8c67636",
-     "src_bytes": 5770021
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第015622號",
-   "zh": "每鞭達挫錠",
-   "en": "MEBENDAZOLE TABLETS \"YUNG CHI\"",
-   "color": [
-    "橘"
-   ],
-   "shape": [
-    "圓形"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "12"
-   ],
-   "mark1": "YC",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/ee30ad7b56e460b5-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/cad6e334-6fee-47b8-9dbf-4fbc7722c989?c=o",
-     "sha256": "d6f78ed877a07b02d3fbdc561c81eb825896d024cad9240280d059929c795c8b",
-     "src_bytes": 418916
+     "file": "img/34fc6c4569c0188d-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/3154ffcb-5204-4429-8eef-c92d21d69263?c=o",
+     "sha256": "3f580d91ca7cd489b7a2623e22133a89582148f83d8ede4fc746b8395560e199",
+     "src_bytes": 7406551
     }
    ]
   },
@@ -154508,80 +154672,61 @@
    ]
   },
   {
-   "id": "衛署藥製字第047984號",
-   "zh": "糖利平錠50毫克",
-   "en": "Carlipin Tablets 50mg",
+   "id": "衛署藥製字第019857號",
+   "zh": "克風邪止疼止痛液",
+   "en": "ANTICOLD CONTROL-PAIN SOLUTION (ACETAMINOPHEN)",
    "color": [
-    "白"
+    "棕"
    ],
    "shape": [
-    "圓形"
+    "液劑(包含糖漿用粉劑)"
    ],
    "score_mark": [
     "無"
    ],
-   "size": [
-    "7.4"
-   ],
-   "mark1": "YSP 6",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/251e82a8b8e8b87d-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/5dfc5f0f-758f-4954-8c41-0761c9626762?c=o",
-     "sha256": "20ebe97c8671270691592d3f9ea3d73cad7d9fbdb9cc5857a97bad730088fca5",
-     "src_bytes": 402886
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第047989號",
-   "zh": "思特寧膜衣錠3毫克",
-   "en": "SPITERIN F.C. Tablets 3mg (Risperidone)",
-   "color": [
-    "黃"
-   ],
-   "shape": [
-    "四邊形"
-   ],
-   "score_mark": [
-    "直線"
-   ],
-   "size": [],
-   "mark1": "SK",
-   "mark2": "3",
-   "imgs": [
-    {
-     "file": "img/37b6d82b30015117-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/22294077-57a8-4cb8-85da-1374b61a3eba?c=o",
-     "sha256": "c18b1e092a4d774df43bf3c0a9e14d52237249472f166907c0030787370b92f4",
-     "src_bytes": 682716
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第047990號",
-   "zh": "樂舒敏點眼液",
-   "en": "Rosumin Eye Drops",
-   "color": [],
-   "shape": [],
-   "score_mark": [],
    "size": [],
    "mark1": null,
    "mark2": null,
    "imgs": [
     {
-     "file": "img/54c720dcae6cd152-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/ca43ac96-bd44-4bf8-9208-edde26aa14cf?c=o",
-     "sha256": "8043d462d3113bce0f5cd37bd31fded52d8f323bce09aafe8421f6e3f30479f0",
-     "src_bytes": 1143469
+     "file": "img/780446d20a130ae6-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/8163f639-dbef-4250-90d2-56d197bd1ce9?c=o",
+     "sha256": "3ee6744d3bfd3f29d9cf4200bfb7b6f920cbe16154b2599bc65916ac7e2e7b14",
+     "src_bytes": 5559936
     }
    ]
   },
   {
-   "id": "衛署藥製字第047991號",
-   "zh": "悅消醣膜衣錠850毫克",
-   "en": "Anxofin F.C. Tablets 850mg",
+   "id": "衛署藥製字第019864號",
+   "zh": "\"皇佳\" 安失疼錠",
+   "en": "ACEDOL TABLETS \"ROYAL\"",
+   "color": [
+    "白"
+   ],
+   "shape": [
+    "四邊形"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "18"
+   ],
+   "mark1": "Royal",
+   "mark2": "A01",
+   "imgs": [
+    {
+     "file": "img/74e30e9dd22a8d13-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/a766799b-207b-43d4-b3f3-bad1cc7c79e0?c=o",
+     "sha256": "abd253e9f8405cc649503bba77723eb1644349bdbfae93cfb3ec038093a42ce2",
+     "src_bytes": 4592017
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第019865號",
+   "zh": "莫暈得錠（敵芬尼/）",
+   "en": "MEMODIN TABLETS (DIPHENIDOL) \"ROYAL\"",
    "color": [
     "白"
    ],
@@ -154592,23 +154737,50 @@
     "無"
    ],
    "size": [
-    "14"
+    "6.5"
    ],
-   "mark1": "AX 054",
+   "mark1": null,
    "mark2": null,
    "imgs": [
     {
-     "file": "img/13708db26d25cd44-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/fdc9af2e-30ff-4db4-b807-c24b225e381c_img_1?c=o",
-     "sha256": "14ced3ba6df84ef6a8ef63895d2a7f74f77d2d4d8d35fb8eb4fd4f665643a81c",
-     "src_bytes": 5121107
+     "file": "img/a1de0c3095135b53-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/4200b89b-f555-4552-b012-fbba8c42de7a?c=o",
+     "sha256": "f6dde0188af36803fc87a9698b4f1c7914abfdfe5a28142865796b9386cd704a",
+     "src_bytes": 16567905
     }
    ]
   },
   {
-   "id": "衛署藥製字第047993號",
-   "zh": "喜伏菌膜衣錠250毫克",
-   "en": "Ciflogen F.C. Tablets 250mg",
+   "id": "衛署藥製字第019875號",
+   "zh": "\"榮民\" 心康樂錠４０公絲（健心寧）",
+   "en": "CARDOLOL TABLETS 40MG (PROPRANOLOL) \"V.P.P.\"",
+   "color": [
+    "粉"
+   ],
+   "shape": [
+    "圓形"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "7.9"
+   ],
+   "mark1": "309",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/5b6de300ef9f34df-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/1ea1e7c0-cb1c-4ed5-a8a0-3df2b179cc3f?c=o",
+     "sha256": "f9379e20e807227e00001a0c054fc8331e697f96a63b58a582706dec17a54d09",
+     "src_bytes": 2109905
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第019877號",
+   "zh": "\"優生\"易復癆錠（醫肺妥）",
+   "en": "EPBUTOL TABLETS \"YU SHENG\" (ETHAMBUTOL)",
    "color": [
     "白"
    ],
@@ -154619,43 +154791,16 @@
     "直線"
    ],
    "size": [
-    "11"
+    "13"
    ],
-   "mark1": "SW 250",
+   "mark1": "YS EB",
    "mark2": null,
    "imgs": [
     {
-     "file": "img/7d2f43eb35cbb9f3-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/a2d3f8a1-f98f-4e8d-8984-e40f60ca7047?c=o",
-     "sha256": "68a9e5f37186ca3edda1de708a28dbb5ea31a7e7df27e8a0c94daaef9e9ad1e1",
-     "src_bytes": 718475
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第047998號",
-   "zh": "\"德聯\" 舒利通膜衣錠",
-   "en": "Suliton F.C. Tab.",
-   "color": [
-    "黃"
-   ],
-   "shape": [
-    "橢圓形"
-   ],
-   "score_mark": [
-    "直線"
-   ],
-   "size": [
-    "10"
-   ],
-   "mark1": "H S",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/2a1fc9e7f94df3f3-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/9e9983e1-1219-49c2-b5a2-7a04802377ac?c=o",
-     "sha256": "f52982ecb94555803c2093af2a57b977d2bf45d96ff6ead35ec073ed7ae99c89",
-     "src_bytes": 241468
+     "file": "img/75c63a640ff1aacf-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/b03871f4-8379-4aa5-afc8-3de3fb6d21cc?c=o",
+     "sha256": "40391ff154143664781ccf9def0f2440a5646ce2da67d7472f70776e0126994a",
+     "src_bytes": 39872333
     }
    ]
   },
@@ -159261,11 +159406,11 @@
    ]
   },
   {
-   "id": "衛署藥製字第022890號",
-   "zh": "\"華興\"邁立酵錠（來縮酵素）",
-   "en": "MILISHER TABLETS (LYSOZYME) \"H.S.\"",
+   "id": "衛署藥製字第049089號",
+   "zh": "\"華興\" 安咳停錠",
+   "en": "Ancopin Tablets \"H.S.\"",
    "color": [
-    "白"
+    "黃"
    ],
    "shape": [
     "圓形"
@@ -159274,52 +159419,50 @@
     "直線"
    ],
    "size": [
-    "7"
+    "11"
    ],
-   "mark1": "HS",
+   "mark1": null,
    "mark2": null,
    "imgs": [
     {
-     "file": "img/25667a8b2f3ca5af-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/f037f836-fb9d-4cc7-bb90-ec58dd0b9788?c=o",
-     "sha256": "b89634c39a40f58273949264c311794617ad5a4b4edc784000111339d7da62ff",
-     "src_bytes": 330968
+     "file": "img/e06f596b5e84f6ca-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/2bfefe84-600d-483b-ac8d-e48eb3a1acf0_img_1?c=o",
+     "sha256": "1980d71849486ec284ffbb3ea0ee034544dab60fe48b52282370a30690485901",
+     "src_bytes": 42456
     }
    ]
   },
   {
-   "id": "衛署藥製字第022903號",
-   "zh": "“優良”胃去病錠２００毫克（希每得定）",
-   "en": "GASTRODIN TABLETS 200MG (CIMETIDINE)",
+   "id": "衛署藥製字第049091號",
+   "zh": "\"治痛單\" 葫蘆標無糖治痛單液",
+   "en": "\"C.T.D.\" HWU RO BIAO Chyr Tong Dan Sugar Free Solution",
    "color": [
-    "綠"
+    "棕"
    ],
    "shape": [
-    "圓形"
+    "液劑(包含糖漿用粉劑)"
    ],
    "score_mark": [
-    "直線"
+    "無"
    ],
-   "size": [
-    "9"
-   ],
-   "mark1": "U L",
-   "mark2": "024",
+   "size": [],
+   "mark1": null,
+   "mark2": null,
    "imgs": [
     {
-     "file": "img/cc34a3aab79f1129-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/2ae5e4c3-67b7-4b39-a884-22dffb57a3a0?c=o",
-     "sha256": "025fa78acfc3dddbdd4f30c233863138185404c4b7e51387d536b931ae70f831",
-     "src_bytes": 12155718
+     "file": "img/50b6d98176ad9dd2-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/1b278c19-3d44-432e-931d-244d28626ac4?c=o",
+     "sha256": "c887a64080ae4f35ffae9585d57c58a2f54b9b4c7f6a7463345fb20730c24285",
+     "src_bytes": 733549
     }
    ]
   },
   {
-   "id": "衛署藥製字第022908號",
-   "zh": "\"十全\"使排通錠（螺環固醇內酮）",
-   "en": "SPIRONOLACTONE TABLETS \"S.C.\"",
+   "id": "衛署藥製字第049092號",
+   "zh": "適穩錠 15 毫克 (美洛西卡)",
+   "en": "LOXU TABLETS 15MG",
    "color": [
-    "白"
+    "黃"
    ],
    "shape": [
     "圓形"
@@ -159330,42 +159473,68 @@
    "size": [
     "8"
    ],
-   "mark1": "SC 802",
+   "mark1": "C 3",
    "mark2": null,
    "imgs": [
     {
-     "file": "img/6589e603e70d12f1-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/3035256a-fced-410d-b1b6-c28ce0c3a2e7?c=o",
-     "sha256": "c2269d555bb11f00a0cda94609ed44639b36ea10ea0795cc34f596658c79db01",
-     "src_bytes": 97764
+     "file": "img/57c32273af1ff792-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/c2d16266-3284-46ba-afed-bbfdfa81f471_img_1?c=o",
+     "sha256": "910f1132e3f2e02fe3d2e7dfb4935103d8c6865d67a5035b3a230e6117aa1d4a",
+     "src_bytes": 56564
     }
    ]
   },
   {
-   "id": "衛署藥製字第022964號",
-   "zh": "拿可欣膠囊100毫克(本補麻隆)",
-   "en": "NARCARICIN CAPSULES 100MG (BENZBROMARONE)",
+   "id": "衛署藥製字第049097號",
+   "zh": "“鼎泰”意覓樂錠200毫克",
+   "en": "Amillian Tablets 200 mg 〝D.T.〞",
    "color": [
-    "藍",
-    "黃"
+    "白"
    ],
    "shape": [
-    "膠囊"
+    "圓形"
+   ],
+   "score_mark": [
+    "直線"
+   ],
+   "size": [
+    "12"
+   ],
+   "mark1": "Amillian 200",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/ca9ad33c63ec9cee-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/1257c3b9-11d1-41c3-82ff-97aa691c5bca?c=o",
+     "sha256": "4a164a3a54a0aab14d84f4aec70a0132428cf7d32df1efeaac22bcad04906e38",
+     "src_bytes": 539511
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第049099號",
+   "zh": "抵敏膜衣錠5毫克",
+   "en": "Desdin Film-coated Tablets 5mg",
+   "color": [
+    "藍"
+   ],
+   "shape": [
+    "圓形"
    ],
    "score_mark": [
     "無"
    ],
    "size": [
-    "18"
+    "7.0"
    ],
-   "mark1": "Narcaricin 100MG",
-   "mark2": null,
+   "mark1": "GBL",
+   "mark2": "83",
    "imgs": [
     {
-     "file": "img/c430e3502ef7e278-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/c91c1a82-314e-423d-abdc-7c239bff1701?c=o",
-     "sha256": "76d35fdda0fffe1a166e1ca99aca59492e29f89b5e3024d612cf037d1867988f",
-     "src_bytes": 7158728
+     "file": "img/9c5f6dce11fe7c2a-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/ce51bfcd-087c-470d-bc1c-9fc56cba071c?c=o",
+     "sha256": "afb718daa237d84fe09ed3259d43636995137db1439f5b51f680d9585c217876",
+     "src_bytes": 9248017
     }
    ]
   },
@@ -163888,36 +164057,92 @@
    ]
   },
   {
-   "id": "衛署藥製字第050016號",
-   "zh": "“新瑞”邁慮煩 膜衣錠 15 毫克",
-   "en": "Minivane F.C. Tablets 15mg“synray”",
+   "id": "衛署藥製字第025275號",
+   "zh": "鼻速通膠囊",
+   "en": "NORSETOA CAPSULES \"CHINTENG\"",
    "color": [
-    "黃"
+    "紅",
+    "白"
    ],
    "shape": [
-    "橢圓形"
+    "膠囊"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "14"
+   ],
+   "mark1": "CTP R05",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/8f2b4f191a4d2562-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/3ef082fa-c0e0-4c4e-bac2-b85126761580?c=o",
+     "sha256": "4858585091a718e3de2c1f0b1667635ef38e2c0c40740f54f9ecdca3b0858f35",
+     "src_bytes": 3821286
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第025279號",
+   "zh": "佑速朗錠90毫克",
+   "en": "SUPERZYME TABLETS 90MG",
+   "color": [
+    "白"
+   ],
+   "shape": [
+    "四邊形"
    ],
    "score_mark": [
     "直線"
    ],
    "size": [
-    "12.5"
+    "12"
    ],
-   "mark1": "S W",
+   "mark1": null,
    "mark2": null,
    "imgs": [
     {
-     "file": "img/a809e9d051afbdb8-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/ffa050e7-e5f1-492a-b072-aa6886325e3e?c=o",
-     "sha256": "3d802d49f7a9ec139aaacd6a49a25d04c3edcc42280ef1943791eaa1d7000054",
-     "src_bytes": 1081967
+     "file": "img/0c50c15b2cbbf311-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/183d7b58-7cbc-41a3-8e13-c40dcf936421?c=o",
+     "sha256": "c1e65c55ad3856f8895871cfbd559bd7de68f463518762749cfb9975afc18888",
+     "src_bytes": 7315518
     }
    ]
   },
   {
-   "id": "衛署藥製字第050027號",
-   "zh": "欣行健錠 100 毫克",
-   "en": "Pleya Tablets 100 mg",
+   "id": "衛署藥製字第025301號",
+   "zh": "\"永信\"旺舒膠囊（檸檬酸歐咳拉命）",
+   "en": "OXO CAPSULES (OXOLAMINE CITRATE) \"YUNG SHIN\"",
+   "color": [
+    "橘",
+    "橘"
+   ],
+   "shape": [
+    "膠囊"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "14.2"
+   ],
+   "mark1": "YSP OXC",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/49b55fe0d706fa26-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/820966be-19bc-4fa2-8171-e7427d76c07f?c=o",
+     "sha256": "d29ab3bd3ed538a8298b30ca4c55c2519af17b9de1c5b9115c32ba07298457b5",
+     "src_bytes": 1015411
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第025304號",
+   "zh": "\"大豐\"咳舒痰錠２０毫克",
+   "en": "COSTAN TABLETS 20MG  \"T.F.\"",
    "color": [
     "白"
    ],
@@ -163925,73 +164150,19 @@
     "圓形"
    ],
    "score_mark": [
-    "直線"
+    "無"
    ],
    "size": [
-    "8.1"
+    "6.0"
    ],
-   "mark1": "YSP 199",
+   "mark1": "TF",
    "mark2": null,
    "imgs": [
     {
-     "file": "img/89526c67963f67d3-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/df24ff07-8ef0-46f2-9bb9-05cdf222562f?c=o",
-     "sha256": "b9d8d27bc52cf7f28d41ccc3c3ec5c745d78d8c69ac8b06e9e0a59d90d59e545",
-     "src_bytes": 729930
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第050030號",
-   "zh": "\"黃氏\" 咳紓安錠",
-   "en": "Coughfree Tablets \"H.S.\"",
-   "color": [
-    "黃"
-   ],
-   "shape": [
-    "橢圓形"
-   ],
-   "score_mark": [
-    "直線"
-   ],
-   "size": [
-    "10"
-   ],
-   "mark1": "H S",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/4f2d77ff6eed13d8-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/07f50dc4-237c-4f58-a130-d8c1d44d0c11?c=o",
-     "sha256": "ebbf651cda925635b65eb512f86ff6bd03f236126d77a83afb7aee90f4ce6fa8",
-     "src_bytes": 4884511
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第050032號",
-   "zh": "\"十全\" 莫伏炎錠",
-   "en": "Mobufen Tablets",
-   "color": [
-    "白"
-   ],
-   "shape": [
-    "橢圓形"
-   ],
-   "score_mark": [
-    "直線"
-   ],
-   "size": [
-    "17.4"
-   ],
-   "mark1": "SC M7",
-   "mark2": null,
-   "imgs": [
-    {
-     "file": "img/e0aafcc65c740835-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/54fd5faf-c970-4200-a312-b5f55077f957?c=o",
-     "sha256": "76eea6d26eb42ff60909d961ae0b2706ab87a6d2dfe25ecf31ed0eb1ba706193",
-     "src_bytes": 175462
+     "file": "img/ab9603f6c24f6767-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/d8f93bb1-d0c5-4164-898f-d4a1264f963e?c=o",
+     "sha256": "0108b3466fbe8cfe9663a53c66d7935440980829c78d86ee1c9ad3e5b8516291",
+     "src_bytes": 10848737
     }
    ]
   },
@@ -168506,11 +168677,38 @@
    ]
   },
   {
-   "id": "衛署藥製字第027445號",
-   "zh": "“衛達”心滴舒糖衣錠５０毫克（待匹力達）",
-   "en": "SANDEL S.C. TABLETS 50MG \"WEIDAR\" (DIPYRIDAMOLE)",
+   "id": "衛署藥製字第055426號",
+   "zh": "“永勝”服敏優膜衣錠 5 毫克",
+   "en": "Minlo F.C. Tablets 5mg“EVEREST”",
    "color": [
-    "橘"
+    "白"
+   ],
+   "shape": [
+    "橢圓形"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "8"
+   ],
+   "mark1": null,
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/714fa2e228c774e4-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/f60c4ca2-ff1d-4669-abad-6eea815a066e?c=o",
+     "sha256": "eb7f1d37515b48f00642ec2ad46b9073dec4a0c75215c53adddb0e73b174ba9e",
+     "src_bytes": 1722546
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第055428號",
+   "zh": "保絡得膜衣錠 75 毫克",
+   "en": "Progrel F.C. Tablets 75 mg",
+   "color": [
+    "粉"
    ],
    "shape": [
     "圓形"
@@ -168519,23 +168717,23 @@
     "無"
    ],
    "size": [
-    "7.0"
+    "8.5"
    ],
-   "mark1": null,
+   "mark1": "75",
    "mark2": null,
    "imgs": [
     {
-     "file": "img/412afc8df5bdcff0-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/1c1657e8-a465-4418-a5d4-a095f3d0ec2a?c=o",
-     "sha256": "b50a9980bc9f55efd0043e8bb99a923404057950d2d948450783be85089cf348",
-     "src_bytes": 10500339
+     "file": "img/6003b4593145c579-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/a2372067-993c-498e-b607-cbebfc7afc3d?c=o",
+     "sha256": "bcfb8edf500626fe827931c50cb9a9a2f2ecf2e0ae39ab6bb03a5765a0eeb630",
+     "src_bytes": 9787270
     }
    ]
   },
   {
-   "id": "衛署藥製字第027446號",
-   "zh": "\"衛達\"必莫痛錠３０公絲（尼夫平）",
-   "en": "BENOTON TABLETS 30MG \"WEIDAR\" (NEFOPAM)",
+   "id": "衛署藥製字第055530號",
+   "zh": "佳能憶膜衣錠 8 毫克",
+   "en": "Gatamine F.C. Tablets 8mg",
    "color": [
     "粉"
    ],
@@ -168543,26 +168741,26 @@
     "圓形"
    ],
    "score_mark": [
-    "直線"
+    "無"
    ],
    "size": [
-    "9.0"
+    "7"
    ],
-   "mark1": null,
-   "mark2": null,
+   "mark1": "SW",
+   "mark2": "8",
    "imgs": [
     {
-     "file": "img/9b33ce2ac520b19e-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/04b690b5-737d-4d08-8424-7b95abf673f6?c=o",
-     "sha256": "fb3afdbdb680b7eba4b0ada17845561e3f60462b44559b9c5f12f5f25ac8bae2",
-     "src_bytes": 10325791
+     "file": "img/e153b87a6231710b-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/72efe114-502b-4b16-a6e1-d2921fca1a46?c=o",
+     "sha256": "96f56e0aebea84cd3178edf84ba87a479be225af9a81f452a0b9c469b3b6c7de",
+     "src_bytes": 7056890
     }
    ]
   },
   {
-   "id": "衛署藥製字第027448號",
-   "zh": "\"衛達\"賜樂泄錠",
-   "en": "SLOSAT TABLETS \"WEIDAR\"",
+   "id": "衛署藥製字第055531號",
+   "zh": "坦壓膜衣錠 50 毫克",
+   "en": "Tanza F.C. Tablets 50mg",
    "color": [
     "白"
    ],
@@ -168573,16 +168771,43 @@
     "直線"
    ],
    "size": [
-    "10.4"
+    "10.3"
    ],
-   "mark1": "W D",
-   "mark2": "SS",
+   "mark1": "C S",
+   "mark2": "03",
    "imgs": [
     {
-     "file": "img/7a1ded5a216f3e44-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/1ddc5298-a33b-45d3-8eff-84d35bf7b5cb?c=o",
-     "sha256": "4d6dd7563306c77db087b4a596dc655c47afb2a34b2721f3b6f542ddb10170b9",
-     "src_bytes": 10307848
+     "file": "img/a0880205cb5f15ac-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/d41fa748-5a82-47f0-a8b5-9e14d07be6a9?c=o",
+     "sha256": "e964373abadcf6065022820034715acf16c6f36e24254944e0ebeeea5c389d78",
+     "src_bytes": 2151660
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第055534號",
+   "zh": "倍得舒持續性藥效膜衣錠 150 毫克",
+   "en": "Betetrim S.R. film-coated tablets 150mg",
+   "color": [
+    "紫"
+   ],
+   "shape": [
+    "圓形"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "11"
+   ],
+   "mark1": "B47",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/8daeb5534e7ff970-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/eae4d503-0cad-4e3a-8b89-3f7c200896e2?c=o",
+     "sha256": "7d21306657939a43b8cc45a02f9602af6086af50de2d6efb132adab083f28f1e",
+     "src_bytes": 4865090
     }
    ]
   },
@@ -169531,33 +169756,6 @@
      "src": "https://mcp.fda.gov.tw/insert/shapeImg/7c7244a3-a0a5-4e4a-878c-bb224aa56e12?c=o",
      "sha256": "fd249eaf4cba0bffc4225f3e05dee3247ccec5b383fb2b4c6878b2b2e5208abb",
      "src_bytes": 537580
-    }
-   ]
-  },
-  {
-   "id": "衛署藥製字第055945號",
-   "zh": "中生喜驅敏膜衣錠5 毫克",
-   "en": "cBc Allevo F.C. Tablets 5mg",
-   "color": [
-    "白"
-   ],
-   "shape": [
-    "橢圓形"
-   ],
-   "score_mark": [
-    "無"
-   ],
-   "size": [
-    "8"
-   ],
-   "mark1": "cBc",
-   "mark2": "121",
-   "imgs": [
-    {
-     "file": "img/deac3293963087e7-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/9f50c244-fc1f-4ae2-b512-9fa435ea80f7_img_1?c=o",
-     "sha256": "d07f2848be5903ab7c422d7c74978e292d32ec41c544ea2f305bdcccff308ce5",
-     "src_bytes": 394559
     }
    ]
   },
@@ -173182,63 +173380,63 @@
    ]
   },
   {
-   "id": "衛署藥製字第057226號",
-   "zh": "\"華興\"肌舒服錠",
-   "en": "Musine Tablets \"H.S.\"",
+   "id": "衛署藥製字第055945號",
+   "zh": "中生喜驅敏膜衣錠5 毫克",
+   "en": "cBc Allevo F.C. Tablets 5mg",
    "color": [
-    "黃"
+    "白"
    ],
    "shape": [
     "橢圓形"
    ],
    "score_mark": [
-    "直線"
+    "無"
    ],
    "size": [
-    "19"
+    "8"
    ],
-   "mark1": "H S",
-   "mark2": "M",
+   "mark1": "cBc",
+   "mark2": "121",
    "imgs": [
     {
-     "file": "img/1aa72379cc259eb8-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/2df42ac0-caf1-4de9-9d95-880ab89c148d_img_1?c=o",
-     "sha256": "f107b986b7339b2b17e2e567c0185f6e3892c197e828b785ab87bc314157a472",
-     "src_bytes": 143381
+     "file": "img/deac3293963087e7-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/b5461a13-e4da-41d5-9716-c20fbadb1e95?c=o",
+     "sha256": "f39c398c609e7a0f93fd7ea8dea0860a7a0440175114d51a2ef6d3f9d6ee261a",
+     "src_bytes": 422500
     }
    ]
   },
   {
-   "id": "衛署藥製字第057228號",
-   "zh": "巧復壓錠10毫克",
-   "en": "Azinium Tablets 10mg",
+   "id": "衛部藥輸字第029165號",
+   "zh": "安悠美脈膜衣錠 5/40毫克",
+   "en": "AMOlmemai F.C. Tablets 5/40 mg",
    "color": [
-    "白"
+    "黃"
    ],
    "shape": [
     "圓形"
    ],
    "score_mark": [
-    "直線"
+    "無"
    ],
    "size": [
-    "7"
+    "8"
    ],
-   "mark1": "AMZ 10",
+   "mark1": "L77",
    "mark2": null,
    "imgs": [
     {
-     "file": "img/ae59a6886da08908-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/34984d99-3d6c-4a8b-82b4-0ec3add63ab1_img_1?c=o",
-     "sha256": "e911847609195d5c3a0ef97566597286a7d1d2a007ee1d686c1510ec1c8b0786",
-     "src_bytes": 12770960
+     "file": "img/cf9826347b9c69fe-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/9b614f3f-cc1c-4e00-8e59-b74892ae5a30?c=o",
+     "sha256": "fc75d483372424a9c3f7adacb49f76591c9d16ef1943d54057fdd476826a85d9",
+     "src_bytes": 1351575
     }
    ]
   },
   {
-   "id": "衛署藥製字第057231號",
-   "zh": "東健膜衣錠300毫克",
-   "en": "EPINE F.C. Tablets 300mg",
+   "id": "衛部藥輸字第029172號",
+   "zh": "達薩平 膜衣錠50毫克",
+   "en": "Dasatinib film coated tablets 50mg \"DRL\"",
    "color": [
     "白"
    ],
@@ -173246,26 +173444,26 @@
     "橢圓形"
    ],
    "score_mark": [
-    "直線"
+    "無"
    ],
    "size": [
-    "17"
+    "11"
    ],
    "mark1": null,
    "mark2": null,
    "imgs": [
     {
-     "file": "img/b45ce210c750852f-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/e7321e06-f387-4d6c-8823-9635e37f644b?c=o",
-     "sha256": "cb697579569c6748674f3c00eac9d38d6aeee114e8e6a0d54cfa49a324a6c710",
-     "src_bytes": 1167104
+     "file": "img/6279624e394e71f5-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/f70fa073-90d6-4542-9694-4b1c195d0b8f?c=o",
+     "sha256": "9614ffb06748bce682f9716149cd54396a4e5211fc11c3d3e4de5bbfebb69ed8",
+     "src_bytes": 744976
     }
    ]
   },
   {
-   "id": "衛署藥製字第057234號",
-   "zh": "優穩壓膜衣錠20毫克",
-   "en": "Olsaa F.C. Tablets 20mg",
+   "id": "衛部藥輸字第029173號",
+   "zh": "達薩平 膜衣錠20毫克",
+   "en": "Dasatinib film coated tablets 20mg \"DRL\"",
    "color": [
     "白"
    ],
@@ -173276,48 +173474,77 @@
     "無"
    ],
    "size": [
-    "8.6"
+    "6"
    ],
-   "mark1": "CCP",
-   "mark2": "214",
+   "mark1": null,
+   "mark2": null,
    "imgs": [
     {
-     "file": "img/1d34892817acd4a8-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/4b28cafa-7c86-49cd-ac40-175f36ba9277?c=o",
-     "sha256": "fec49a91035f42ea334021f26eaed70d36fc54540d11dc27cf09f9146cfeb628",
-     "src_bytes": 4937530
+     "file": "img/2caf18c5cb1c1ca2-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/4a630cd6-39fd-46de-a9c2-897c7768a4d7?c=o",
+     "sha256": "d413cd6f1c5c68a18c471c2f003a92589d67885f129b9ebc1f5a296ed05b5861",
+     "src_bytes": 4825389
     }
    ]
   },
   {
-   "id": "衛署藥製字第057235號",
-   "zh": "\"十全\"柔心錠2.5毫克",
-   "en": "Roopril Tablets 2.5mg \"S.C.\"",
+   "id": "衛部藥輸字第029174號",
+   "zh": "達薩平 膜衣錠70毫克",
+   "en": "Dasatinib film coated tablets 70mg \"DRL\"",
    "color": [
-    "黃"
+    "白"
+   ],
+   "shape": [
+    "圓形"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "10"
+   ],
+   "mark1": "215",
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/457e49ff87e77233-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/5efd1fca-5402-4f32-b55c-ce2936f76084?c=o",
+     "sha256": "bbc6703744b71157f5c57163aff6a6a5771e8d97c7c5a2e61d43dca460151df9",
+     "src_bytes": 4811209
+    }
+   ]
+  },
+  {
+   "id": "衛部藥輸字第029240號",
+   "zh": "邁妥脂膜衣錠 10/20毫克",
+   "en": "MITORPID F.C. Tablets 10mg/20mg",
+   "color": [
+    "棕"
    ],
    "shape": [
     "橢圓形"
    ],
    "score_mark": [
-    "直線"
+    "無"
    ],
-   "size": [],
-   "mark1": "SC",
+   "size": [
+    "15"
+   ],
+   "mark1": "V2",
    "mark2": null,
    "imgs": [
     {
-     "file": "img/4e7d42a0f5d4df60-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/fc0216a9-7bbc-40e8-b76c-184e1396d2b4?c=o",
-     "sha256": "9c6175227402c5a214b02e837a96ca76694cf339e3c22ef26d1e76356fb43c8d",
-     "src_bytes": 110865
+     "file": "img/442277975ee32d89-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/a6de282e-d1a0-4883-8f6a-39774cbd7f69?c=o",
+     "sha256": "8bcf714d1174ce771bff9dcbf658eb365c88a1277080ec617a07e3acf343e53e",
+     "src_bytes": 3816479
     }
    ]
   },
   {
-   "id": "衛署藥製字第036480號",
-   "zh": "\"嘉林\" 安胃寧錠５００毫克",
-   "en": "ANWENIN TABLETS 500MG \"C.L.\"",
+   "id": "衛署藥製字第016422號",
+   "zh": "“嘉林”使鼻朗錠",
+   "en": "SEUPHENON TABLETS \"C.L.\"",
    "color": [
     "白"
    ],
@@ -173328,81 +173555,153 @@
     "直線"
    ],
    "size": [
-    "13"
+    "7.2"
    ],
    "mark1": null,
    "mark2": null,
    "imgs": [
     {
-     "file": "img/e1ad0793785cb79d-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/41e2b791-d6c7-4886-b89c-d2e04371cde7?c=o",
-     "sha256": "69189edaf0d72af7c56c0130a7007ebde261697111b01e80e2bcf3f25e901d0b",
-     "src_bytes": 4124148
+     "file": "img/8b343e50c21d1aeb-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/cce8fecb-fd70-414d-ba70-58e54db4df2b?c=o",
+     "sha256": "7e9cf4836453ede6ceb67a99ec073a1d6c73d6d8ba857e39aa1226c22b30120f",
+     "src_bytes": 2674629
     }
    ]
   },
   {
-   "id": "衛部藥製字第062418號",
-   "zh": "＂約克＂滅磷膜衣錠800毫克",
-   "en": "Seveless F.C. Tablet 800 mg \"Y.K.\"",
+   "id": "衛署藥製字第023833號",
+   "zh": "\"優生\"舒胃錠",
+   "en": "SWEI TABLETS \"YU SHENG\"",
    "color": [
-    "白",
     "白"
    ],
    "shape": [
-    "橢圓形"
+    "圓形"
+   ],
+   "score_mark": [
+    "直線"
+   ],
+   "size": [
+    "11"
+   ],
+   "mark1": null,
+   "mark2": null,
+   "imgs": [
+    {
+     "file": "img/52d4a9441e363e73-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/8efcc9ef-f887-4bdf-8225-7290c2851ad3?c=o",
+     "sha256": "56d2ea2cdc8406143e49338681ad702b8e288da4c37902c3e1a9b86d7a4be0b0",
+     "src_bytes": 40392356
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第045126號",
+   "zh": "歐洲草保肝膠囊",
+   "en": "SILYBUM CAPSULES",
+   "color": [
+    "棕"
+   ],
+   "shape": [
+    "膠囊"
    ],
    "score_mark": [
     "無"
    ],
    "size": [
-    "20"
+    "19.1"
    ],
-   "mark1": null,
+   "mark1": "Silybum",
    "mark2": null,
    "imgs": [
     {
-     "file": "img/6b218ee218041db1-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/465e453b-ecf9-40a4-af18-a17006d26013?c=o",
-     "sha256": "72007f45980983ea7982963538c81a5eefd9a7fc9cd0ae9001f3dfc867301425",
-     "src_bytes": 706483
+     "file": "img/31c15382dcab2660-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/4a6470c1-2a71-4463-bfbd-6543536dde83?c=o",
+     "sha256": "9f9c3ae675c0c43747c150f8b0286d93f00db4e3b92126992c666f47fe8aafe2",
+     "src_bytes": 315322
     }
    ]
   },
   {
-   "id": "衛署藥輸字第022924號",
-   "zh": "內舒拿水溶性鼻用噴液劑",
-   "en": "NASONEX AQUEOUS NASAL SPRAY",
-   "color": [],
-   "shape": [],
-   "score_mark": [],
-   "size": [],
-   "mark1": null,
+   "id": "衛署藥製字第045336號",
+   "zh": "\"五洲\"口炎膠囊",
+   "en": "U-Chu Coyan Capsules",
+   "color": [
+    "棕",
+    "紅"
+   ],
+   "shape": [
+    "膠囊"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "19.2"
+   ],
+   "mark1": "UC13",
    "mark2": null,
    "imgs": [
     {
-     "file": "img/702edccc690fd1ae-0.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/00797d23-da50-4251-b66e-7ba918eeab38?c=o",
-     "sha256": "e94bd828df0c2f8a1c6da2792e6a3485d7122255f3ea077d58fb602fb749befd",
-     "src_bytes": 8534980
-    },
+     "file": "img/2016595b6ccc5d3f-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/9316dd57-57ef-4142-a80b-600e9d893152?c=o",
+     "sha256": "4b5aec5354af19577bc8213d5e211a7f4e69fc3e2344a5df36b194f8708b2f2e",
+     "src_bytes": 432143
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第047629號",
+   "zh": "替你坦舒持續釋放膠囊0.2毫克",
+   "en": "Tamso SR Capsules 0.2mg",
+   "color": [
+    "粉",
+    "白"
+   ],
+   "shape": [
+    "膠囊"
+   ],
+   "score_mark": [
+    "無"
+   ],
+   "size": [
+    "14.2"
+   ],
+   "mark1": "UC21",
+   "mark2": null,
+   "imgs": [
     {
-     "file": "img/702edccc690fd1ae-1.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/a80a6ea2-158c-44f0-a835-020162e38078?c=o",
-     "sha256": "5e9e369d7b653108d12773116200f30a6924d482881c4cf737e8d9d496c45eb3",
-     "src_bytes": 8477371
-    },
+     "file": "img/e381691c3a4d828a-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/6d99998b-a739-4387-b228-b41a2b338391?c=o",
+     "sha256": "2740a605beb31fc947f66c3ec05bc04a6360cd3c4ddeb9049cad46154a6f4e56",
+     "src_bytes": 10360151
+    }
+   ]
+  },
+  {
+   "id": "衛署藥製字第056708號",
+   "zh": "安怡美錠20毫克",
+   "en": "ABIMAY Tablets 20mg",
+   "color": [
+    "白"
+   ],
+   "shape": [
+    "圓形"
+   ],
+   "score_mark": [
+    "直線"
+   ],
+   "size": [
+    "7.6"
+   ],
+   "mark1": "UC 73",
+   "mark2": null,
+   "imgs": [
     {
-     "file": "img/702edccc690fd1ae-2.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/ab8f17ea-c631-4a17-8641-c90f052bf8aa?c=o",
-     "sha256": "c56deb09d8cc2daf439abfa1a13310bc3c3c4e33a8632c3084fa91a9f249be62",
-     "src_bytes": 8522994
-    },
-    {
-     "file": "img/702edccc690fd1ae-3.webp",
-     "src": "https://mcp.fda.gov.tw/insert/shapeImg/be398e45-ad54-41a6-b691-7842c160f45e?c=o",
-     "sha256": "4c5e93c3ff02af6ee69f39e46e413f7feac8ff12fc8a63160ee78b7b5fe56d1f",
-     "src_bytes": 8353627
+     "file": "img/18bfea6f591f9f3d-0.webp",
+     "src": "https://mcp.fda.gov.tw/insert/shapeImg/6c2da85d-f2da-4527-a171-171738fae4a4?c=o",
+     "sha256": "8ec7e6e6a1975058b32b6aa8ba1bf82199131c2cfb0c49721d76727bdd1da99c",
+     "src_bytes": 9868547
     }
    ]
   }
