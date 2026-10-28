@@ -524,3 +524,25 @@ test('E12d 人工留檔存在且對應本次規則版本', () => {
     assert.ok(doc.includes(must), `E12d: 留檔未涵蓋「${must}」`);
   }
 });
+
+test('E13 連寫級（D40）：分區排在包含級之後、卡片標示「連寫命中」、placeholder 示範連寫', () => {
+  const src = stripComments(read('app.js'));
+  const titles = src.match(/TIER_TITLE\s*=\s*\[([^\]]*)\]/);
+  assert.ok(titles, 'E13: 找不到 TIER_TITLE');
+  const t = [...titles[1].matchAll(/'([^']+)'/g)].map((m) => m[1]);
+  assert.deepEqual(t, ['完全符合', '字首符合', '包含', '連寫'], 'E13: 主區四級的標題與順序');
+  const whys = src.match(/TIER_WHY\s*=\s*\[([^\]]*)\]/);
+  assert.equal([...whys[1].matchAll(/'([^']+)'/g)].length, 4, 'E13: TIER_WHY 必須有四條說明');
+  assert.match(src, /TIER_CARD\s*=\s*\[card,\s*card,\s*card,\s*joinedCard\]/, 'E13: 連寫級沒有用 joinedCard 繪製');
+  assert.match(src, /joinedCard\s*=\s*\(item\)\s*=>\s*card\(item,\s*null,\s*true\)/, 'E13: joinedCard 沒有打開 viaJoin');
+  // 四級都要畫出來：迴圈寫死 3 的話連寫級會靜默不顯示——比沒做更糟（主區計數有、畫面沒有）
+  assert.match(src, /t < res\.tiers\.length/, 'E13: 分區迴圈沒有涵蓋全部 tier');
+  // 逐卡標示：連寫命中必須貼在卡片內文，不只在分區標題
+  assert.match(src, /'連寫命中'/, 'E13: 卡片缺「連寫命中」標示');
+  assert.match(src, /body\.appendChild\(\s*joined\s*\)/, 'E13: 連寫標示沒有掛進卡片內文');
+  // placeholder
+  const html = read('index.html');
+  assert.match(html, /id="imprint"[^>]*placeholder="例如 10、APO、M 40、FYT061"/, 'E13: placeholder 文案');
+  // app.js 不得自己實作連寫索引
+  assert.ok(!/\.join\(''\)/.test(src), "E13: app.js 疑似自行串接 token（join('')）");
+});

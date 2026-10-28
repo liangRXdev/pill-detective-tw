@@ -249,8 +249,10 @@ const VARIANT_WHY = { flip: '倒讀', canon: '字形相近' };
  * @param reasons  變體理由陣列；非變體區傳 null。
  *                 **理由跟著這一次搜尋的結果進來，不是從 item 上讀的**——
  *                 掛在 item 上的話，上一個查詢的理由會顯示在這一個查詢的卡片上（D37）。
+ * @param viaJoin  D40：這張卡在主區連寫級。標示貼在**卡片內文**，分區標題被捲走之後仍看得出
+ *                 這筆是「把相鄰刻字連起來讀才符合」，不是原樣命中。
  */
-function card(item, reasons = null) {
+function card(item, reasons = null, viaJoin = false) {
   const b = el('button', 'pill');
   b.type = 'button';
   b.appendChild(thumb(item));
@@ -267,6 +269,11 @@ function card(item, reasons = null) {
     for (const r of reasons) why.appendChild(el('span', null, VARIANT_WHY[r] ?? r));
     body.appendChild(why);
   }
+  if (viaJoin) {
+    const joined = el('div', 'vwhy');
+    joined.appendChild(el('span', null, '連寫命中'));
+    body.appendChild(joined);
+  }
   b.appendChild(body);
   b.addEventListener('click', () => openDetail(item));
   return b;
@@ -274,6 +281,8 @@ function card(item, reasons = null) {
 
 /** 變體區的元素是 `{ item, reasons }`，不是裸 item——身份與理由不可分離（D37）。 */
 const variantCard = (v) => card(v.item, v.reasons);
+/** 連寫級（D40）。由分區決定、不由 item 決定——同一筆換個查詢可能是原樣命中。 */
+const joinedCard = (item) => card(item, null, true);
 
 /**
  * 分區：標題 + 說明 + 卡片格 + 捲動載入；低確定性分區可延遲展開。
@@ -325,12 +334,15 @@ function section(title, why, list, soft, collapsed = false, renderCard = card) {
 
 // ── 主渲染 ────────────────────────────────────────────────────────
 
-const TIER_TITLE = ['完全符合', '字首符合', '包含'];
+const TIER_TITLE = ['完全符合', '字首符合', '包含', '連寫'];
 const TIER_WHY = [
   '輸入的每一段文字都與該藥的刻字完全相同',
   '輸入的每一段文字都是該藥某段刻字的開頭',
   '輸入的每一段文字都出現在該藥的刻字之中',
+  'TFDA 將刻字分段記錄，把相鄰的段落連起來讀才與輸入相同',
 ];
+/** 與 TIER_TITLE 逐格對齊。連寫級的卡片另標「連寫命中」（D40）。 */
+const TIER_CARD = [card, card, card, joinedCard];
 
 function render() {
   if (!items) return;
@@ -394,8 +406,9 @@ function render() {
     acts.appendChild(el('span', 'aux', '候選藥品較多，建議加入藥錠文字、顏色或形狀'));
   }
 
-  for (let t = 0; t < 3; t++) {
-    const s = section(TIER_TITLE[t], TIER_WHY[t], res.tiers[t]);
+  // 迴圈上限取自結果本身：寫死 3 的話 D40 的連寫級會「主區計數有、畫面沒有」
+  for (let t = 0; t < res.tiers.length; t++) {
+    const s = section(TIER_TITLE[t], TIER_WHY[t], res.tiers[t], false, false, TIER_CARD[t]);
     if (s) out.appendChild(s);
   }
   const p = section('部分符合', 'TFDA 只記錄了部分刻字，無法排除', res.partial, true, true);

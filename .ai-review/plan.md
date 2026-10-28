@@ -1,6 +1,6 @@
-# 藥丸偵探 Pill Detective TW — 台灣藥品外觀搜尋　規劃文件 v1.12
+# 藥丸偵探 Pill Detective TW — 台灣藥品外觀搜尋　規劃文件 v1.13
 
-- 修訂時間：2026-10-28（最新 v1.12；v1.2 依 `plan-verdict-2.md`，v1.3–v1.11 為實作階段裁決，v1.12 為 2026-10 覆審修正。修訂紀錄見 §14）
+- 修訂時間：2026-10-28（最新 v1.13；v1.2 依 `plan-verdict-2.md`，v1.3–v1.11 為實作階段裁決，v1.12 為 2026-10 覆審修正，v1.13 為 H1 刻字連寫（D40）。修訂紀錄見 §14）
 - repo：https://github.com/liangRXdev/pill-detective-tw （GitHub Pages 靜態站）
 - 資料源：衛生福利部食品藥物管理署 Open Data「藥品外觀資料集」（opendata infoId=42）
 - 姊妹專案：`TFDA-drug-id-quiz`（藥品辨識王，同一資料源，已上線）
@@ -265,6 +265,10 @@
 
 **為什麼不選純子字串**：`T` → 950 筆、`1` → 1148 筆，且 `M 40` 順序敏感。
 **為什麼不選只做完全比對**：使用者只看得出刻字的一部分正是典型情境。
+
+**第四級「連寫」（v1.13，D40）**：原樣比對為 mismatch 或 partial 時，若每個查詢 token
+「原樣命中（任一級）」或「與同欄相鄰 token 的串接**完全相等**」，且至少一個靠串接，
+記錄進主區第四級（排在包含之後），卡片標「連寫命中」。詳見 §14 v1.12 → v1.13。
 
 規則寫死在 `search.js`，**無分數、無門檻、無 AI confidence**。
 
@@ -686,8 +690,8 @@ touch target ≥ 44 × 44 px；**只有搜尋列 sticky，條件面板隨頁捲�
 
 | # | 條件 |
 |---|---|
-| **A1** | imprint `10`：三個**互斥**分區 = 完全 **72**／字首 **129**／包含 **67**，聯集 268；未提供區 **2,085**。須斷言**四個** expected ID set（含未提供區）、四區 pairwise disjoint、無重複、每筆符合該級 predicate、未提供區逐筆 token 集合為空，且**四區聯集 ＋ 被排除者 === baseline 全量**（窮盡性）。只指定未提供區的**筆數**會讓「塞入任意 2,085 筆」通過 |
-| **A2** | imprint `M 40` 與 `40 M`：**兩者三分區集合完全相等**，且**主區非空**（11 筆 = 2／4／5，部分符合區 294），並斷言三分區 expected sets 與逐筆 predicate。**另須一筆查詢 token 分散於 `mark1`／`mark2` 的辨識性案例**——只有跨欄聯集正確才會命中（v1.1 漏掉這條） |
+| **A1** | imprint `10`：四個**互斥**分區 = 完全 **72**／字首 **129**／包含 **67**／連寫 **3**（D40；D40 前無第四級），聯集 271；未提供區 **2,085**。須斷言**四個** expected ID set（含未提供區）、四區 pairwise disjoint、無重複、每筆符合該級 predicate、未提供區逐筆 token 集合為空，且**四區聯集 ＋ 被排除者 === baseline 全量**（窮盡性）。只指定未提供區的**筆數**會讓「塞入任意 2,085 筆」通過 |
+| **A2** | imprint `M 40` 與 `40 M`：**兩者三分區集合完全相等**，且**主區非空**（12 筆 = 2／4／5／1，部分符合區 293；D40 前 11 筆、294——`衛署藥製字第051523號`（`M A`｜`4 0`）由部分符合移入連寫級），並斷言三分區 expected sets 與逐筆 predicate。**另須一筆查詢 token 分散於 `mark1`／`mark2` 的辨識性案例**——只有跨欄聯集正確才會命中（v1.1 漏掉這條） |
 | **A3** | imprint `T`：完全 **95**／字首 **333**／包含 **0**（互斥，D18 後包含級歸零），聯集 428。強度同 A1（expected sets ＋ 互斥 ＋ 逐筆最差等級 predicate）。專門堵「偷偷退回純子字串」與「誤用累計口徑」 |
 | **A4** | 顏色=白：主區 **2,680**、未提供區 **217**。逐筆斷言主區皆含「白」、未提供區皆為顏色拆解後為空且其他條件無 mismatch、兩區互斥。**另對 vocab 的 13 個顏色全值做集合性質驗證**（每個值的主區皆為「含該值」的記錄），避免只有「白」特判正確 |
 | **A5** | 白 + 圓形 + 無刻痕：主區 **754**、未提供區 **205**。斷言主區逐筆三欄皆 match、未提供區完整集合、被排除者至少一欄 mismatch。**754 是「顏色含白」不是「顏色恰為白」**。**另加合成 3×3 矩陣**（兩個條件各取 match／mismatch／unknown 的九種組合）證明 **mismatch 優先於 unknown**——全量數字只在單一資料分布上成立，換條件即可能漏檢 |
@@ -699,6 +703,7 @@ touch target ≥ 44 × 44 px；**只有搜尋列 sticky，條件面板隨頁捲�
 | **A10** | imprint `ZZZZ9`：三個確定分區皆 **0**，未提供區 **2,085**（**expected set ＋ 逐筆 token 集合為空**，不只筆數）。UI 文案須由 `main === 0 && unknown > 0` 的狀態推出，**不得**顯示「找不到符合的藥品」。另以 deep-frozen 條件物件證明條件未被 mutate——**但 mutation 檢查不得當作分類正確的證據** |
 | **A11** | 複選：顏色勾選「白＋黃」→ 主區 **3,868**、未提供區 **217**（組內 OR），expected sets。另須五個 witness：只含白、只含黃、兩者皆無、顏色命中但形狀 mismatch、顏色其中一值命中且形狀 match——沒有 witness 時「忽略 AND」也可能碰巧通過 |
 | **A19** | **名稱 NFKC ＋ 多詞 AND（D39）**：oracle 具名查詢 9 組的 expected sets（`益庇益庇錠500` **1**、`力佳爽錠0.5公絲` **1**、`力佳爽錠０．５公絲` **1**、`CEPHENDOL 25MG` **1**、`25MG CEPHENDOL` **1**、`cephendol  s.c.` **1**、`25毫克` **184**、`錠 500` **245**、`sodium` **34**），逐筆 naive predicate；（b）驗收 witness `益庇益庇錠500` 命中恰 `衛署藥製字第015596號`（資料為全形 `５００`）；（c）**超集合護欄**：舊規則命中者新規則不得遺失（決定性取樣，比對 >200 筆）；（d）全形 imprint `１０`／`Ｍ　４０` 與半形五區逐一相等 |
+| **A20** | **刻字連寫（D40）**：（a）baseline 全部 **2,335** 個多 token 欄位去分隔後查詢，本筆回收率 **100%**（D40 前 6 筆＝0.3%），其中 2,329 在連寫級、原本已在主區的 6 筆等級不變；（b）連寫級 expected sets 與逐筆 naive predicate：`10` [72,129,67,**3**]、`M 40`／`40 M`／`Ｍ　４０` [2,4,5,**1**]、`HS` [42,1,1,**14**]、`SH` [3,22,12,**2**]；（c）合成 witness：原樣命中者等級不變、其他條件 mismatch 仍排除、連寫鍵不得餵給倒讀（`H S` 對查詢 `SH` 不得進變體區）、字首不算連寫。變異「拿掉 fallback」「改包含級」「改字首」「併入 `_tok`」皆轉紅 |
 | **A12** | **髒值 golden decisions（必過）＋ 反例追問（必答）**：<br>（a）**五類髒值各至少一筆固定 golden decision**：中文混合標註（`六邊形裡面有K`）、頭／尾字樣（`頭CL`／`尾016`，同一筆）、兩欄相同（41 筆）、只有標註二（68 筆）、單字元高噪音 token（`S` 出現於 174 筆）。每筆記錄輸入、規則輸出、人工裁決與理由。<br>（b）**雙向反例是必須被回答的問題，不是必須被填滿的配額**：須明文回答「是否存在規則命中但人工認為不該命中者」與「是否存在規則不命中但人工認為該命中者」。**「查無」是合法答案**，但須附**列舉範圍與查找方法**。<br>（c）真實發現的分歧另記 observation log，格式依 E6。<br>設計理由：強制湊滿雙向反例會誘發事後編造；完全不問則放回取樣偏誤 |
 
 ### B 組 — 正規化（純函式）
@@ -713,6 +718,7 @@ touch target ≥ 44 × 44 px；**只有搜尋列 sticky，條件面板隨頁捲�
 | **B6** | 中文：**逐欄**斷言 `normalizeImprintField("六邊形裡面有K") === ["K"]`。**注意該筆記錄的整體 token 集合是 `["K","KJ","195"]`（另一欄有值）**——條文若寫成逐筆會恆紅。另含「純中文 → 空陣列」與「中文夾多段英數 → 完整英數 tokens」 |
 | **B23** | **全形／半形（D39）**：（a）`normalizeName` 對 6 組全形／半形 pair 斷言**兩側相等**且等於指定半形字串（含 U+3000、tab、連續空白）；（b）`normalizeImprintField('TC１００') === ['TC100']`，全形查詢為 `VALID`，中文仍為 `NO_TOKEN`；（c）`nameCondition` 多詞 AND：詞序無關、跨欄可成立、任一詞不中即 `mismatch`（擋住 OR 實作） |
 | **B24** | **前端資料契約純函式（D16）**：`contractErrors()` 自 `app.js` 移至 `search.js`。合法 payload 回 `null`（對照組）；id 重複須報錯並指出該 id；`items` 為空須報錯；另 14 種結構損壞（非物件、schema、`images_complete` 型別、缺 id、四個陣列欄位、`imgs` 結構）逐一報錯；`app.js` 不得自帶同名函式且須從 `search.js` import |
+| **B25** | **連寫純函式（D40）**：`joinedTokens` 為同欄連續 ≥2 token 串接（`A B C` → `AB`／`BC`／`ABC`），**不跨欄**（`M A`｜`4 0` → `MA`／`40`），單 token 欄為空，NFKC 一致；`joinedPredicate` 只接受完全相等（字首 `FYT06`、包含 `YT061` 皆 false）、全部原樣命中時 false、逐 token 可一段原樣一段連寫；`indexItems` 另存 `_tokJoin`，`_tok`／`_tokCanon` 不變；`Tier.JOINED === 3` |
 | **B7** | 對 B1–B6 的每個 golden case 連呼叫兩次結果相同，且**輸入物件與前次輸出皆未被 mutate**（只驗「兩次相同」會讓回傳固定錯誤常數通過） |
 
 ### C 組 — 管線 fail-closed（每條以注入 fixture 實跑，且須有「相鄰合法 fixture 會成功」的對照組）
@@ -772,6 +778,7 @@ touch target ≥ 44 × 44 px；**只有搜尋列 sticky，條件面板隨頁捲�
 | **E9** | （自動）`manifest.webmanifest` 的每個圖示都存在、路徑為相對路徑，且**宣稱的 `sizes` 等於 PNG IHDR 的實際像素**；具備 192／512 `any` 與 512 `maskable`；`scope` 與 `start_url` 為 `./`；`theme_color` 與 `index.html` 的 meta 一致；`index.html` 連上 manifest 與 180px 的 `apple-touch-icon` |
 | **E10** | （自動）SW 契約：`activate` **只刪 `pill-` 前綴**的 cache；全檔不得出現 `ignoreSearch`；`networkFirstData` 的 `fetch` 必須早於 `cache.match`，無快取時 `throw` 且**不得合成 `new Response`**，退快取時必須 `notifyClients({type:'OFFLINE_MODE', path})`；install 預抓清單**不得含 `appearance.json`**；圖片快取上限為 0 < N < 6798 的常數、有淘汰路徑、且淘汰掛在 `event.waitUntil()` 上；shell **不得**使用 stale-while-revalidate；每一處 `cache.put` 都必須經 `putSafe`；跨源請求不攔截。**這條只擋原始碼層的移除**——「上限真的成立」「首次重載真的拿到新版」屬執行期行為，由 E11 負責 |
 | **E10b** | （自動）`#offline` 預設 hidden 且內容為空；`OFFLINE_MODE` 的監聽**註冊位置早於 `load()`**（SW 在回應資料之前送訊息）；離線狀態存成變數並在資料載入後補畫；SW 註冊失敗必須被吞掉 |
+| **E13** | （自動＋人工）連寫級 UI（D40）：`TIER_TITLE` 為完全／字首／包含／連寫四級、`TIER_WHY` 四條；分區迴圈上限取 `res.tiers.length`（寫死 3 會「計數有、畫面沒有」）；`TIER_CARD[3]` 為 `joinedCard`，「連寫命中」標示掛進卡片內文；placeholder 為 `例如 10、APO、M 40、FYT061`；app.js 不得自行串接 token。人工：375 px 截圖確認 placeholder 不截斷、連寫卡片標示可見（`.ai-review/evidence/e13-2026-10-28.md`） |
 | **E11** | （人工）本機起靜態站實測並留存證據：①SW active、cache key 只有 `pill-` 前綴 ②install 預抓清單不含 `appearance.json` ③二次載入後 `appearance.json` 進 `pill-data-*` ④圖片進 `pill-img-*` 且 URL **保留 `?v=`** ⑤**關閉伺服器後重載**：`#fatal` 仍 hidden、搜尋可用、`#offline` 可見、快取圖片正常顯示 ⑥注入 `last_checked` 過期的狀態檔驗 `is-stale`。每項附截圖或實測輸出 |
 
 ### F 組 — 整體驗收
@@ -856,6 +863,34 @@ CLAUDE.md / README.md / LICENSE / .gitignore / package.json
 ---
 
 ## 14. 修訂紀錄
+
+### v1.12 → v1.13（H1 刻字連寫，2026-10-28）
+
+#### D40 刻字連寫：主區第四級
+
+**缺陷（H1）**：TFDA 記 `FY T061`、使用者讀成 `FYT061` → 原樣 mismatch → 完全排除。
+baseline **2,335** 個多 token 欄位（live 2,357）去分隔後查詢，本筆回收率 **0.3%**（6 筆）。
+
+**裁決**（依 PR #9 的待決段，使用者 2026-10-28 裁定）：
+
+1. **索引 a1**：同一欄內所有連續 ≥2 token 的串接（`A B C` → `AB`、`BC`、`ABC`），
+   `indexItems()` 另存 `_tokJoin`，只在記憶體衍生、不持久化（D15），**不併入 `_tok`、不餵給 flip／canon**。
+   併入 `_tok` 已實測否決：會改動既有三級（`10` 包含 67→69）與變體區（`SH` 42→55）。
+2. **比對（案 1：逐 token）**：只在原樣為 mismatch／partial 時判；每個查詢 token 須原樣命中（任一級）
+   或與某連寫鍵**完全相等**（比照 D34），且至少一個靠連寫。
+   曾考慮「整串查詢去分隔後完全相等」（案 2），差別在 `衛署藥製字第051523號`（`M A`｜`4 0`）：
+   案 1 查 `M 40` 進連寫級，案 2 留在部分符合。兩案回收率同為 100%，採案 1（與 PR #9 表格一致）。
+3. **分區案 A**：主區第四級「連寫」，排在包含之後；卡片標「連寫命中」。**連寫先於變體**判定。
+4. **D17 不變**：單 token 查詢的部分符合區恆為 0（連寫命中進主區，不進 partial）。
+
+**影響（baseline，與 PR #9 量測逐項相同）**：`10`／`１０` +3、`M 40`／`40 M`／`Ｍ　４０` +1（partial 294→293）、
+`SH` +2、`HS` +14、`01` +5、`12` +5、`MS` +2、`15` +4、`IS` +1；其餘具名查詢 0。
+`VARIANT_EXPECTED` **全數不變**；A17 閉包 worst／flip／canon **111／84／111 不變**；
+閉包內「連寫先於變體而改道」**0 筆**；新增指紋 `worstJoined` **27**（`NK`，查詢域另加全部連寫鍵，共 5,171）。
+
+**四處同步**：`make-expected.mjs`（獨立 `joinedKeys`：逐段累加字串，不用 slice＋join；`joinedOf`）＋
+`EXPECTED_COUNTS` 全部 tier tuple 改 4 元素、新增 9 組連寫具名查詢與 `partialM40` ＋ `CLOSURE_FINGERPRINT.worstJoined`
+→ `npm run expected` → §10 A1／A2／A20／B25／E13 → 測試（既有 3 元素斷言改 4 元素，A15a 主區 37→39）。
 
 ### v1.11 → v1.12（2026-10 覆審修正，2026-10-28）
 

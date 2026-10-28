@@ -91,6 +91,15 @@ const naiveVariant = (row, q) => {
   return reasons.length ? reasons : null;
 };
 
+/** naive 連寫鍵：同欄連續 ≥2 token 串接。**不從 search.js import**。 */
+const naiveJoined = (row) => {
+  const out = new Set();
+  for (const f of [row['標註一'], row['標註二']]) {
+    const t = naiveTokens(String(f ?? '').normalize('NFKC'));
+    for (let i = 0; i < t.length; i++) for (let j = i + 2; j <= t.length; j++) out.add(t.slice(i, j).join(''));
+  }
+  return out;
+};
 // ── 測試工具 ────────────────────────────────────────────────────────
 const ids = (list) => list.map((i) => i.id).sort();
 const sorted = (a) => [...a].sort();
@@ -130,16 +139,17 @@ function assertCase(res, key, label) {
   assert.deepEqual(ids(res.tiers[0]), sorted(e.tiers[0]), `${label}: 完全符合區成員不符`);
   assert.deepEqual(ids(res.tiers[1]), sorted(e.tiers[1]), `${label}: 字首符合區成員不符`);
   assert.deepEqual(ids(res.tiers[2]), sorted(e.tiers[2]), `${label}: 包含區成員不符`);
+  assert.deepEqual(ids(res.tiers[3]), sorted(e.tiers[3]), `${label}: 連寫區成員不符`);
   assert.deepEqual(ids(res.partial), sorted(e.partial), `${label}: 部分符合區成員不符`);
   assert.deepEqual(ids(res.unknown), sorted(e.unknown), `${label}: 未提供區成員不符`);
   assertPartition(res, label);
 }
 
 // ── A1 ──────────────────────────────────────────────────────────────
-test('A1 imprint 10：三個互斥分區 72/129/67，未提供區 2085', () => {
+test('A1 imprint 10：四個互斥分區 72/129/67/3（D40 加連寫級），未提供區 2085', () => {
   const res = search(items, { imprint: '10' });
-  assert.deepEqual(res.tiers.map((t) => t.length), [72, 129, 67]);
-  assert.equal(res.mainCount, 268);
+  assert.deepEqual(res.tiers.map((t) => t.length), [72, 129, 67, 3]);
+  assert.equal(res.mainCount, 271);
   assert.equal(res.unknown.length, 2085);
   assertCase(res, 'imprint:10', 'A1');
 
@@ -147,6 +157,11 @@ test('A1 imprint 10：三個互斥分區 72/129/67，未提供區 2085', () => {
     for (const it of res.tiers[tier]) {
       assert.equal(naiveTier(rowOf(it.id), '10'), tier, `A1: ${it.id} 等級錯置`);
     }
+  }
+  // 連寫級：原樣比對不命中，但 10 是某個同欄連寫鍵
+  for (const it of res.tiers[3]) {
+    assert.equal(naiveTier(rowOf(it.id), '10'), null, `A1: ${it.id} 原樣即命中，不該在連寫級`);
+    assert.ok(naiveJoined(rowOf(it.id)).has('10'), `A1: ${it.id} 沒有連寫鍵 10`);
   }
   for (const it of res.unknown) {
     assert.deepEqual(naiveRowTokens(rowOf(it.id)), [], `A1: ${it.id} 有 token 卻進未提供區`);
@@ -158,15 +173,16 @@ test('A2 M 40 與 40 M 結果完全相等且非空', () => {
   const a = search(items, { imprint: 'M 40' });
   const b = search(items, { imprint: '40 M' });
   assert.deepEqual(buckets(a), buckets(b), 'A2: 順序敏感');
-  assert.deepEqual(a.tiers.map((t) => t.length), [2, 4, 5]);
-  assert.equal(a.mainCount, 11, 'A2: 主區為空——相等但無意義');
-  assert.equal(a.partial.length, 294, 'A2: 部分符合區筆數');
+  // D40：衛署藥製字第051523號（M A｜4 0）由部分符合移入連寫級
+  assert.deepEqual(a.tiers.map((t) => t.length), [2, 4, 5, 1]);
+  assert.equal(a.mainCount, 12, 'A2: 主區為空——相等但無意義');
+  assert.equal(a.partial.length, 293, 'A2: 部分符合區筆數（D40 前 294）');
   assertCase(a, 'imprint:M 40', 'A2');
 });
 
 // ── D18 單字元查詢不啟用「包含」級 ─────────────────────────────────
 test('D18a 單字元查詢的包含級恆為 0，且完全／字首兩級不受影響', () => {
-  for (const [q, want] of [['T', [95, 333, 0]], ['S', [174, 657, 0]], ['1', null]]) {
+  for (const [q, want] of [['T', [95, 333, 0, 0]], ['S', [174, 657, 0, 0]], ['1', null]]) {
     const res = search(items, { imprint: q });
     assert.equal(res.tiers[2].length, 0, `D18a: ${q} 的包含級應為 0`);
     if (want) assert.deepEqual(res.tiers.map((t) => t.length), want, `D18a: ${q}`);
@@ -178,7 +194,7 @@ test('D18a 單字元查詢的包含級恆為 0，且完全／字首兩級不受�
 test('D18b 單字元 token 在多 token 查詢中同樣不啟用包含級', () => {
   // 「M 40」的 M 是單字元：D18 前主區 2/4/13、部分 504；之後為 2/4/5、部分 294
   const res = search(items, { imprint: 'M 40' });
-  assert.deepEqual(res.tiers.map((t) => t.length), [2, 4, 5]);
+  assert.deepEqual(res.tiers.map((t) => t.length), [2, 4, 5, 1]);
   for (const it of res.tiers.flat()) {
     const toks = naiveRowTokens(rowOf(it.id));
     // 每一筆的 M 必須是完全或字首命中，不得是「某個 token 內含 M」
@@ -225,11 +241,12 @@ test('D17b 部分符合區逐筆：至少一個查詢 token 命中、但非全�
 test('D17c 第四區不得改變既有三級與未提供區（凍結數字的迴歸護欄）', () => {
   // 註：2/4/5 是 D18 之後的值（D17 剛引入時為 2/4/13）。
   // D17 本身不改動三級，改動三級的是 D18——兩次變更都在規格 §14 有紀錄。
+  // D40 的連寫級是第四級：前三級數字必須與 D40 前完全相同（只多出第四個元素）。
   const a = search(items, { imprint: 'M 40' });
-  assert.deepEqual(a.tiers.map((t) => t.length), [2, 4, 5]);
+  assert.deepEqual(a.tiers.map((t) => t.length), [2, 4, 5, 1]);
   assert.equal(a.unknown.length, 2085);
   const b = search(items, { imprint: '10' });
-  assert.deepEqual(b.tiers.map((t) => t.length), [72, 129, 67]);
+  assert.deepEqual(b.tiers.map((t) => t.length), [72, 129, 67, 3]);
   assert.equal(b.unknown.length, 2085);
 });
 
@@ -246,7 +263,7 @@ test('D17d 未提供區優先於部分符合區（TFDA 沒填 優先於 填了�
 // ── A3 ──────────────────────────────────────────────────────────────
 test('A3 imprint T：互斥分區 95/333/0（D18 後包含級歸零；D18 前為 95/333/522）', () => {
   const res = search(items, { imprint: 'T' });
-  assert.deepEqual(res.tiers.map((t) => t.length), [95, 333, 0]);
+  assert.deepEqual(res.tiers.map((t) => t.length), [95, 333, 0, 0]);
   assert.equal(res.mainCount, 428);
   assertCase(res, 'imprint:T', 'A3');
   for (let tier = 0; tier < 3; tier++) {
@@ -350,7 +367,7 @@ test('A6a 未輸入 imprint 時，結果集合須與 A5 完全相同', () => {
 test('A6b 白+圓形+無+imprint S：主區 94（16/78/0）、未提供區 419，UI 為已無更多條件可縮小', () => {
   const criteria = { color: ['白'], shape: ['圓形'], score: '無', imprint: 'S' };
   const res = search(items, criteria);
-  assert.deepEqual(res.tiers.map((t) => t.length), [16, 78, 0]);
+  assert.deepEqual(res.tiers.map((t) => t.length), [16, 78, 0, 0]);
   assert.equal(res.mainCount, 94);
   assert.equal(res.unknown.length, 419);
   assertCase(res, 'white-round-noscore+S', 'A6b');
@@ -530,6 +547,77 @@ test('A19d 全形 imprint 查詢與半形完全等價（M1）', () => {
   assertCase(search(items, { imprint: '１０' }), 'imprint:10', 'A19d 全形 10');
 });
 
+// ── A20 刻字連寫（D40）────────────────────────────────────────────────
+
+const inTier = (res, id) => res.tiers.findIndex((t) => t.some((i) => i.id === id));
+
+test('A20 多 token 欄位去分隔查詢：本筆回收率 100%（D40 前 0.3%）', () => {
+  let fields = 0, recalled = 0, viaJoined = 0;
+  const miss = [];
+  for (const r of rows) {
+    for (const f of [r['標註一'], r['標註二']]) {
+      const t = naiveTokens(f);
+      if (t.length < 2) continue;
+      fields++;
+      const id = String(r['許可證字號']).trim();
+      const tier = inTier(search(items, { imprint: t.join('') }), id);
+      if (tier >= 0) recalled++; else miss.push(`${id}:${t.join('')}`);
+      if (tier === 3) viaJoined++;
+    }
+  }
+  assert.equal(fields, 2335, 'A20: 母體筆數（baseline 多 token 欄位）');
+  assert.deepEqual(miss.slice(0, 5), [], `A20: ${miss.length} 個欄位去分隔後仍排除`);
+  assert.equal(recalled, fields);
+  assert.equal(viaJoined, 2329, 'A20: D40 前已在主區的 6 個不得被搬進連寫級');
+});
+
+test('A20b 連寫級 expected sets（4 元素 tier）與逐筆 predicate', () => {
+  const WANT = {
+    'imprint:10': [72, 129, 67, 3], 'imprint:１０': [72, 129, 67, 3],
+    'imprint:M 40': [2, 4, 5, 1], 'imprint:40 M': [2, 4, 5, 1], 'imprint:Ｍ　４０': [2, 4, 5, 1],
+    'imprint:HS': [42, 1, 1, 14], 'imprint:SH': [3, 22, 12, 2],
+  };
+  for (const [key, want] of Object.entries(WANT)) {
+    const res = search(items, EXP.cases[key].criteria);
+    assert.deepEqual(res.tiers.map((t) => t.length), want, `A20b ${key}`);
+    assertCase(res, key, `A20b ${key}`);
+    const q = naiveTokens(String(EXP.cases[key].criteria.imprint).normalize('NFKC'));
+    for (const it of res.tiers[3]) {
+      const row = rowOf(it.id);
+      const j = naiveJoined(row);
+      assert.ok(q.some((t) => j.has(t)), `A20b ${key}: ${it.id} 沒有任何 token 靠連寫命中`);
+      assert.ok(q.every((t) => j.has(t) || naiveHits(row, t).length === 1),
+        `A20b ${key}: ${it.id} 有 token 既非原樣命中也非連寫鍵`);
+      assert.ok(naiveHits(row, q.join(' ')).length < q.length, `A20b ${key}: ${it.id} 原樣即全中，不該在連寫級`);
+    }
+  }
+  // 案 1（逐 token）的 witness：連寫的一段在標註二、另一段原樣在標註一
+  const m40 = search(items, { imprint: 'M 40' });
+  assert.equal(inTier(m40, '衛署藥製字第051523號'), 3);
+  assert.equal(m40.partial.length, 293, 'A20b: M 40 的部分符合區 294 → 293（那一筆移到連寫級）');
+});
+
+test('A20c 連寫只在原樣 MISMATCH／PARTIAL 時才判；原樣命中者等級不變', () => {
+  const grid = indexItems([
+    { id: 'A', zh: 'a', en: 'a', color: ['白'], shape: [], score_mark: [], size: [], mark1: 'FY T061', mark2: null, imgs: [] },
+    { id: 'B', zh: 'b', en: 'b', color: ['黑'], shape: [], score_mark: [], size: [], mark1: 'FY T061', mark2: null, imgs: [] },
+    { id: 'C', zh: 'c', en: 'c', color: ['白'], shape: [], score_mark: [], size: [], mark1: 'H S', mark2: null, imgs: [] },
+  ]);
+  const r1 = search(grid, { imprint: 'FYT061' });
+  assert.deepEqual(ids(r1.tiers[3]), ['A', 'B']);
+  assert.deepEqual(ids(search(grid, { imprint: 'FY' }).tiers[0]), ['A', 'B'], 'A20c: 原樣完全命中不得被改成連寫級');
+  // 其他條件的 mismatch 仍壓過連寫（AND 不得被繞過）
+  const r2 = search(grid, { imprint: 'FYT061', color: ['白'] });
+  assert.deepEqual(ids(r2.tiers[3]), ['A']);
+  assert.equal(r2.excludedCount, 2);
+  // 連寫鍵不得餵給倒讀：C 的連寫鍵是 HS，flip('SH') === 'HS'，餵進去的話 C 會進變體區
+  const r3 = search(grid, { imprint: 'SH' });
+  assert.equal(r3.variant.length, 0, 'A20c: 連寫鍵被拿去做倒讀比對');
+  assert.equal(r3.mainCount, 0);
+  // 字首不算連寫：FYT06 對 FYT061 只是連寫鍵的字首
+  assert.equal(search(grid, { imprint: 'FYT06' }).mainCount, 0, 'A20c: 連寫級不得放寬成字首比對');
+});
+
 // ── A10 ─────────────────────────────────────────────────────────────
 test('A10 不存在的 imprint：確定三區皆 0、未提供區 2085、不得說找不到', () => {
   const criteria = Object.freeze({
@@ -538,7 +626,7 @@ test('A10 不存在的 imprint：確定三區皆 0、未提供區 2085、不得�
   const before = JSON.stringify(criteria);
   const res = search(items, criteria);
 
-  assert.deepEqual(res.tiers.map((t) => t.length), [0, 0, 0]);
+  assert.deepEqual(res.tiers.map((t) => t.length), [0, 0, 0, 0]);
   assert.equal(res.partial.length, 0);
   assert.equal(res.unknown.length, 2085);
   assertCase(res, 'imprint:ZZZZ9', 'A10');
@@ -763,9 +851,10 @@ test('A15 反例組：七類必須不放行或分區正確的案例', () => {
   const V = (q) => search(items, { imprint: q });
   const reasonsOf = (res) => res.variant.map((v) => v.reasons.join('+'));
 
-  // (a) 變體區(42) 大於主區(37)：兩者不得混區
+  // (a) 變體區(42) 大於主區(39＝原樣 37 ＋ D40 連寫 2)：兩者不得混區
   const sh = V('SH');
-  assert.equal(sh.mainCount, 37, 'A15a: 主區筆數');
+  assert.equal(sh.mainCount, 39, 'A15a: 主區筆數（D40 前 37）');
+  assert.equal(sh.tiers[3].length, 2, 'A15a: 其中連寫級 2 筆');
   assert.equal(sh.variant.length, 42, 'A15a: 變體區筆數');
   assert.ok(reasonsOf(sh).every((r) => r === 'flip'), 'A15a: 42 筆理由皆須為倒讀');
   const mainIds = new Set(sh.tiers.flat().map((i) => i.id));

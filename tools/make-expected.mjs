@@ -49,18 +49,32 @@ const BASELINE_SHA256 = '6f62c4ad5d0bf9af388adbc3bf9f6c005cde9625861a4522cbc96fd
  * 這些數字產生於 search.js 之前，見上方獨立性說明。
  */
 const EXPECTED_COUNTS = {
+  // 主區四級 [完全, 字首, 包含, 連寫]。D40（2026-10）加入第四級「連寫」，全部改為 4 元素。
   // D18 起，單字元查詢 token 不啟用「包含」級。受影響者已標註原值。
-  'imprint:10': [72, 129, 67],
-  'imprint:T': [95, 333, 0],          // D18 前為 95/333/522
-  'imprint:S': [174, 657, 0],         // D18 前為 174/657/423
-  'imprint:M 40': [2, 4, 5],          // D18 前為 2/4/13（M 是單字元）
-  'imprint:40 M': [2, 4, 5],
-  'imprint:I JCP': [3, 0, 0],
-  'imprint:ZZZZ9': [0, 0, 0],
-  'color:白': [2680, 0, 0],
-  'color:白+黃': [3868, 0, 0],
-  'white-round-noscore': [754, 0, 0],
-  'white-round-noscore+S': [16, 78, 0],   // D18 前為 16/78/35
+  'imprint:10': [72, 129, 67, 3],     // D40 前無第四級
+  'imprint:T': [95, 333, 0, 0],       // D18 前為 95/333/522
+  'imprint:S': [174, 657, 0, 0],      // D18 前為 174/657/423
+  'imprint:M 40': [2, 4, 5, 1],       // D18 前為 2/4/13（M 是單字元）；D40：051523（M A｜4 0）由部分符合移入
+  'imprint:40 M': [2, 4, 5, 1],
+  'imprint:I JCP': [3, 0, 0, 0],
+  'imprint:ZZZZ9': [0, 0, 0, 0],
+  'color:白': [2680, 0, 0, 0],
+  'color:白+黃': [3868, 0, 0, 0],
+  'white-round-noscore': [754, 0, 0, 0],
+  'white-round-noscore+S': [16, 78, 0, 0],   // D18 前為 16/78/35
+
+  // D40：連寫級受影響的具名查詢。前三級是 D40 前的值（不得變動），第四級來自
+  // PR #9（liangRXdev/pill-detective-tw#9）「待決：H1」表格——寫於 search.js 有任何連寫程式碼之前。
+  'imprint:１０': [72, 129, 67, 3],
+  'imprint:Ｍ　４０': [2, 4, 5, 1],
+  'imprint:SH': [3, 22, 12, 2],
+  'imprint:HS': [42, 1, 1, 14],
+  'imprint:01': [7, 52, 103, 5],
+  'imprint:12': [12, 48, 38, 5],
+  'imprint:MS': [2, 5, 7, 2],
+  'imprint:15': [24, 58, 44, 4],
+  'imprint:IS': [3, 1, 42, 1],
+  partialM40: 293,                    // D40 前 294
   noImprint: 2085,
   unknownColor: 217,
   unknownWhiteRoundNoScore: 205,
@@ -75,15 +89,15 @@ const EXPECTED_COUNTS = {
   // D39（2026-10）：名稱比對改為 NFKC ＋ 收合空白 ＋ 依空白切詞各自 includes 取 AND。
   // 舊規則下前八個全部是 0（全形資料配半形查詢／多詞不連續），`sodium` 34 不變。
   // 數字來源：`.ai-review/evidence/d39-name-2026-10.md` 的量測腳本，寫於 search.js 改動之前。
-  'name:益庇益庇錠500': [1, 0, 0],       // 資料為全形「５００」；驗收條件
-  'name:力佳爽錠0.5公絲': [1, 0, 0],
-  'name:力佳爽錠０．５公絲': [1, 0, 0],   // 全形查詢（舊規則即命中，新規則不得退步）
-  'name:CEPHENDOL 25MG': [1, 0, 0],      // 兩詞不連續（中間是 S.C. TABLETS）
-  'name:25MG CEPHENDOL': [1, 0, 0],      // 詞序無關
-  'name:cephendol  s.c.': [1, 0, 0],     // 小寫＋連續空白
-  'name:25毫克': [184, 0, 0],            // 舊規則 143：差額 41 筆是全形「２５毫克」
-  'name:錠 500': [245, 0, 0],            // 舊規則 21（只有字面「錠 500」連續出現者）
-  'name:sodium': [34, 0, 0],             // A9 的既有數字，回歸護欄
+  'name:益庇益庇錠500': [1, 0, 0, 0],       // 資料為全形「５００」；驗收條件
+  'name:力佳爽錠0.5公絲': [1, 0, 0, 0],
+  'name:力佳爽錠０．５公絲': [1, 0, 0, 0],   // 全形查詢（舊規則即命中，新規則不得退步）
+  'name:CEPHENDOL 25MG': [1, 0, 0, 0],      // 兩詞不連續（中間是 S.C. TABLETS）
+  'name:25MG CEPHENDOL': [1, 0, 0, 0],      // 詞序無關
+  'name:cephendol  s.c.': [1, 0, 0, 0],     // 小寫＋連續空白
+  'name:25毫克': [184, 0, 0, 0],            // 舊規則 143：差額 41 筆是全形「２５毫克」
+  'name:錠 500': [245, 0, 0, 0],            // 舊規則 21（只有字面「錠 500」連續出現者）
+  'name:sodium': [34, 0, 0, 0],             // A9 的既有數字，回歸護欄
 };
 
 /**
@@ -152,7 +166,12 @@ const VARIANT_EXPECTED = {
  *
  * **任一數字變動即中止。** 放行字首級會讓 worst 上升、單字元啟用字形會讓它衝到 801。
  */
-const CLOSURE_FINGERPRINT = { worst: 111, worstFlip: 84, worstCanon: 111 };
+const CLOSURE_FINGERPRINT = {
+  worst: 111, worstFlip: 84, worstCanon: 111,
+  // D40：連寫級單查詢最壞值（查詢域另加全部連寫鍵）。PR #9 量測為 27（`NK`），寫於實作之前。
+  // 放行字首級會讓它暴增；變體三項在 D40 前後必須完全不變（連寫先於變體，實測改道 0 筆）。
+  worstJoined: 27,
+};
 
 // ── 直白版的正規化（刻意與 search.js 各寫一次）─────────────────────
 
@@ -258,6 +277,41 @@ function canonToken(token) {
   return out;
 }
 
+// ── 直白版的刻字連寫（D40）─────────────────────────────────────────
+//
+// **刻意換寫法**：search.js 用 slice＋join 產生連寫鍵，這裡用「從每個起點往右逐段累加字串」。
+
+/** 同一欄內所有連續 ≥2 個 token 的串接。**不跨欄**——跨欄串接沒有實體依據。 */
+function joinedKeys(row) {
+  const keys = [];
+  for (const field of [row['標註一'], row['標註二']]) {
+    const t = fieldTokens(field);
+    for (let start = 0; start < t.length; start++) {
+      let acc = t[start];
+      for (let end = start + 1; end < t.length; end++) {
+        acc = acc + t[end];
+        if (!keys.includes(acc)) keys.push(acc);
+      }
+    }
+  }
+  return keys;
+}
+
+/**
+ * 連寫判定（D40）。**只在原樣比對為 MISMATCH 或 PARTIAL 時呼叫。**
+ * 每個查詢 token：原樣命中（任一級）或與某連寫鍵**完全相等**；且至少一個靠連寫。
+ */
+function joinedOf(tokens, keys, queryTokens) {
+  let usedJoin = false;
+  for (const q of queryTokens) {
+    const [single] = imprintCond(tokens, [q]);
+    if (single === MATCH) continue;
+    if (keys.indexOf(q) >= 0) { usedJoin = true; continue; }
+    return false;
+  }
+  return usedJoin;
+}
+
 /**
  * 變體判定（§5.2）。**只在 imprint 原樣比對為 MISMATCH 時呼叫。**
  *
@@ -331,7 +385,7 @@ function nameCond(row, query) {
 function run(rows, { color = [], shape = [], score = null, imprint = '', name = '' } = {}) {
   const queryTokens = fieldTokens(imprint);
   const imprintOn = String(imprint).trim() !== '' && queryTokens.length > 0;
-  const tiers = [[], [], []];
+  const tiers = [[], [], [], []];
   const partial = [];
   const unknown = [];
   const variant = [];
@@ -346,7 +400,12 @@ function run(rows, { color = [], shape = [], score = null, imprint = '', name = 
     if (score !== null) states.push(setCond(splitOn(row['刻痕']), [score]));
     if (imprintOn) {
       const tokens = rowTokens(row);
-      const [st, tr] = imprintCond(tokens, queryTokens);
+      let [st, tr] = imprintCond(tokens, queryTokens);
+      // D40：原樣 MISMATCH／PARTIAL 才看連寫；命中即為主區第四級。排在變體之前——
+      // 連寫是記錄上真的有的字，變體是假設看錯。
+      if ((st === MISMATCH || st === PARTIAL) && joinedOf(tokens, joinedKeys(row), queryTokens)) {
+        st = MATCH; tr = 3;
+      }
       // D31：只有 MISMATCH 才計算變體。其餘四種狀態照舊，
       // 因此 main／partial／unknown 三區逐筆不變、excluded 只會變少。
       if (st === MISMATCH) reasons = variantOf(tokens, queryTokens);
@@ -386,7 +445,7 @@ function run(rows, { color = [], shape = [], score = null, imprint = '', name = 
 function closureFingerprint(rows) {
   const perRow = rows.map((r) => {
     const toks = rowTokens(r);
-    return { toks, canon: toks.map(canonToken) };
+    return { toks, canon: toks.map(canonToken), keys: joinedKeys(r) };
   });
 
   const real = new Set();
@@ -399,6 +458,7 @@ function closureFingerprint(rows) {
   }
 
   let worst = 0, worstQ = '', worstFlip = 0, worstFlipQ = '', worstCanon = 0, worstCanonQ = '';
+  let stolen = 0;
   for (const q of closure) {
     const queryTokens = fieldTokens(q);
     if (queryTokens.length === 0) continue;
@@ -406,6 +466,10 @@ function closureFingerprint(rows) {
     for (const r of perRow) {
       const [st] = imprintCond(r.toks, queryTokens);
       if (st !== MISMATCH) continue;
+      if (joinedOf(r.toks, r.keys, queryTokens)) {           // D40：連寫先於變體
+        if (variantOf(r.toks, queryTokens)) stolen++;        // 若無 D40 會進變體區的筆數（只計不擋）
+        continue;
+      }
       const reasons = variantOf(r.toks, queryTokens);
       if (!reasons) continue;
       n++;
@@ -416,9 +480,24 @@ function closureFingerprint(rows) {
     if (nf > worstFlip) { worstFlip = nf; worstFlipQ = q; }
     if (nc > worstCanon) { worstCanon = nc; worstCanonQ = q; }
   }
+  // D40：連寫級的單查詢最壞值。查詢域另加全部連寫鍵——連寫鍵本身就是使用者會打的字串。
+  const joinDomain = new Set(closure);
+  for (const r of perRow) for (const k of r.keys) joinDomain.add(k);
+  let worstJoined = 0, worstJoinedQ = '';
+  for (const q of joinDomain) {
+    const queryTokens = fieldTokens(q);
+    if (queryTokens.length === 0) continue;
+    let n = 0;
+    for (const r of perRow) {
+      const [st] = imprintCond(r.toks, queryTokens);
+      if ((st === MISMATCH || st === PARTIAL) && joinedOf(r.toks, r.keys, queryTokens)) n++;
+    }
+    if (n > worstJoined) { worstJoined = n; worstJoinedQ = q; }
+  }
   return {
     closureSize: closure.size, realTokens: real.size,
     worst, worstQ, worstFlip, worstFlipQ, worstCanon, worstCanonQ,
+    stolen, joinDomainSize: joinDomain.size, worstJoined, worstJoinedQ,
   };
 }
 
@@ -588,6 +667,7 @@ const checks = [
   ['literalWu（記錄數）', literalWu.length, EXPECTED_COUNTS.literalWu],
   ['literalWu（欄位出現次數）', literalWuFieldOccurrences, EXPECTED_COUNTS.literalWuFieldOccurrences],
   ['literalWuWithOtherTokens', literalWuWithOtherTokens.length, EXPECTED_COUNTS.literalWuWithOtherTokens],
+  ['partialM40（D40）', out.cases['imprint:M 40'].partial.length, EXPECTED_COUNTS.partialM40],
 ];
 for (const [label, got, want] of checks) {
   if (got !== want) problems.push(`${label} 期望 ${want} 實際 ${got}`);
@@ -599,11 +679,15 @@ console.log(`\n可達查詢閉包 ${fp.closureSize}（真實 token ${fp.realToke
 console.log(`  最壞變體區       ${String(fp.worst).padStart(4)}  ("${fp.worstQ}")`);
 console.log(`  flip  上界       ${String(fp.worstFlip).padStart(4)}  ("${fp.worstFlipQ}")`);
 console.log(`  canon 上界       ${String(fp.worstCanon).padStart(4)}  ("${fp.worstCanonQ}")`);
+console.log(`  D40 連寫上界     ${String(fp.worstJoined).padStart(4)}  ("${fp.worstJoinedQ}"，查詢域 ${fp.joinDomainSize})`);
+console.log(`  D40 連寫先於變體而改道的筆數（閉包合計）${fp.stolen}`);
 out.closureFingerprint = {
   closure_size: fp.closureSize, real_tokens: fp.realTokens,
   worst: fp.worst, worst_query: fp.worstQ,
   worst_flip: fp.worstFlip, worst_flip_query: fp.worstFlipQ,
   worst_canon: fp.worstCanon, worst_canon_query: fp.worstCanonQ,
+  worst_joined: fp.worstJoined, worst_joined_query: fp.worstJoinedQ, join_domain_size: fp.joinDomainSize,
+  joined_preempted_variant: fp.stolen,
   note: '規則指紋，非政策上界。任一數字變動＝規則漂移，見 plan-imprint-variant.md A17。',
 };
 for (const [k, want] of Object.entries(CLOSURE_FINGERPRINT)) {

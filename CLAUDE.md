@@ -1,6 +1,6 @@
 # CLAUDE.md — 藥丸偵探 Pill Detective TW
 
-規格在 `.ai-review/plan.md`（**v1.12，動任何東西前先讀 §5 的 D1.1／D3／D12／D14／D17／D18**）。
+規格在 `.ai-review/plan.md`（**v1.13，動任何東西前先讀 §5 的 D1.1／D3／D12／D14／D17／D18**）。
 兩輪 Codex 覆審報告與判定在同目錄，數字爭議先查 `plan-verdict.md` 的事實查核段。
 
 底下只記「從 code 看不出來、但改錯會出事」的部分。
