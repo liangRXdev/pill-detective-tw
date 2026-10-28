@@ -301,6 +301,41 @@ export function freshnessView(meta, status, now = new Date()) {
   };
 }
 
+// ── 前端資料契約（D16）──────────────────────────────────────────────
+
+/**
+ * 前端資料載入的逐筆契約檢查（D16）。回傳第一個違反的描述；合法回 `null`。
+ *
+ * 從 `app.js` 抽出來是為了**測得到**（驗收 B24）——理由同 `freshnessView`：
+ * 本專案沒有 jsdom，留在 app.js 裡就只剩原始碼掃描。
+ *
+ * 只檢查 schema 與「items 非空」是不夠的：若 items 非空但個別記錄損壞，
+ * 資料仍會進入搜尋並產生**部分結果**——那是最危險的一種，畫面看起來正常。
+ */
+export function contractErrors(payload) {
+  if (!payload || typeof payload !== 'object') return '回應不是物件';
+  if (payload.meta?.schema !== 1) return `meta.schema 不是 1（${JSON.stringify(payload.meta?.schema)}）`;
+  if ('images_complete' in payload.meta && typeof payload.meta.images_complete !== 'boolean') {
+    return 'meta.images_complete 不是 boolean';
+  }
+  if (!Array.isArray(payload.items)) return 'items 不是陣列';
+  if (payload.items.length === 0) return 'items 為空';
+  const seen = new Set();
+  for (const it of payload.items) {
+    if (!it || typeof it.id !== 'string' || !it.id) return '有記錄缺 id';
+    if (seen.has(it.id)) return `id 重複：${it.id}`;
+    seen.add(it.id);
+    for (const f of ['color', 'shape', 'score_mark', 'size']) {
+      if (!Array.isArray(it[f])) return `${it.id} 的 ${f} 不是陣列`;
+    }
+    if (!Array.isArray(it.imgs)) return `${it.id} 的 imgs 不是陣列`;
+    for (const g of it.imgs) {
+      if (!g || typeof g.file !== 'string' || typeof g.src !== 'string') return `${it.id} 的 imgs 結構損壞`;
+    }
+  }
+  return null;
+}
+
 /**
  * 許可證字號 → TFDA 官方仿單資料頁。
  *

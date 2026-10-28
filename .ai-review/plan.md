@@ -712,6 +712,7 @@ touch target ≥ 44 × 44 px；**只有搜尋列 sticky，條件面板隨頁捲�
 | **B5** | `;;;` 展開：斷言 exact token array、token 數、順序，且**無任何 token 含分隔符**（只刪 `;;;` 會產生黏合 token，寬鬆 contains 斷言看不出來） |
 | **B6** | 中文：**逐欄**斷言 `normalizeImprintField("六邊形裡面有K") === ["K"]`。**注意該筆記錄的整體 token 集合是 `["K","KJ","195"]`（另一欄有值）**——條文若寫成逐筆會恆紅。另含「純中文 → 空陣列」與「中文夾多段英數 → 完整英數 tokens」 |
 | **B23** | **全形／半形（D39）**：（a）`normalizeName` 對 6 組全形／半形 pair 斷言**兩側相等**且等於指定半形字串（含 U+3000、tab、連續空白）；（b）`normalizeImprintField('TC１００') === ['TC100']`，全形查詢為 `VALID`，中文仍為 `NO_TOKEN`；（c）`nameCondition` 多詞 AND：詞序無關、跨欄可成立、任一詞不中即 `mismatch`（擋住 OR 實作） |
+| **B24** | **前端資料契約純函式（D16）**：`contractErrors()` 自 `app.js` 移至 `search.js`。合法 payload 回 `null`（對照組）；id 重複須報錯並指出該 id；`items` 為空須報錯；另 14 種結構損壞（非物件、schema、`images_complete` 型別、缺 id、四個陣列欄位、`imgs` 結構）逐一報錯；`app.js` 不得自帶同名函式且須從 `search.js` import |
 | **B7** | 對 B1–B6 的每個 golden case 連呼叫兩次結果相同，且**輸入物件與前次輸出皆未被 mutate**（只驗「兩次相同」會讓回傳固定錯誤常數通過） |
 
 ### C 組 — 管線 fail-closed（每條以注入 fixture 實跑，且須有「相鄰合法 fixture 會成功」的對照組）

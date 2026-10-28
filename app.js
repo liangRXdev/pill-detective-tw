@@ -9,7 +9,7 @@ import {
   COLORS, SHAPES, SCORE_MARKS, SCORE_ANY,
   indexItems, search, resultStates, relaxSuggestions, ResultState, hasActiveCriteria,
   isOfficialImgUrl, officialLeafletUrl,
-  freshnessView,
+  freshnessView, contractErrors,
 } from './search.js';
 
 const DATA_URL = 'data/appearance.json';
@@ -43,36 +43,6 @@ let dataVersion = null;
 const imagePlaceholder = () => imagesComplete ? '官方暫無可用圖片' : '鏡像圖片建置中';
 
 // ── 資料載入：任何契約違反都 fail-closed（D16）────────────────────
-
-/**
- * 逐筆資料契約檢查。
- *
- * 只檢查 schema 與「items 非空」是不夠的：若 items 非空但個別記錄損壞，
- * 資料仍會進入搜尋並產生**部分結果**——那是最危險的一種，畫面看起來正常。
- */
-function contractErrors(payload) {
-  if (!payload || typeof payload !== 'object') return '回應不是物件';
-  if (payload.meta?.schema !== 1) return `meta.schema 不是 1（${JSON.stringify(payload.meta?.schema)}）`;
-  if ('images_complete' in payload.meta && typeof payload.meta.images_complete !== 'boolean') {
-    return 'meta.images_complete 不是 boolean';
-  }
-  if (!Array.isArray(payload.items)) return 'items 不是陣列';
-  if (payload.items.length === 0) return 'items 為空';
-  const seen = new Set();
-  for (const it of payload.items) {
-    if (!it || typeof it.id !== 'string' || !it.id) return '有記錄缺 id';
-    if (seen.has(it.id)) return `id 重複：${it.id}`;
-    seen.add(it.id);
-    for (const f of ['color', 'shape', 'score_mark', 'size']) {
-      if (!Array.isArray(it[f])) return `${it.id} 的 ${f} 不是陣列`;
-    }
-    if (!Array.isArray(it.imgs)) return `${it.id} 的 imgs 不是陣列`;
-    for (const g of it.imgs) {
-      if (!g || typeof g.file !== 'string' || typeof g.src !== 'string') return `${it.id} 的 imgs 結構損壞`;
-    }
-  }
-  return null;
-}
 
 function fatal(why) {
   $('fatalWhy').textContent = why;
