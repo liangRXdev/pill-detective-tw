@@ -19,6 +19,7 @@ import {
   hasActiveCriteria, SCORE_ANY,
   taipeiDate, daysSinceISODate, STALE_DAYS, freshnessView,
   flip, canon, flipPredicate, canonPredicate, variantReasons,
+  nameCondition, Cond,
 } from '../search.js';
 
 const B_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -109,8 +110,10 @@ test('B6 中文：逐欄規則（不是逐筆）', () => {
   assert.deepEqual(normalizeImprintField('無'), []);
   assert.deepEqual(normalizeImprintField('六邊形'), []);
   assert.deepEqual(normalizeImprintField('前AB後CD'), ['AB', 'CD']);
-  // 全形英數不是 [A-Z0-9]，一律視為分隔（刻意：全形不會出現在藥錠刻字上）
-  assert.deepEqual(normalizeImprintField('ＡＢ'), []);
+  // D39 起全形英數先 NFKC 成半形。v1.x 原本刻意把它當分隔（「全形不會出現在藥錠刻字上」），
+  // 但那個前提只對**資料側**成立——**查詢側**的中文輸入法預設就會打出全形，
+  // `ＴＣ１００` 因而只剩 `TC`，且不觸發 noToken 提示（M1）。
+  assert.deepEqual(normalizeImprintField('ＡＢ'), ['AB']);
 });
 
 test('B7 決定性：重複呼叫結果相同，且輸入與前次輸出不被 mutate', () => {
@@ -502,4 +505,54 @@ test('B22-3 變體理由永不為空集合 —— 空集合會被讀成「有變
   const r = variantReasons(['HS'], ['H5'], ['SH']);
   assert.ok(Array.isArray(r) && r.length > 0, 'B22-3: 有中就必須是非空陣列');
   assert.ok(Object.isFrozen(r), 'B22-3: 理由陣列必須凍結 —— 呼叫端改到它就會污染別筆');
+});
+
+// ── B23 全形／半形與名稱多詞（D39）────────────────────────────────────
+//
+// TFDA 中文品名有 1,220 筆（baseline）含全形數字（如「力佳爽錠０．５公絲」）。
+// 只做 toUpperCase 時，使用者打半形「0.5」**全部落入 EMPTY**——
+// 名稱是唯一能產生 EMPTY 的條件，所以這是會被讀成「查無此藥」的漏檢。
+
+test('B23 normalizeName：NFKC 全形→半形、大寫、收合連續空白（H2）', () => {
+  const PAIRS = [
+    ['力佳爽錠０．５公絲', '力佳爽錠0.5公絲'],
+    ['益庇益庇錠５００毫克', '益庇益庇錠500毫克'],
+    ['ｓｏｄｉｕｍ', 'SODIUM'],
+    ['ＡＰＡＰ　ＴＡＢＬＥＴＳ', 'APAP TABLETS'],          // U+3000 全形空白
+    ['  cephendol   s.c.\t25mg ', 'CEPHENDOL S.C. 25MG'],  // 前後空白、連續空白、tab
+    ['（敵芬尼朵）', '(敵芬尼朵)'],
+  ];
+  for (const [full, half] of PAIRS) {
+    assert.equal(normalizeName(full), half, `B23:「${full}」`);
+    // 全形與半形必須正規化成**同一個**字串——只驗其中一側會讓「兩邊都不轉」通過
+    assert.equal(normalizeName(full), normalizeName(half), `B23:「${full}」與「${half}」不等價`);
+  }
+  assert.equal(normalizeName(null), '');
+  assert.equal(normalizeName('　'), '', 'B23: 只有全形空白 → 空字串');
+});
+
+test('B23b normalizeImprintField：全形英數先 NFKC 再取 token（M1）', () => {
+  // 修正前 `TC１００` 只剩 ['TC']，且因為仍有 1 個 token，不會顯示 noToken 提示
+  assert.deepEqual(normalizeImprintField('TC１００'), ['TC100']);
+  assert.deepEqual(normalizeImprintField('ｔｃ　１００'), ['TC', '100']);
+  assert.deepEqual(normalizeImprintField('Ｍ　４０'), ['M', '40']);
+  assert.deepEqual(tokenizeQuery('ＦＹ－Ｔ０６１'), ['FY', 'T061']);
+  // 全形字元全部轉得掉時，狀態必須是 VALID 而不是 NO_TOKEN
+  assert.equal(imprintQueryState('１０'), QueryState.VALID);
+  // 對照組：中文仍然不是 token（NFKC 不得把中文變成英數）
+  assert.deepEqual(normalizeImprintField('六邊形裡面有Ｋ'), ['K']);
+  assert.equal(imprintQueryState('無'), QueryState.NO_TOKEN);
+});
+
+test('B23c nameCondition：依空白切詞、各詞 includes 取 AND、詞序無關（M2）', () => {
+  const it = { id: '衛署藥製字第016449號', zh: '世華妥糖衣錠２５毫克', en: 'CEPHENDOL S.C. TABLETS 25MG' };
+  for (const q of ['CEPHENDOL 25MG', '25mg cephendol', 'cephendol   s.c.', '世華妥 CEPHENDOL', '016449 25毫克']) {
+    assert.equal(nameCondition(it, q), Cond.MATCH, `B23c:「${q}」應命中`);
+  }
+  // AND 的反例：任一詞不中 → mismatch（OR 實作會讓這條通過）
+  assert.equal(nameCondition(it, 'CEPHENDOL 50MG'), Cond.MISMATCH);
+  assert.equal(nameCondition(it, 'CEPHENDOL ZZZ'), Cond.MISMATCH);
+  // 單詞行為不變
+  assert.equal(nameCondition(it, 'S.C. TAB'), Cond.MATCH);
+  assert.equal(nameCondition(it, 'TABLETS25'), Cond.MISMATCH);
 });

@@ -1,6 +1,6 @@
-# 藥丸偵探 Pill Detective TW — 台灣藥品外觀搜尋　規劃文件 v1.11
+# 藥丸偵探 Pill Detective TW — 台灣藥品外觀搜尋　規劃文件 v1.12
 
-- 修訂時間：2026-08-15（最新 v1.11；v1.2 依 `plan-verdict-2.md`，v1.3–v1.11 為實作階段裁決。修訂紀錄見 §14）
+- 修訂時間：2026-10-28（最新 v1.12；v1.2 依 `plan-verdict-2.md`，v1.3–v1.11 為實作階段裁決，v1.12 為 2026-10 覆審修正。修訂紀錄見 §14）
 - repo：https://github.com/liangRXdev/pill-detective-tw （GitHub Pages 靜態站）
 - 資料源：衛生福利部食品藥物管理署 Open Data「藥品外觀資料集」（opendata infoId=42）
 - 姊妹專案：`TFDA-drug-id-quiz`（藥品辨識王，同一資料源，已上線）
@@ -207,10 +207,10 @@
 | 形狀（已勾選集合 S） | 同上 | 同上 | 同上 |
 | 刻痕（已選 v ≠ 不限） | 記錄刻痕任一值 = v | 記錄刻痕非空且無值 = v | 記錄刻痕拆解後為空 |
 | imprint（有效查詢，見 D3） | **每個** Q token 皆在記錄 token 集合中命中 | 記錄 token 集合非空且至少一個 Q token 無命中 | 記錄 token 集合為空 |
-| 名稱（查詢 Q） | `toUpperCase(Q)` 為 `toUpperCase(zh)`／`toUpperCase(en)`／`id` **任一**的子字串 | 其餘 | **不存在**（`en` 與 `id` 恆非空，恆可判定） |
+| 名稱（查詢 Q） | `N(Q)` 依空白切出的**每個詞**皆為 `N(zh)`／`N(en)`／`N(id)` **任一**的子字串（D39；`N` = NFKC → 大寫 → 收合空白） | 其餘 | **不存在**（`en` 與 `id` 恆非空，恆可判定） |
 
-> 名稱比較一律先 `toUpperCase()` 再比子字串（中文與許可證字號不受影響，無大小寫）。
-> 這是 A9 要求「小寫 `sodium` 命中」的唯一依據，不得用個案特判達成。
+> 名稱比較一律先 `NFKC` 再 `toUpperCase()` 再比子字串（中文與許可證字號不受影響，無大小寫）。
+> 這是 A9 要求「小寫 `sodium` 命中」與 A19 要求「半形 `500` 命中全形 `５００`」的唯一依據，不得用個案特判達成。
 
 **分區規則（三選一，互斥且窮盡）：**
 
@@ -698,6 +698,7 @@ touch target ≥ 44 × 44 px；**只有搜尋列 sticky，條件面板隨頁捲�
 | **A9** | 名稱搜尋：**三欄各用不同記錄**的 expected set，涵蓋中文子字串、英文小寫 `sodium`（依 D1.1 的 `toUpperCase` 規則）、許可證字號子字串，且各有一個**負例**與一個**非前綴位置**的命中。AND 案例須有能區分「忽略外觀條件」與「真 AND」的**正反 witness**。名稱不命中一律 mismatch，**不得**進未提供區 |
 | **A10** | imprint `ZZZZ9`：三個確定分區皆 **0**，未提供區 **2,085**（**expected set ＋ 逐筆 token 集合為空**，不只筆數）。UI 文案須由 `main === 0 && unknown > 0` 的狀態推出，**不得**顯示「找不到符合的藥品」。另以 deep-frozen 條件物件證明條件未被 mutate——**但 mutation 檢查不得當作分類正確的證據** |
 | **A11** | 複選：顏色勾選「白＋黃」→ 主區 **3,868**、未提供區 **217**（組內 OR），expected sets。另須五個 witness：只含白、只含黃、兩者皆無、顏色命中但形狀 mismatch、顏色其中一值命中且形狀 match——沒有 witness 時「忽略 AND」也可能碰巧通過 |
+| **A19** | **名稱 NFKC ＋ 多詞 AND（D39）**：oracle 具名查詢 9 組的 expected sets（`益庇益庇錠500` **1**、`力佳爽錠0.5公絲` **1**、`力佳爽錠０．５公絲` **1**、`CEPHENDOL 25MG` **1**、`25MG CEPHENDOL` **1**、`cephendol  s.c.` **1**、`25毫克` **184**、`錠 500` **245**、`sodium` **34**），逐筆 naive predicate；（b）驗收 witness `益庇益庇錠500` 命中恰 `衛署藥製字第015596號`（資料為全形 `５００`）；（c）**超集合護欄**：舊規則命中者新規則不得遺失（決定性取樣，比對 >200 筆）；（d）全形 imprint `１０`／`Ｍ　４０` 與半形五區逐一相等 |
 | **A12** | **髒值 golden decisions（必過）＋ 反例追問（必答）**：<br>（a）**五類髒值各至少一筆固定 golden decision**：中文混合標註（`六邊形裡面有K`）、頭／尾字樣（`頭CL`／`尾016`，同一筆）、兩欄相同（41 筆）、只有標註二（68 筆）、單字元高噪音 token（`S` 出現於 174 筆）。每筆記錄輸入、規則輸出、人工裁決與理由。<br>（b）**雙向反例是必須被回答的問題，不是必須被填滿的配額**：須明文回答「是否存在規則命中但人工認為不該命中者」與「是否存在規則不命中但人工認為該命中者」。**「查無」是合法答案**，但須附**列舉範圍與查找方法**。<br>（c）真實發現的分歧另記 observation log，格式依 E6。<br>設計理由：強制湊滿雙向反例會誘發事後編造；完全不問則放回取樣偏誤 |
 
 ### B 組 — 正規化（純函式）
@@ -710,6 +711,7 @@ touch target ≥ 44 × 44 px；**只有搜尋列 sticky，條件面板隨頁捲�
 | **B4** | 符號 `.` `-` `/` `'` 各自、連續混用、首尾出現，逐一斷言 exact token array |
 | **B5** | `;;;` 展開：斷言 exact token array、token 數、順序，且**無任何 token 含分隔符**（只刪 `;;;` 會產生黏合 token，寬鬆 contains 斷言看不出來） |
 | **B6** | 中文：**逐欄**斷言 `normalizeImprintField("六邊形裡面有K") === ["K"]`。**注意該筆記錄的整體 token 集合是 `["K","KJ","195"]`（另一欄有值）**——條文若寫成逐筆會恆紅。另含「純中文 → 空陣列」與「中文夾多段英數 → 完整英數 tokens」 |
+| **B23** | **全形／半形（D39）**：（a）`normalizeName` 對 6 組全形／半形 pair 斷言**兩側相等**且等於指定半形字串（含 U+3000、tab、連續空白）；（b）`normalizeImprintField('TC１００') === ['TC100']`，全形查詢為 `VALID`，中文仍為 `NO_TOKEN`；（c）`nameCondition` 多詞 AND：詞序無關、跨欄可成立、任一詞不中即 `mismatch`（擋住 OR 實作） |
 | **B7** | 對 B1–B6 的每個 golden case 連呼叫兩次結果相同，且**輸入物件與前次輸出皆未被 mutate**（只驗「兩次相同」會讓回傳固定錯誤常數通過） |
 
 ### C 組 — 管線 fail-closed（每條以注入 fixture 實跑，且須有「相鄰合法 fixture 會成功」的對照組）
@@ -844,6 +846,32 @@ CLAUDE.md / README.md / LICENSE / .gitignore / package.json
 ---
 
 ## 14. 修訂紀錄
+
+### v1.11 → v1.12（2026-10 覆審修正，2026-10-28）
+
+#### D39 名稱與刻字的全形正規化；名稱多詞 AND
+
+**缺陷**（H2／M1／M2）：
+
+| # | 實測 | 後果 |
+|---|---|---|
+| H2 | baseline `中文品名` 有 **1,220 筆**（live 1,227）含全形數字，`normalizeName` 只做 `toUpperCase` | 半形 `益庇益庇錠500` → **0 筆 → EMPTY**（名稱是唯一能產生 EMPTY 的條件） |
+| M1 | `normalizeImprintField` 不轉全形 | 查詢 `TC１００` → token 只剩 `TC`，且**不顯示 noToken 提示**（仍有 1 token） |
+| M2 | 名稱整串 includes | `CEPHENDOL 25MG` 對 `CEPHENDOL S.C. TABLETS 25MG` 為 mismatch |
+
+**決策**：
+
+1. `normalizeName = NFKC → toUpperCase → 收合 \s+ → trim`；`normalizeImprintField` 在 `toUpperCase` 前加 NFKC。
+   B6 原本「全形一律視為分隔」的刻意規則**撤回**：該前提（全形不會出現在藥錠刻字上）只對資料側成立，
+   查詢側的中文輸入法預設打全形。資料側 `標註一／二` 實測全形 **0 筆**，故既有 imprint 數字全數不變。
+2. 名稱查詢依空白切詞，**每個詞**須為 `zh／en／id` **任一欄**的子字串（詞間 AND、欄間 OR）。
+   不要求同欄：理由同 D3 的跨欄聯集——使用者不知道哪段字記在哪一欄。
+3. **新規則是舊規則的超集合**：整串為某欄子字串 ⇒ 每個詞亦然。實測 3,000 個真實子字串查詢、
+   2,818,361 次舊命中，**新規則遺失 0**（`.ai-review/evidence/d39-name-2026-10.md`）。
+
+**四處同步**：`make-expected.mjs`（獨立 `nameWords`／`nameCond`，逐字迴圈切詞而非 regex）＋
+`EXPECTED_COUNTS` 新增 9 組名稱 ＋ 2 組全形 imprint 自檢 → `npm run expected`（既有 cases 位元組不變、新增 11 組）→
+§10 A19／B23 → 測試。數字錨點：量測腳本先於 `search.js` 改動算出，oracle 重產後逐項相同。
 
 ### v1.10 → v1.11（`images_bytes` 的 sentinel 拆解，2026-08-15）
 

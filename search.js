@@ -83,9 +83,14 @@ export function splitMulti(v) {
  *
  * `;;;` 在此一併被當成分隔符處理（`;` 不是 `[A-Z0-9]`），
  * 因此不會產生黏合 token（驗收 B5）。
+ *
+ * **NFKC 必須在 toUpperCase 之前**（D39）：全形 `ＴＣ１００` 不先轉半形的話，
+ * `１００` 不屬於 `[A-Z0-9]` 而被當成分隔符丟掉，只剩 `TC`——
+ * 且因為仍有 1 個 token，連 noToken 提示都不會出現（驗收 B23b）。
  */
 export function normalizeImprintField(v) {
   return String(v ?? '')
+    .normalize('NFKC')
     .toUpperCase()
     .replace(/[^A-Z0-9]+/g, ' ')
     .trim()
@@ -189,9 +194,15 @@ export function recordCanonTokens(item) {
   return recordTokens(item).map(canon);
 }
 
-/** 名稱比較一律先大寫（D1.1）。中文與許可證字號無大小寫，不受影響。 */
+/**
+ * 名稱正規化（D1.1 ＋ D39）：NFKC → 大寫 → 收合連續空白 → trim。
+ *
+ * TFDA 中文品名有上千筆用全形數字（`力佳爽錠０．５公絲`）。只做 toUpperCase 時，
+ * 半形查詢 `0.5` 對這些記錄**全部是 mismatch**——而名稱恆可判定、沒有 unknown，
+ * 所以這批藥會直接落入 EMPTY，畫面說「找不到」。那是本工具最怕的漏檢。
+ */
 export function normalizeName(s) {
-  return String(s ?? '').toUpperCase();
+  return String(s ?? '').normalize('NFKC').toUpperCase().replace(/\s+/g, ' ').trim();
 }
 
 /**
@@ -503,13 +514,18 @@ export function variantReasons(tokens, canonTokens, queryTokens) {
  *
  * 因此名稱不命中一律是 mismatch，不會把記錄推進未提供區——
  * 這點與顏色/形狀/刻痕/imprint 不同，是資料性質決定的，不是取捨。
+ *
+ * D39：查詢依空白切詞，**每個詞**都要是 zh／en／id **任一欄**的子字串（詞間 AND、欄間 OR）。
+ * `CEPHENDOL 25MG` 對 `CEPHENDOL S.C. TABLETS 25MG` 在整串 includes 下是 mismatch。
+ *
+ * 新規則是舊規則的**超集合**：整串是某欄子字串 ⇒ 每個詞也是（驗收 A19c）。
+ * 不要求各詞落在同一欄：使用者不會知道「25MG」記在中文還是英文品名，
+ * 要求同欄全中會製造漏檢——與 D3 的 imprint 跨欄聯集同一條理由。
  */
 export function nameCondition(item, query) {
-  const raw = String(query ?? '').trim();
-  const q = normalizeName(raw);
-  const hit = normalizeName(item.zh).includes(q)
-    || normalizeName(item.en).includes(q)
-    || String(item.id ?? '').includes(raw);
+  const words = normalizeName(query).split(' ').filter(Boolean);
+  const fields = [normalizeName(item.zh), normalizeName(item.en), normalizeName(item.id)];
+  const hit = words.every((w) => fields.some((f) => f.includes(w)));
   return hit ? Cond.MATCH : Cond.MISMATCH;
 }
 

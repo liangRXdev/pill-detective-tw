@@ -457,6 +457,79 @@ test('A9b 名稱與外觀條件是 AND（正反 witness）', () => {
   assert.equal(miss.unknown.length, 0);
 });
 
+// ── A19 名稱全形／多詞（D39）──────────────────────────────────────────
+//
+// 名稱是**唯一能產生 EMPTY 的條件**（CLAUDE.md），所以名稱的漏檢會被讀成「查無此藥」。
+// expected sets 由 oracle 產生（D13），本檔另以 naive 版逐筆驗 predicate。
+
+const naiveName = (s) => String(s ?? '').normalize('NFKC').toUpperCase().split(/\s+/).filter(Boolean).join(' ');
+const naiveNameHit = (row, q) => {
+  const fields = [row['中文品名'], row['英文品名'], row['許可證字號']].map(naiveName);
+  return naiveName(q).split(' ').every((w) => fields.some((f) => f.includes(w)));
+};
+
+const NAME_CASES = [
+  'name:益庇益庇錠500', 'name:力佳爽錠0.5公絲', 'name:力佳爽錠０．５公絲',
+  'name:CEPHENDOL 25MG', 'name:25MG CEPHENDOL', 'name:cephendol  s.c.',
+  'name:25毫克', 'name:錠 500', 'name:sodium',
+];
+
+test('A19 名稱 expected sets：全形／半形、多詞 AND、詞序無關（H2／M2）', () => {
+  for (const key of NAME_CASES) {
+    const q = EXP.cases[key]?.criteria?.name;
+    assert.ok(q, `A19: expected 缺少 ${key}（oracle 未產生）`);
+    const res = search(items, { name: q });
+    assertCase(res, key, `A19 ${key}`);
+    assert.equal(res.partial.length + res.unknown.length + res.variant.length, 0, `${key}: 名稱沒有 unknown`);
+    for (const it of res.tiers[0]) assert.ok(naiveNameHit(rowOf(it.id), q), `${key}: ${it.id} 不符 predicate`);
+  }
+});
+
+test('A19b 驗收：「益庇益庇錠500」半形查詢命中恰 1 筆（資料為全形５００）', () => {
+  const res = search(items, { name: '益庇益庇錠500' });
+  assert.deepEqual(ids(res.tiers[0]), ['衛署藥製字第015596號']);
+  assert.match(rowOf('衛署藥製字第015596號')['中文品名'], /５００/, 'A19b: witness 必須真的是全形');
+  assert.deepEqual(resultStates(res, { name: '益庇益庇錠500' }), [ResultState.NORMAL]);
+  // 全形查詢與半形查詢結果必須相同
+  assert.deepEqual(ids(search(items, { name: '益庇益庇錠５００' }).tiers[0]), ids(res.tiers[0]));
+});
+
+test('A19c 新名稱規則是舊規則的超集合 —— 不得因 NFKC／切詞引入任何漏檢', () => {
+  // 舊規則：toUpperCase 後整串 includes（zh／en），id 用原字串 includes
+  const oldHit = (row, q) => {
+    const raw = String(q).trim();
+    const Q = raw.toUpperCase();
+    return String(row['中文品名'] ?? '').toUpperCase().includes(Q)
+      || String(row['英文品名'] ?? '').toUpperCase().includes(Q)
+      || String(row['許可證字號'] ?? '').includes(raw);
+  };
+  // 決定性取樣：從真實品名切子字串當查詢（含空白、全形、括號）
+  let checked = 0;
+  for (let k = 0; k < rows.length; k += 53) {
+    for (const f of [rows[k]['中文品名'], rows[k]['英文品名']]) {
+      const s = String(f ?? '');
+      if (s.length < 4) continue;
+      const q = s.slice(1, Math.min(s.length, 9));
+      if (!q.trim()) continue;
+      const got = new Set(ids(search(items, { name: q }).tiers[0]));
+      for (const r of rows) {
+        if (!oldHit(r, q)) continue;
+        checked++;
+        assert.ok(got.has(String(r['許可證字號']).trim()), `A19c: 「${q}」舊規則命中 ${r['許可證字號']}，新規則漏掉`);
+      }
+    }
+  }
+  assert.ok(checked > 200, `A19c: 對照組失效 —— 只比對了 ${checked} 筆`);
+});
+
+test('A19d 全形 imprint 查詢與半形完全等價（M1）', () => {
+  for (const [full, half] of [['１０', '10'], ['Ｍ　４０', 'M 40'], ['ｔ', 'T']]) {
+    assert.deepEqual(buckets(search(items, { imprint: full })), buckets(search(items, { imprint: half })),
+      `A19d:「${full}」與「${half}」分區不同`);
+  }
+  assertCase(search(items, { imprint: '１０' }), 'imprint:10', 'A19d 全形 10');
+});
+
 // ── A10 ─────────────────────────────────────────────────────────────
 test('A10 不存在的 imprint：確定三區皆 0、未提供區 2085、不得說找不到', () => {
   const criteria = Object.freeze({
