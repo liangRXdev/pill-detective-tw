@@ -213,6 +213,117 @@ test('C4b 變動幅度守門：>3% 中止、--allow-any-delta 可放行，且與
   assert.equal(fingerprint(ws.dir), before, '放行只產生 staging，不得改動已發布版本');
 });
 
+test('C4c 同筆數置換 id：移除 51 筆中止、移除 50 筆通過（M4：幅度 0% 也擋得住）', () => {
+  // 筆數不變時 ratio = 0，**只剩「移除 >50」這道**在守。沒有這條，
+  // 把 MAX_DELTA_REMOVED 刪掉或改成 >= 都不會有任何測試變紅。
+  const replaced = (n) => srcRows(5100).map((r, i) => (i < n
+    ? { ...r, 許可證字號: `衛署藥輸字第${String(900000 + i)}號` }
+    : r));
+  const ws = workspace();
+  publish(ws, srcRows(5100));
+  const before = fingerprint(ws.dir);
+
+  const r51 = run(['--source', writeZip(ws.dir, replaced(51)), '--out', ws.out, '--vocab-lock', ws.lock]);
+  assert.notEqual(r51.code, 0, 'C4c: 置換 51 個 id 應中止');
+  assert.match(r51.stderr, /變動幅度超出門檻/);
+  assert.match(r51.stdout, /新增 51／移除 51，幅度 0\.00%/);
+  assert.equal(fingerprint(ws.dir), before);
+
+  const r50 = run(['--source', writeZip(ws.dir, replaced(50)), '--out', ws.out, '--vocab-lock', ws.lock]);
+  assert.equal(r50.code, 0, `C4c: 置換 50 個 id 應通過：${r50.stderr}`);
+  assert.equal(fingerprint(ws.dir), before);
+});
+
+test('C4d 幅度邊界：+2.9% 通過、+3.1% 中止（只動筆數、不移除）', () => {
+  const ws = workspace();
+  publish(ws, srcRows(6000));
+  const before = fingerprint(ws.dir);
+
+  const ok = run(['--source', writeZip(ws.dir, srcRows(6174)), '--out', ws.out, '--vocab-lock', ws.lock]);
+  assert.equal(ok.code, 0, `C4d: +2.9% 應通過：${ok.stderr}`);
+  assert.match(ok.stdout, /移除 0，幅度 2\.90%/);
+
+  const bad = run(['--source', writeZip(ws.dir, srcRows(6186)), '--out', ws.out, '--vocab-lock', ws.lock]);
+  assert.notEqual(bad.code, 0, 'C4d: +3.1% 應中止');
+  assert.match(bad.stdout, /移除 0，幅度 3\.10%/);
+  assert.match(bad.stderr, /變動幅度超出門檻/);
+  assert.equal(fingerprint(ws.dir), before);
+});
+
+test('C22 必要欄位含「標註二」與「外觀尺寸」：缺任一即中止（M3）', () => {
+  // 缺「標註二」時 toItem 會把 6,000 筆的 mark2 全寫成 null——不報錯、只是靜靜少掉
+  // 一半的刻字 token，而 D3 的跨欄聯集正是靠這一欄。
+  const ws = workspace();
+  publish(ws, srcRows(5100));
+  const before = fingerprint(ws.dir);
+  for (const f of ['標註二', '外觀尺寸']) {
+    const rows = srcRows(5100).map((r) => { const o = { ...r }; delete o[f]; return o; });
+    const r = run(['--source', writeZip(ws.dir, rows), '--out', ws.out, '--vocab-lock', ws.lock]);
+    assert.notEqual(r.code, 0, `C22: 來源缺「${f}」被放行`);
+    assert.equal(fingerprint(ws.dir), before);
+    assert.equal(fs.existsSync(`${ws.out}.staging`), false, 'C22: staging 殘留');
+  }
+  // 對照組
+  const ok = run(['--source', writeZip(ws.dir, srcRows(5100)), '--out', ws.out, '--vocab-lock', ws.lock]);
+  assert.equal(ok.code, 0, ok.stderr);
+});
+
+test('C23 欄位非空筆數對前版變動超出門檻即中止，--allow-any-delta 可放行（M3）', () => {
+  // 筆數與 id 都不變、只有某一欄被整批清空或錯位，C4 系列的守門全部看不到。
+  // 清空刻字欄 → 那批藥全部改落未提供區；錯位 → 變成錯的 token → 直接漏檢。
+  const N = 5100;
+  const base = srcRows(N, (i) => ({ 標註二: i % 2 ? 'B 2' : null }));
+  const ws = workspace();
+  publish(ws, base);
+  const before = fingerprint(ws.dir);
+
+  const FIELDS = [
+    ['mark1', (r) => ({ ...r, 標註一: '' })],
+    // 暴增方向：前 200 筆中原本為空的 100 筆被灌值（模擬他欄錯位）。
+    // 不可寫成「有值清空、空值灌值」——200 筆一半增一半減，淨變動 0，測到的是別的事。
+    ['mark2', (r) => ({ ...r, 標註二: 'NEW 9' })],
+    ['color', (r) => ({ ...r, 顏色: '' })],
+    ['shape', (r) => ({ ...r, 形狀: '' })],
+    ['score_mark', (r) => ({ ...r, 刻痕: '' })],
+  ];
+  for (const [field, mut] of FIELDS) {
+    const bigRows = base.map((r, i) => (i < 200 ? mut(r) : r));        // 200 > max(50, 3%)
+    const big = run(['--source', writeZip(ws.dir, bigRows), '--out', ws.out, '--vocab-lock', ws.lock]);
+    assert.notEqual(big.code, 0, `C23: ${field} 變動 200 筆被放行`);
+    assert.match(big.stderr, new RegExp(`欄位非空筆數變動超出門檻.*${field}`, 's'));
+    assert.equal(fingerprint(ws.dir), before);
+
+    const smallRows = base.map((r, i) => (i < 40 ? mut(r) : r));       // 對照組：40 筆應通過
+    const small = run(['--source', writeZip(ws.dir, smallRows), '--out', ws.out, '--vocab-lock', ws.lock]);
+    assert.equal(small.code, 0, `C23: ${field} 變動 40 筆應通過：${small.stderr}`);
+
+    const forced = run(['--source', writeZip(ws.dir, bigRows), '--out', ws.out, '--vocab-lock', ws.lock,
+      '--allow-any-delta']);
+    assert.equal(forced.code, 0, `C23: ${field} 人工放行後應可通過`);
+    assert.equal(fingerprint(ws.dir), before);
+  }
+});
+
+test('C24 前版 appearance.json 損毀時不得靜默關閉 delta 守門（Low）', () => {
+  // 原本 `catch {}` 視同無前版 → 走「首次建置」→ 變動守門與非空筆數守門全部跳過，
+  // 且 carryHashes 讀不到前版 → 全量重抓 6,798 張。
+  const ws = workspace();
+  publish(ws, srcRows(5100));
+  for (const garbage of ['{"meta":', '{"meta":{"schema":1},"items":"x"}']) {
+    fs.writeFileSync(ws.out, garbage, 'utf8');
+    const before = fingerprint(ws.dir);
+    const r = run(['--source', writeZip(ws.dir, srcRows(5100)), '--out', ws.out, '--vocab-lock', ws.lock]);
+    assert.notEqual(r.code, 0, `C24: 前版損毀（${garbage}）被當成首建`);
+    assert.match(r.stderr, /前版.*(損毀|無法解析|結構)/);
+    assert.equal(fingerprint(ws.dir), before);
+  }
+  // 對照組：前版不存在 → 首建仍可通過
+  fs.unlinkSync(ws.out);
+  const ok = run(['--source', writeZip(ws.dir, srcRows(5100)), '--out', ws.out, '--vocab-lock', ws.lock]);
+  assert.equal(ok.code, 0, ok.stderr);
+  assert.match(ok.stdout, /無前版，視為首次建置/);
+});
+
 // ── C5 id 唯一 ──────────────────────────────────────────────────────
 
 test('C5 許可證字號重複 → 中止並指出該 id 與次數（其他資料保持合法、總筆數不變）', () => {
