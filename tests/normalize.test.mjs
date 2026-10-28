@@ -20,6 +20,7 @@ import {
   taipeiDate, daysSinceISODate, STALE_DAYS, freshnessView,
   flip, canon, flipPredicate, canonPredicate, variantReasons,
   nameCondition, Cond,
+  joinedTokens, joinedPredicate, indexItems, Tier,
 } from '../search.js';
 
 const B_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -555,4 +556,49 @@ test('B23c nameCondition：依空白切詞、各詞 includes 取 AND、詞序無
   // 單詞行為不變
   assert.equal(nameCondition(it, 'S.C. TAB'), Cond.MATCH);
   assert.equal(nameCondition(it, 'TABLETS25'), Cond.MISMATCH);
+});
+
+// ── B25 刻字連寫（D40）──────────────────────────────────────────────
+//
+// TFDA 記 `FY T061`、使用者讀成 `FYT061`：原樣比對為 MISMATCH → 完全排除。
+// 2,335 個多 token 欄位（baseline）去分隔後查詢，本筆回收率 0.3%。
+
+const sortJ = (a) => [...a].sort();
+
+test('B25 joinedTokens：同欄所有連續 ≥2 token 的串接，不跨欄', () => {
+  assert.deepEqual(sortJ(joinedTokens({ mark1: 'A B C', mark2: null })), ['AB', 'ABC', 'BC']);
+  assert.deepEqual(sortJ(joinedTokens({ mark1: 'FY T061', mark2: 'FY-T061' })), ['FYT061']);
+  // 不跨欄：衛署藥製字第051523號 標註一「M A」、標註二「4 0」→ 不得產生 A4／MA40
+  assert.deepEqual(sortJ(joinedTokens({ mark1: 'M A', mark2: '4 0' })), ['40', 'MA']);
+  // 單 token 欄、空欄、純中文 → 無連寫鍵
+  assert.deepEqual(joinedTokens({ mark1: 'APO', mark2: null }), []);
+  assert.deepEqual(joinedTokens({ mark1: null, mark2: '無' }), []);
+  // 與 normalizeImprintField 同一套規則（NFKC、大寫、符號為分隔）
+  assert.deepEqual(sortJ(joinedTokens({ mark1: 'ｆｙ．ｔ０６１', mark2: null })), ['FYT061']);
+});
+
+test('B25b joinedPredicate：每個查詢 token 原樣命中或「連寫鍵完全相等」，且至少一個靠連寫', () => {
+  const tok = ['FY', 'T061'];
+  const j = ['FYT061'];
+  assert.equal(joinedPredicate(tok, j, ['FYT061']), true);
+  // 只用完全相等（D34 同理）：字首與包含都不算
+  assert.equal(joinedPredicate(tok, j, ['FYT06']), false, 'B25b: 字首不得算連寫命中');
+  assert.equal(joinedPredicate(tok, j, ['YT061']), false, 'B25b: 包含不得算連寫命中');
+  assert.equal(joinedPredicate(tok, j, ['FYT0610']), false);
+  // 全部原樣命中 → 不是連寫命中（那是原樣比對的事）
+  assert.equal(joinedPredicate(tok, j, ['FY', 'T061']), false);
+  // 逐 token：一個原樣、一個靠連寫（跨欄）
+  assert.equal(joinedPredicate(['M', 'A', '4', '0'], ['MA', '40'], ['M', '40']), true);
+  // 任一 token 兩者皆不中 → false（every，不是 some）
+  assert.equal(joinedPredicate(['M', 'A', '4', '0'], ['MA', '40'], ['ZZ', '40']), false);
+  assert.equal(joinedPredicate([], [], ['FYT061']), false);
+});
+
+test('B25c indexItems：連寫鍵另存 _tokJoin，不併入 _tok、不進 _tokCanon（不餵給 flip／canon）', () => {
+  const [it] = indexItems([{ id: 'X', zh: 'x', en: 'x', color: [], shape: [], score_mark: [], size: [],
+    mark1: 'H S', mark2: null, imgs: [] }]);
+  assert.deepEqual(it._tok, ['H', 'S']);
+  assert.deepEqual(it._tokCanon, ['H', '5']);
+  assert.deepEqual(it._tokJoin, ['HS']);
+  assert.equal(Tier.JOINED, 3, 'B25c: 連寫級排在包含級之後');
 });

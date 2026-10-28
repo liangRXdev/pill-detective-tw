@@ -456,8 +456,13 @@ export function setCondition(values, selected) {
   return values.some((v) => selected.includes(v)) ? Cond.MATCH : Cond.MISMATCH;
 }
 
-/** imprint 的三值判定 ＋ 命中等級。**只在 QueryState.VALID 時呼叫。** */
-export const Tier = { EXACT: 0, PREFIX: 1, CONTAINS: 2 };
+/**
+ * imprint 的三值判定 ＋ 命中等級。**只在 QueryState.VALID 時呼叫。**
+ *
+ * `JOINED`（D40）排在包含級之後：它不是原樣比對的一級，而是「原樣比對不全中、
+ * 但把同欄相鄰刻字連起來讀就全中」。卡片另標「連寫命中」，與原樣命中可區分。
+ */
+export const Tier = { EXACT: 0, PREFIX: 1, CONTAINS: 2, JOINED: 3 };
 
 /**
  * D18：**長度為 1 的查詢 token 不啟用「包含」級。**
@@ -490,6 +495,47 @@ export function imprintCondition(tokens, queryTokens) {
   if (hit === queryTokens.length) return { state: Cond.MATCH, tier: worst };
   if (hit === 0) return { state: Cond.MISMATCH, tier: null };
   return { state: Cond.PARTIAL, tier: null, hit, total: queryTokens.length };
+}
+
+// ── 刻字連寫（D40）──────────────────────────────────────────────────
+//
+// TFDA 記 `FY T061`、使用者讀成 `FYT061`：原樣比對是 MISMATCH → 完全排除。
+// baseline 的 2,335 個多 token 欄位，去分隔後查詢本筆回收率只有 0.3%（6 個）。
+
+/**
+ * 記錄的連寫鍵：**同一欄**內所有連續 ≥2 個 token 的串接（`A B C` → `AB`、`BC`、`ABC`）。
+ *
+ * **不跨欄**：標註一與標註二之間沒有「相鄰」的實體依據（D7：兩欄不是正反面）。
+ * 跨欄的情境由 `joinedPredicate` 的逐 token 判定接住（一段原樣、一段連寫）。
+ */
+export function joinedTokens(item) {
+  const out = new Set();
+  for (const field of [item.mark1, item.mark2]) {
+    const t = normalizeImprintField(field);
+    for (let i = 0; i < t.length; i++) {
+      for (let j = i + 2; j <= t.length; j++) out.add(t.slice(i, j).join(''));
+    }
+  }
+  return [...out];
+}
+
+/**
+ * 連寫 predicate（D40）。**只在原樣比對為 MISMATCH 或 PARTIAL 時呼叫。**
+ *
+ * 每個查詢 token 必須「原樣命中（任一級）」或「與某連寫鍵**完全相等**」，且至少一個靠連寫。
+ * 只接受完全相等（比照 D34）：放行字首會讓 `FYT0` 這種殘段也進主區。
+ *
+ * **連寫鍵只在這裡用，不併入 `_tok`、不餵給 flip／canon**——
+ * 併入 `_tok` 實測會改動既有三級（`10` 的包含級 67→69）與變體區（`SH` 42→55）。
+ */
+export function joinedPredicate(tokens, joined, queryTokens) {
+  let usedJoin = false;
+  for (const q of queryTokens) {
+    if (imprintCondition(tokens, [q]).state === Cond.MATCH) continue;
+    if (joined.includes(q)) { usedJoin = true; continue; }
+    return false;
+  }
+  return usedJoin;
 }
 
 // ── 變體判定（§5.2 admission contract）──────────────────────────────
@@ -572,7 +618,7 @@ export function nameCondition(item, query) {
  *
  * 分區：任一 mismatch → 排除；否則任一 unknown → 未提供區；否則 → 主區。
  */
-export function evaluate(item, criteria, tokens, canonTokens) {
+export function evaluate(item, criteria, tokens, canonTokens, joined) {
   const { color = [], shape = [], score = null, imprint = '', name = '' } = criteria;
   const conds = [];
   let tier = Tier.EXACT;
@@ -586,7 +632,14 @@ export function evaluate(item, criteria, tokens, canonTokens) {
   if (qs === QueryState.VALID) {
     const recTokens = tokens ?? recordTokens(item);
     const queryTokens = tokenizeQuery(imprint);
-    const r = imprintCondition(recTokens, queryTokens);
+    let r = imprintCondition(recTokens, queryTokens);
+
+    // D40：原樣 MISMATCH／PARTIAL 才看連寫，且**先於變體**——連寫是記錄上真的有的字，
+    // 變體是假設看錯。實測（A17 閉包）連寫搶走變體的筆數為 0。
+    if ((r.state === Cond.MISMATCH || r.state === Cond.PARTIAL)
+      && joinedPredicate(recTokens, joined ?? joinedTokens(item), queryTokens)) {
+      r = { state: Cond.MATCH, tier: Tier.JOINED };
+    }
 
     // D31：**只有 MISMATCH 才計算變體。** 其餘四種狀態一律照舊，
     // 因此 main／partial／unknown 三區的成員逐筆不變，excluded 只會變少（驗收 A13）。
@@ -655,7 +708,7 @@ export function compareItems(a, b) {
  *             variant: {item, reasons: string[]}[], excludedCount: number,
  *             mainCount: number, imprintQueryState: string }}
  *
- * `tiers` 是**三個互斥分區**（完全／字首／包含），不是累計集合。
+ * `tiers` 是**四個互斥分區**（完全／字首／包含／連寫，D40），不是累計集合。
  * 未輸入 imprint 時全部落在 tiers[0]（等級一律視為 EXACT）。
  *
  * `variant` 的元素是 `{ item, reasons }` 而不是裸 item——**身份與理由不可分離**（D37）。
@@ -670,14 +723,14 @@ export function compareItems(a, b) {
  * 唯一的分層是上面三個規則型等級；變體區內沒有任何分層。
  */
 export function search(items, criteria = {}) {
-  const tiers = [[], [], []];
+  const tiers = [[], [], [], []];
   const partial = [];
   const unknown = [];
   const variant = [];
   let excludedCount = 0;
 
   for (const it of items) {
-    const r = evaluate(it, criteria, it._tok, it._tokCanon);
+    const r = evaluate(it, criteria, it._tok, it._tokCanon, it._tokJoin);
     if (r.bucket === 'excluded') { excludedCount++; continue; }
     if (r.bucket === 'variant') { variant.push({ item: it, reasons: r.reasons }); continue; }
     if (r.bucket === 'unknown') { unknown.push(it); continue; }
@@ -696,7 +749,7 @@ export function search(items, criteria = {}) {
     unknown,
     variant,
     excludedCount,
-    mainCount: tiers[0].length + tiers[1].length + tiers[2].length,
+    mainCount: tiers.reduce((n, t) => n + t.length, 0),
     imprintQueryState: imprintQueryState(criteria.imprint ?? ''),
   };
 }
@@ -715,6 +768,7 @@ export function indexItems(items) {
   for (const it of items) {
     it._tok = recordTokens(it);
     it._tokCanon = it._tok.map(canon);
+    it._tokJoin = joinedTokens(it);    // D40：另存，不併入 _tok
   }
   return items;
 }
