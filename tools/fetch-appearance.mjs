@@ -26,8 +26,23 @@ import { toItem, splitMulti, COLORS, SHAPES, SCORE_MARKS } from '../search.js';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SOURCE_URL = 'https://data.fda.gov.tw/data/opendata/export/42/json';
 
-/** 用於辨識資料檔的必備欄位（依 schema，不依檔名——ZIP 內檔名帶版本號會變） */
-const REQUIRED_FIELDS = ['許可證字號', '中文品名', '英文品名', '形狀', '顏色', '刻痕', '標註一', '外觀圖檔連結'];
+/**
+ * 用於辨識資料檔的必備欄位（依 schema，不依檔名——ZIP 內檔名帶版本號會變）。
+ *
+ * **`toItem()` 讀的每一欄都必須在這裡。** 缺「標註二」時 toItem 不報錯，
+ * 只是把全部 mark2 寫成 null——D3 的跨欄聯集靜靜少掉一半 token（M3）。
+ */
+const REQUIRED_FIELDS = [
+  '許可證字號', '中文品名', '英文品名', '形狀', '顏色', '刻痕', '外觀尺寸', '標註一', '標註二', '外觀圖檔連結',
+];
+
+/**
+ * 非空筆數對前版的變動守門（M3）。鍵是 canonical item 的欄位。
+ *
+ * 筆數與 id 都不變、只有某一欄被整批清空或錯位時，筆數／移除守門全部看不到。
+ * 清空 → 那批藥改落未提供區；錯位 → 變成錯的 token → 直接漏檢。
+ */
+const NONEMPTY_GUARDED = ['mark1', 'mark2', 'color', 'shape', 'score_mark'];
 
 /** D8：這兩欄實測 100% 空。由全空轉為有值時警告（不中止）。 */
 const WATCHED_EMPTY_FIELDS = ['特殊劑型', '特殊氣味'];
@@ -193,6 +208,23 @@ export function checkVocab(rows, lock) {
     if (removed.length) errs.push(`${key} 快照中的值已從來源消失：${removed.map((v) => JSON.stringify(v)).join('、')}`);
   }
   return { errs, seen: Object.fromEntries(Object.entries(seen).map(([k, v]) => [k, [...v].sort()])) };
+}
+
+const isNonEmpty = (v) => (Array.isArray(v) ? v.length > 0 : v !== null && v !== undefined && String(v).trim() !== '');
+
+/**
+ * 各守門欄位的非空筆數，前版 → 本版。變動量超過 `max(MAX_DELTA_REMOVED, 前版 × MAX_DELTA_RATIO)`
+ * 即列入違規。**雙向都算**：暴增同樣代表欄位錯位（另一欄的值灌進來）。
+ */
+export function nonEmptyDeltas(prevItems, items) {
+  const out = [];
+  for (const f of NONEMPTY_GUARDED) {
+    const before = prevItems.filter((it) => isNonEmpty(it?.[f])).length;
+    const after = items.filter((it) => isNonEmpty(it?.[f])).length;
+    const limit = Math.max(MAX_DELTA_REMOVED, Math.floor(before * MAX_DELTA_RATIO));
+    out.push({ field: f, before, after, limit, exceeded: Math.abs(after - before) > limit });
+  }
+  return out;
 }
 
 /** D12.1：資產鍵 = sha1(許可證字號)[:16]。不可由字號去中文或只留數字產生（實測會碰撞）。 */
@@ -442,7 +474,17 @@ async function main() {
   const prevPath = path.resolve(ROOT, arg('--resume') || outPath);
   let prev = null;
   if (fs.existsSync(prevPath)) {
-    try { prev = JSON.parse(fs.readFileSync(prevPath, 'utf8')); } catch { /* 損毀視同無前版 */ }
+    // **損毀不得視同無前版。** 那會走「首次建置」分支，變動幅度與非空筆數守門全部跳過，
+    // carryHashes 也讀不到前版 → 全量重抓。前版存在卻讀不懂，就該停下來讓人看。
+    try {
+      prev = JSON.parse(fs.readFileSync(prevPath, 'utf8'));
+    } catch (e) {
+      die(`前版 ${path.relative(ROOT, prevPath)} 損毀、無法解析（${e.message}），中止。`
+        + '確認後修復或移除該檔再重跑（移除＝視為首次建置）');
+    }
+    if (!prev || typeof prev !== 'object' || !Array.isArray(prev.items)) {
+      die(`前版 ${path.relative(ROOT, prevPath)} 結構損壞（items 不是陣列），中止`);
+    }
     if (prevPath !== outPath) console.log(`      前版取自 ${path.relative(ROOT, prevPath)}（首建續傳）`);
   }
   const carried = carryHashes(items, prev?.items);
@@ -459,6 +501,14 @@ async function main() {
     if (!allowAnyDelta && (ratio > MAX_DELTA_RATIO || removed > MAX_DELTA_REMOVED)) {
       die(`變動幅度超出門檻（±${MAX_DELTA_RATIO * 100}% 或移除 >${MAX_DELTA_REMOVED} 筆），不發布。`
         + '確認無誤請加 --allow-any-delta');
+    }
+    const deltas = nonEmptyDeltas(prev.items, items);
+    console.log(`      非空筆數 ${deltas.map((d) => `${d.field} ${d.before}→${d.after}`).join('／')}`);
+    const over = deltas.filter((d) => d.exceeded);
+    if (!allowAnyDelta && over.length) {
+      die(`欄位非空筆數變動超出門檻（±${MAX_DELTA_RATIO * 100}% 或 >${MAX_DELTA_REMOVED} 筆）：`
+        + over.map((d) => `${d.field} ${d.before}→${d.after}（上限 ±${d.limit}）`).join('；')
+        + '。可能是來源欄位被清空或錯位，確認無誤請加 --allow-any-delta');
     }
   } else {
     console.log('      無前版，視為首次建置');

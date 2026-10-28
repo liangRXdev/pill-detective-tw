@@ -5,6 +5,13 @@ on:
   schedule:
     - cron: '17 20 * * 0'      # 每週一 04:17 (UTC+8)
   workflow_dispatch:
+    inputs:
+      # 變動幅度／非空筆數守門擋下後，人工確認差異無誤時的放行開關（原本只能改檔或本機跑）。
+      # **boolean、預設 false**：排程觸發時 inputs 不存在，env 會是空字串 → 不放行。
+      allow_any_delta:
+        description: '放行變動幅度與非空筆數守門（確認差異無誤後才勾）'
+        type: boolean
+        default: false
 
 # D9：同一 branch 只允許一個資料更新在跑。
 # 兩個並行的更新會讓較舊的來源覆蓋較新的，或兩邊都失敗。
@@ -32,8 +39,17 @@ jobs:
       - uses: astral-sh/setup-uv@94527f2e458b27549849d47d273a16bec83a01e9  # v7
 
       # ① 抓來源並守門 → 寫出 staging（尚未發布）
-      - name: 建置 canonical（守門：筆數／欄位／詞彙鎖／id／資產鍵／變動幅度）
-        run: node tools/fetch-appearance.mjs
+      #    allow_any_delta 走 env 而非內插（C25）；只有字面 'true' 才放行（C25c）
+      - name: 建置 canonical（守門：筆數／欄位／詞彙鎖／id／資產鍵／變動幅度／非空筆數）
+        env:
+          ALLOW_ANY_DELTA: ${{ github.event.inputs.allow_any_delta }}
+        run: |
+          if [ "$ALLOW_ANY_DELTA" = 'true' ]; then
+            echo '::warning::allow_any_delta=true：變動幅度與非空筆數守門已人工放行'
+            node tools/fetch-appearance.mjs --allow-any-delta
+          else
+            node tools/fetch-appearance.mjs
+          fi
 
       # ② 增量鏡像圖片。失敗即整批中止，staging 不回寫。
       #    **不得**用「把該張剔除」吸收暫時性失敗。
@@ -101,7 +117,7 @@ jobs:
                 `執行紀錄：${url}`,
                 '',
                 '常見原因與處置：',
-                '- 變動幅度 > ±3% 或移除 > 50 筆 → 確認差異無誤後以 `--allow-any-delta` 重跑',
+                '- 變動幅度 > ±3%、移除 > 50 筆或欄位非空筆數暴增／暴減 → 確認差異無誤後以 workflow_dispatch 勾選 `allow_any_delta` 重跑',
                 '- 詞彙快照出現新值 → 人工更新 `data/vocab.lock.json` **與** `search.js` 的常數',
                 '- 圖片永久回 0 bytes → 人工審核後加入 `data/image-exceptions.json`（管線不得自動加）',
               ].join('\n'),

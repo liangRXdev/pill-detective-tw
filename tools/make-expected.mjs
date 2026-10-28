@@ -71,6 +71,19 @@ const EXPECTED_COUNTS = {
   literalWu: 6,
   literalWuFieldOccurrences: 9,
   literalWuWithOtherTokens: 3,
+
+  // D39（2026-10）：名稱比對改為 NFKC ＋ 收合空白 ＋ 依空白切詞各自 includes 取 AND。
+  // 舊規則下前八個全部是 0（全形資料配半形查詢／多詞不連續），`sodium` 34 不變。
+  // 數字來源：`.ai-review/evidence/d39-name-2026-10.md` 的量測腳本，寫於 search.js 改動之前。
+  'name:益庇益庇錠500': [1, 0, 0],       // 資料為全形「５００」；驗收條件
+  'name:力佳爽錠0.5公絲': [1, 0, 0],
+  'name:力佳爽錠０．５公絲': [1, 0, 0],   // 全形查詢（舊規則即命中，新規則不得退步）
+  'name:CEPHENDOL 25MG': [1, 0, 0],      // 兩詞不連續（中間是 S.C. TABLETS）
+  'name:25MG CEPHENDOL': [1, 0, 0],      // 詞序無關
+  'name:cephendol  s.c.': [1, 0, 0],     // 小寫＋連續空白
+  'name:25毫克': [184, 0, 0],            // 舊規則 143：差額 41 筆是全形「２５毫克」
+  'name:錠 500': [245, 0, 0],            // 舊規則 21（只有字面「錠 500」連續出現者）
+  'name:sodium': [34, 0, 0],             // A9 的既有數字，回歸護欄
 };
 
 /**
@@ -153,7 +166,8 @@ function splitOn(value) {
 }
 
 function fieldTokens(value) {
-  const upper = String(value === null || value === undefined ? '' : value).toUpperCase();
+  // D39：先 NFKC 再大寫——全形「１０」與半形「10」必須是同一個 token（M1）
+  const upper = String(value === null || value === undefined ? '' : value).normalize('NFKC').toUpperCase();
   const out = [];
   let buf = '';
   for (const ch of upper) {
@@ -284,11 +298,37 @@ function variantOf(tokens, queryTokens) {
   return reasons.length > 0 ? reasons : null;
 }
 
+// ── 直白版的名稱比對（D39）──────────────────────────────────────────
+
+/** NFKC → 大寫 → 依空白切詞。**逐字迴圈切詞**，刻意不用 search.js 的 regex 收合寫法。 */
+function nameWords(value) {
+  const s = String(value === null || value === undefined ? '' : value).normalize('NFKC').toUpperCase();
+  const out = [];
+  let buf = '';
+  for (const ch of s) {
+    if (ch.trim() === '') { if (buf.length > 0) { out.push(buf); buf = ''; } }
+    else buf += ch;
+  }
+  if (buf.length > 0) out.push(buf);
+  return out;
+}
+
+/** 名稱沒有 unknown（en／id 恆非空）：每個查詢詞都要是 zh／en／id **任一欄**的子字串。 */
+function nameCond(row, query) {
+  const fields = [row['中文品名'], row['英文品名'], row['許可證字號']].map((f) => nameWords(f).join(' '));
+  for (const w of nameWords(query)) {
+    let found = false;
+    for (const f of fields) if (f.indexOf(w) >= 0) { found = true; break; }
+    if (!found) return MISMATCH;
+  }
+  return MATCH;
+}
+
 /**
  * 對全量 baseline 跑一次搜尋，回傳三個互斥主區與未提供區的 id 清單。
  * 條件未啟用時**完全不看記錄的值**（規格 D1.1 階段 ①）。
  */
-function run(rows, { color = [], shape = [], score = null, imprint = '' } = {}) {
+function run(rows, { color = [], shape = [], score = null, imprint = '', name = '' } = {}) {
   const queryTokens = fieldTokens(imprint);
   const imprintOn = String(imprint).trim() !== '' && queryTokens.length > 0;
   const tiers = [[], [], []];
@@ -314,6 +354,7 @@ function run(rows, { color = [], shape = [], score = null, imprint = '' } = {}) 
       states.push(reasons ? VARIANT : st);
       if (tr !== null) tier = tr;
     }
+    if (String(name).trim() !== '') states.push(nameCond(row, name));
 
     let hasMismatch = false, hasUnknown = false, hasPartial = false, hasVariant = false;
     for (const s of states) {
@@ -429,6 +470,21 @@ const cases = {
   'imprint:AS': { imprint: 'AS' }, 'imprint:A5': { imprint: 'A5' }, 'imprint:M5': { imprint: 'M5' },
   'imprint:Z2': { imprint: 'Z2' }, 'imprint:2Z': { imprint: '2Z' }, 'imprint:1Z': { imprint: '1Z' },
   'imprint:8B': { imprint: '8B' }, 'imprint:B8': { imprint: 'B8' }, 'imprint:82': { imprint: '82' },
+
+  // ── D39：全形 imprint 必須與半形完全等價（M1，下方自檢逐區比對）
+  'imprint:１０': { imprint: '１０' },
+  'imprint:Ｍ　４０': { imprint: 'Ｍ　４０' },
+
+  // ── D39：名稱 NFKC ＋ 多詞 AND（H2／M2）
+  'name:益庇益庇錠500': { name: '益庇益庇錠500' },
+  'name:力佳爽錠0.5公絲': { name: '力佳爽錠0.5公絲' },
+  'name:力佳爽錠０．５公絲': { name: '力佳爽錠０．５公絲' },
+  'name:CEPHENDOL 25MG': { name: 'CEPHENDOL 25MG' },
+  'name:25MG CEPHENDOL': { name: '25MG CEPHENDOL' },
+  'name:cephendol  s.c.': { name: 'cephendol  s.c.' },
+  'name:25毫克': { name: '25毫克' },
+  'name:錠 500': { name: '錠 500' },
+  'name:sodium': { name: 'sodium' },
 };
 
 const out = { cases: {} };
@@ -559,6 +615,12 @@ if (JSON.stringify(out.cases['imprint:M 40']) !== JSON.stringify({
   ...out.cases['imprint:40 M'], criteria: out.cases['imprint:M 40'].criteria,
 })) {
   problems.push('「M 40」與「40 M」的結果不相等');
+}
+
+// D39／M1：全形查詢與半形查詢的五區必須逐一相等（criteria 除外）
+for (const [full, half] of [['imprint:１０', 'imprint:10'], ['imprint:Ｍ　４０', 'imprint:M 40']]) {
+  const strip = (c) => JSON.stringify({ ...c, criteria: null });
+  if (strip(out.cases[full]) !== strip(out.cases[half])) problems.push(`「${full}」與「${half}」的結果不相等`);
 }
 
 if (problems.length) {

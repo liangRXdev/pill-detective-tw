@@ -83,9 +83,14 @@ export function splitMulti(v) {
  *
  * `;;;` 在此一併被當成分隔符處理（`;` 不是 `[A-Z0-9]`），
  * 因此不會產生黏合 token（驗收 B5）。
+ *
+ * **NFKC 必須在 toUpperCase 之前**（D39）：全形 `ＴＣ１００` 不先轉半形的話，
+ * `１００` 不屬於 `[A-Z0-9]` 而被當成分隔符丟掉，只剩 `TC`——
+ * 且因為仍有 1 個 token，連 noToken 提示都不會出現（驗收 B23b）。
  */
 export function normalizeImprintField(v) {
   return String(v ?? '')
+    .normalize('NFKC')
     .toUpperCase()
     .replace(/[^A-Z0-9]+/g, ' ')
     .trim()
@@ -189,9 +194,15 @@ export function recordCanonTokens(item) {
   return recordTokens(item).map(canon);
 }
 
-/** 名稱比較一律先大寫（D1.1）。中文與許可證字號無大小寫，不受影響。 */
+/**
+ * 名稱正規化（D1.1 ＋ D39）：NFKC → 大寫 → 收合連續空白 → trim。
+ *
+ * TFDA 中文品名有上千筆用全形數字（`力佳爽錠０．５公絲`）。只做 toUpperCase 時，
+ * 半形查詢 `0.5` 對這些記錄**全部是 mismatch**——而名稱恆可判定、沒有 unknown，
+ * 所以這批藥會直接落入 EMPTY，畫面說「找不到」。那是本工具最怕的漏檢。
+ */
 export function normalizeName(s) {
-  return String(s ?? '').toUpperCase();
+  return String(s ?? '').normalize('NFKC').toUpperCase().replace(/\s+/g, ' ').trim();
 }
 
 /**
@@ -288,6 +299,41 @@ export function freshnessView(meta, status, now = new Date()) {
     days: show ? days : null,
     stale: show && days > STALE_DAYS,
   };
+}
+
+// ── 前端資料契約（D16）──────────────────────────────────────────────
+
+/**
+ * 前端資料載入的逐筆契約檢查（D16）。回傳第一個違反的描述；合法回 `null`。
+ *
+ * 從 `app.js` 抽出來是為了**測得到**（驗收 B24）——理由同 `freshnessView`：
+ * 本專案沒有 jsdom，留在 app.js 裡就只剩原始碼掃描。
+ *
+ * 只檢查 schema 與「items 非空」是不夠的：若 items 非空但個別記錄損壞，
+ * 資料仍會進入搜尋並產生**部分結果**——那是最危險的一種，畫面看起來正常。
+ */
+export function contractErrors(payload) {
+  if (!payload || typeof payload !== 'object') return '回應不是物件';
+  if (payload.meta?.schema !== 1) return `meta.schema 不是 1（${JSON.stringify(payload.meta?.schema)}）`;
+  if ('images_complete' in payload.meta && typeof payload.meta.images_complete !== 'boolean') {
+    return 'meta.images_complete 不是 boolean';
+  }
+  if (!Array.isArray(payload.items)) return 'items 不是陣列';
+  if (payload.items.length === 0) return 'items 為空';
+  const seen = new Set();
+  for (const it of payload.items) {
+    if (!it || typeof it.id !== 'string' || !it.id) return '有記錄缺 id';
+    if (seen.has(it.id)) return `id 重複：${it.id}`;
+    seen.add(it.id);
+    for (const f of ['color', 'shape', 'score_mark', 'size']) {
+      if (!Array.isArray(it[f])) return `${it.id} 的 ${f} 不是陣列`;
+    }
+    if (!Array.isArray(it.imgs)) return `${it.id} 的 imgs 不是陣列`;
+    for (const g of it.imgs) {
+      if (!g || typeof g.file !== 'string' || typeof g.src !== 'string') return `${it.id} 的 imgs 結構損壞`;
+    }
+  }
+  return null;
 }
 
 /**
@@ -503,13 +549,18 @@ export function variantReasons(tokens, canonTokens, queryTokens) {
  *
  * 因此名稱不命中一律是 mismatch，不會把記錄推進未提供區——
  * 這點與顏色/形狀/刻痕/imprint 不同，是資料性質決定的，不是取捨。
+ *
+ * D39：查詢依空白切詞，**每個詞**都要是 zh／en／id **任一欄**的子字串（詞間 AND、欄間 OR）。
+ * `CEPHENDOL 25MG` 對 `CEPHENDOL S.C. TABLETS 25MG` 在整串 includes 下是 mismatch。
+ *
+ * 新規則是舊規則的**超集合**：整串是某欄子字串 ⇒ 每個詞也是（驗收 A19c）。
+ * 不要求各詞落在同一欄：使用者不會知道「25MG」記在中文還是英文品名，
+ * 要求同欄全中會製造漏檢——與 D3 的 imprint 跨欄聯集同一條理由。
  */
 export function nameCondition(item, query) {
-  const raw = String(query ?? '').trim();
-  const q = normalizeName(raw);
-  const hit = normalizeName(item.zh).includes(q)
-    || normalizeName(item.en).includes(q)
-    || String(item.id ?? '').includes(raw);
+  const words = normalizeName(query).split(' ').filter(Boolean);
+  const fields = [normalizeName(item.zh), normalizeName(item.en), normalizeName(item.id)];
+  const hit = words.every((w) => fields.some((f) => f.includes(w)));
   return hit ? Cond.MATCH : Cond.MISMATCH;
 }
 

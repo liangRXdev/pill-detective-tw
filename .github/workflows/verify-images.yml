@@ -17,7 +17,7 @@ on:
   workflow_dispatch:
     inputs:
       sample:
-        description: '抽樣深驗張數'
+        description: '抽樣深驗張數（1–9999 的正整數）'
         default: '100'
 
 concurrency:
@@ -39,10 +39,18 @@ jobs:
       # 對**已發布**的版本檢查。這裡刻意不重建 canonical：
       # 要驗的是「線上這一版的圖片是否仍與官方相同」，不是產一個新版本。
       # freshness 模式**不寫入任何檔案**（由 fetch_images_probe.py 的斷言守著）。
+      #
+      # 輸入**走 env、不內插進 run**：`${{ }}` 在 run 裡是字串替換後才交給 shell，
+      # `100; curl … | sh` 就是一行指令。驗證為 1–9999 的正整數才往下跑（C25b）。
       - name: 新鮮度檢查
-        run: >
-          uv run tools/fetch-images.py --in data/appearance.json
-          --freshness --sample ${{ github.event.inputs.sample || '100' }}
+        env:
+          SAMPLE: ${{ github.event.inputs.sample || '100' }}
+        run: |
+          if ! [[ "$SAMPLE" =~ ^[1-9][0-9]{0,3}$ ]]; then
+            echo "::error::sample 必須是 1–9999 的正整數，收到：$SAMPLE"
+            exit 1
+          fi
+          uv run tools/fetch-images.py --in data/appearance.json --freshness --sample "$SAMPLE"
 
       # 有發現 → 開 issue。**不自動更新圖片**：
       # 官方換圖可能代表藥品外觀真的變了，需要人看過。
